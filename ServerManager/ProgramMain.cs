@@ -8,11 +8,18 @@ namespace blog.dachs.ServerManager
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
+            try
+            {
+                // To customize application configuration such as set high DPI settings or default font,
+                // see https://aka.ms/applicationconfiguration.
+                ApplicationConfiguration.Initialize();
 
-            ServerManagerGuiMain serverManagerGuiMain = new ServerManagerGuiMain();
+                ServerManagerGuiMain serverManagerGuiMain = new ServerManagerGuiMain();
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }
