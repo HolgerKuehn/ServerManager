@@ -6,47 +6,61 @@ using System.Threading.Tasks;
 
 namespace blog.dachs.ServerManager
 {
-    public enum DataLogEntrySeverity
-    {
-        Debug,
-        Info,
-        Critical
-    }
-
-    public enum DataLogEntryOrigin
-    {
-        DataLogEntry_Constructor
-    }
-
     internal class DataLogEntry
     {
-        private DataLogEntrySeverity dataLogEntrySeverity = DataLogEntrySeverity.Info;
-        private DataLogEntryOrigin dataLogEntryOrigin = DataLogEntryOrigin.DataLogEntry_Constructor;
-        private string dataLogEntryMessage = string.Empty;
+        private DataLogSeverity dataLogSeverity = DataLogSeverity.Informational;
+        private DataLogOrigin dataLogOrigin     = DataLogOrigin.ProgramMain_Main;
+        private string dataLogMessage           = string.Empty;
 
-        public DataLogEntry(DataLogEntrySeverity dataLogEntrySeverity, DataLogEntryOrigin dataLogEntryOrigin, string dataLogEntryMessage)
+        public DataLogEntry(DataLogSeverity dataLogSeverity, DataLogOrigin dataLogOrigin, string dataLogMessage)
         {
-            DataLogEntrySeverity = dataLogEntrySeverity;
-            DataLogEntryOrigin = dataLogEntryOrigin;
-            DataLogEntryMessage = dataLogEntryMessage;
+            DataLogSeverity = dataLogSeverity;
+            DataLogOrigin   = dataLogOrigin;
+            DataLogMessage  = dataLogMessage;
         }
 
-        protected DataLogEntrySeverity DataLogEntrySeverity
+        public DataLogSeverity DataLogSeverity
         {
-            get { return this.dataLogEntrySeverity; }
-            set { this.dataLogEntrySeverity = value; }
+            get { return this.dataLogSeverity; }
+            set { this.dataLogSeverity = value; }
         }
 
-        protected DataLogEntryOrigin DataLogEntryOrigin
+        public DataLogOrigin DataLogOrigin
         {
-            get { return this.dataLogEntryOrigin; }
-            set { this.dataLogEntryOrigin = value; }
+            get { return this.dataLogOrigin; }
+            set { this.dataLogOrigin = value; }
         }
 
-        protected string DataLogEntryMessage
+        public string DataLogMessage
         {
-            get { return this.dataLogEntryMessage; }
-            set { this.dataLogEntryMessage = value; }
+            get { return this.dataLogMessage; }
+            set { this.dataLogMessage = value; }
+        }
+
+        public string DataLogInsert()
+        { 
+            string sqlInsertHeader = string.Empty;
+            string sqlInsertValue = string.Empty;
+
+            sqlInsertHeader += "insert into DataLog ";
+            sqlInsertHeader += "   (";
+            sqlInsertValue  += "select ";
+
+            sqlInsertHeader +=                "DataLog_Timestamp, ";
+            sqlInsertValue  += "unixepoch() as DataLog_Timestamp, ";
+
+            sqlInsertHeader +=                                              "DataLogSeverity_ID, ";
+            sqlInsertValue  += ((int)this.DataLogSeverity).ToString() + " as DataLogSeverity_ID, ";
+
+            sqlInsertHeader +=                                            "DataLogOrigin_ID, ";
+            sqlInsertValue  += ((int)this.DataLogOrigin).ToString() + " as DataLogOrigin_ID, ";
+
+            sqlInsertHeader +=                                    "DataLog_Message";
+            sqlInsertValue  += "\"" + this.DataLogMessage + "\" as DataLog_Message";
+
+            sqlInsertHeader += ") ";
+
+            return sqlInsertHeader + sqlInsertValue;
         }
     }
 }
