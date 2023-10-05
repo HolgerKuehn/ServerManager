@@ -2,15 +2,19 @@ namespace blog.dachs.ServerManager
 {
     public partial class ServerManagerGuiWindowLog : Form
     {
-        private HandlerSqlite handlerSqlite;
+        private readonly DataLog dataLog;
+        private readonly HandlerSqlite handlerSqlite;
 
-        public ServerManagerGuiWindowLog(HandlerSqlite serverManagerSqlite)
+        public ServerManagerGuiWindowLog(DataLog dataLog)
         {
-            this.handlerSqlite = serverManagerSqlite;
+            this.handlerSqlite = new HandlerSqlite();
+            this.dataLog = dataLog;
 
             // initialze Log Window and default values
+            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiWindowLog_ServerManagerGuiWindowLog, "initializing ServerManagerGuiWindowLog"));
             InitializeComponent();
 
+            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiWindowLog_ServerManagerGuiWindowLog, "initializing clbServerManagerGuiWindowLogSeverity"));
             clbServerManagerGuiWindowLogSeverity.Items.Add(new ServerManagerGuiCheckedListBoxItem("Emergency", DataLogSeverity.Emergency), CheckState.Checked);
             clbServerManagerGuiWindowLogSeverity.Items.Add(new ServerManagerGuiCheckedListBoxItem("Alert", DataLogSeverity.Alert), CheckState.Checked);
             clbServerManagerGuiWindowLogSeverity.Items.Add(new ServerManagerGuiCheckedListBoxItem("Critical", DataLogSeverity.Critical), CheckState.Checked);
@@ -21,8 +25,19 @@ namespace blog.dachs.ServerManager
             clbServerManagerGuiWindowLogSeverity.Items.Add(new ServerManagerGuiCheckedListBoxItem("Debug", DataLogSeverity.Debug), CheckState.Unchecked);
         }
 
+        public DataLog DataLog
+        {
+            get { return this.dataLog; }
+        }
+
+        public HandlerSqlite HandlerSqlite
+        {
+            get { return this.handlerSqlite; }
+        }
+
         private void WindowLog_Shown(object sender, EventArgs e)
         {
+            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiWindowLog_WindowLog_Shown, "initializing clbServerManagerGuiWindowLogSeverity"));
             this.Hide();
         }
 
@@ -41,8 +56,12 @@ namespace blog.dachs.ServerManager
             command += "limit 10000; ";
 
 
+            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiWindowLog_tmrServerManagerGuiWindowLog_Tick, "reading DataTable dgvServerManagerGuiWindowLogLog"));
+            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiWindowLog_tmrServerManagerGuiWindowLog_Tick, command));
             dgvServerManagerGuiWindowLogLog.DataSource = this.handlerSqlite.GetDataTable(command);
 
+            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiWindowLog_tmrServerManagerGuiWindowLog_Tick, "setting column properties on dgvServerManagerGuiWindowLogLog"));
+            
             // DataLog_ID
             dgvServerManagerGuiWindowLogLog.Columns[0].Visible = false;
 
@@ -81,6 +100,7 @@ namespace blog.dachs.ServerManager
         {
             if(this.Visible)
             {
+                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiWindowLog_tmrServerManagerGuiWindowLog_Tick, "setting column properties on dgvServerManagerGuiWindowLogLog"));
                 tmrServerManagerGuiWindowLog.Enabled = true;
                 tmrServerManagerGuiWindowLog_Tick(sender, e);
             }

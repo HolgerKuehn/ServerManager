@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace blog.dachs.ServerManager
+﻿namespace blog.dachs.ServerManager
 {
-    internal class DataLogEntry
+    public class DataLogEntry
     {
         private DataLogSeverity dataLogSeverity = DataLogSeverity.Informational;
         private DataLogOrigin dataLogOrigin     = DataLogOrigin.ProgramMain_Main;

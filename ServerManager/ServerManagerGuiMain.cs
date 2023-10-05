@@ -21,7 +21,7 @@
 
             // initialize log window
             dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiMain_ServerManagerGuiMain, "initializing ServerManagerGuiWindowLog"));
-            windowLog = new ServerManagerGuiWindowLog(new HandlerSqlite());
+            windowLog = new ServerManagerGuiWindowLog(dataLog);
             Application.Run(windowLog);
         }
 

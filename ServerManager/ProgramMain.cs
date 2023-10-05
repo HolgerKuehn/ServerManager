@@ -24,7 +24,7 @@ namespace blog.dachs.ServerManager
             }
             catch (Exception ex)
             {
-
+                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Critical, DataLogOrigin.ProgramMain_Main, "caught exception: " + ex.Message));
             }
         }
     }
