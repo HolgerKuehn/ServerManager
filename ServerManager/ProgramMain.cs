@@ -19,8 +19,8 @@ namespace blog.dachs.ServerManager
                 dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ProgramMain_Main, "initializing ApplicationConfiguration"));
                 ApplicationConfiguration.Initialize();
 
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ProgramMain_Main, "creating new ServerManagerGuiMain"));
-                ServerManagerGuiMain serverManagerGuiMain = new ServerManagerGuiMain(dataLog);
+                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ProgramMain_Main, "creating new GuiMain"));
+                GuiMain GuiMain = new GuiMain(dataLog);
             }
             catch (Exception ex)
             {

@@ -15,12 +15,12 @@
     public enum DataLogOrigin
     {
         ProgramMain_Main = 1,
-        ServerManagerGuiMain_ServerManagerGuiMain = 2,
-        ServerManagerGuiMain_SystemTrayIcon_OnLogClicked = 3,
-        ServerManagerGuiWindowLog_ServerManagerGuiWindowLog = 4,
-        ServerManagerGuiWindowLog_WindowLog_Shown = 5,
-        ServerManagerGuiWindowLog_tmrServerManagerGuiWindowLog_Tick = 6
-        ServerManagerGuiWindowLog_VisibleChanged
+        GuiMain_GuiMain = 2,
+        GuiMain_SystemTrayIcon_OnLogClicked = 3,
+        GuiWindowLog_GuiWindowLog = 4,
+        GuiWindowLog_GuiWindowLog_Shown = 5,
+        GuiWindowLog_tmrGuiWindowLog_Tick = 6,
+        GuiWindowLog_GuiWindowLog_VisibleChanged = 7
     }
 
 public class DataLog

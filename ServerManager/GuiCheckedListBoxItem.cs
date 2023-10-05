@@ -1,11 +1,11 @@
 ﻿namespace blog.dachs.ServerManager
 {
-    internal class ServerManagerGuiCheckedListBoxItem
+    internal class GuiCheckedListBoxItem
     {
         private string text;
         private object value;
 
-        public ServerManagerGuiCheckedListBoxItem(string text, object value)
+        public GuiCheckedListBoxItem(string text, object value)
         {
             this.text = text;
             this.value = value;

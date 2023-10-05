@@ -1,17 +1,17 @@
 ﻿namespace blog.dachs.ServerManager
 {
-    internal class ServerManagerGuiMain
+    internal class GuiMain
     {
         private readonly NotifyIcon systemTrayIcon;
         private readonly Form windowLog;
         private readonly DataLog dataLog;
 
-        public ServerManagerGuiMain(DataLog dataLog)
+        public GuiMain(DataLog dataLog)
         {
             this.dataLog = dataLog;
 
             // initialize system tray icon
-            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiMain_ServerManagerGuiMain, "initializing systemTrayIcon"));
+            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.GuiMain_GuiMain, "initializing systemTrayIcon"));
             systemTrayIcon = new NotifyIcon();
             systemTrayIcon.Icon = new Icon("Icon\\48.ico");
             systemTrayIcon.Visible = true;
@@ -20,8 +20,8 @@
             systemTrayIcon.ContextMenuStrip.Items.Add("Log", Image.FromFile("Icon\\48.ico"), SystemTrayIcon_OnLogClicked);
 
             // initialize log window
-            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiMain_ServerManagerGuiMain, "initializing ServerManagerGuiWindowLog"));
-            windowLog = new ServerManagerGuiWindowLog(dataLog);
+            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.GuiMain_GuiMain, "initializing GuiWindowLog"));
+            windowLog = new GuiWindowLog(dataLog);
             Application.Run(windowLog);
         }
 
@@ -29,12 +29,12 @@
         {
             if (windowLog.Visible)
             {
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiMain_ServerManagerGuiMain, "hiding ServerManagerGuiWindowLog"));
+                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.GuiMain_GuiMain, "hiding GuiWindowLog"));
                 windowLog.Hide();
             }
             else
             {
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ServerManagerGuiMain_ServerManagerGuiMain, "showing ServerManagerGuiWindowLog"));
+                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.GuiMain_GuiMain, "showing GuiWindowLog"));
                 windowLog.Show();
             }
         }
