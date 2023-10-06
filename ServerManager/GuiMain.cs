@@ -4,14 +4,14 @@
     {
         private readonly NotifyIcon systemTrayIcon;
         private readonly Form windowLog;
-        private readonly DataLog dataLog;
+        private readonly Log Log;
 
-        public GuiMain(DataLog dataLog)
+        public GuiMain(Log Log)
         {
-            this.dataLog = dataLog;
+            this.Log = Log;
 
             // initialize system tray icon
-            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.GuiMain_GuiMain, "initializing systemTrayIcon"));
+            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiMain_GuiMain, "initializing systemTrayIcon"));
             systemTrayIcon = new NotifyIcon();
             systemTrayIcon.Icon = new Icon("Icon\\48.ico");
             systemTrayIcon.Visible = true;
@@ -20,8 +20,8 @@
             systemTrayIcon.ContextMenuStrip.Items.Add("Log", Image.FromFile("Icon\\48.ico"), SystemTrayIcon_OnLogClicked);
 
             // initialize log window
-            dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.GuiMain_GuiMain, "initializing GuiWindowLog"));
-            windowLog = new GuiWindowLog(dataLog);
+            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiMain_GuiMain, "initializing GuiWindowLog"));
+            windowLog = new GuiWindowLog(Log);
             Application.Run(windowLog);
         }
 
@@ -29,12 +29,12 @@
         {
             if (windowLog.Visible)
             {
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.GuiMain_GuiMain, "hiding GuiWindowLog"));
+                Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiMain_GuiMain, "hiding GuiWindowLog"));
                 windowLog.Hide();
             }
             else
             {
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.GuiMain_GuiMain, "showing GuiWindowLog"));
+                Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiMain_GuiMain, "showing GuiWindowLog"));
                 windowLog.Show();
             }
         }

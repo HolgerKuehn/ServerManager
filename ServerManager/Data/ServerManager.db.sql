@@ -27,37 +27,37 @@ CREATE TABLE IF NOT EXISTS "Configuration" (
 	"Configuration_Services"	INTEGER NOT NULL DEFAULT '0',
 	PRIMARY KEY("Configuration_ID")
 );
-CREATE TABLE IF NOT EXISTS "DataLogSeverity" (
-	"DataLogSeverity_ID"	INTEGER NOT NULL,
-	"DataLogSeverity_Name"	TEXT NOT NULL UNIQUE,
-	PRIMARY KEY("DataLogSeverity_ID")
+CREATE TABLE IF NOT EXISTS "LogSeverity" (
+	"LogSeverity_ID"	INTEGER NOT NULL,
+	"LogSeverity_Name"	TEXT NOT NULL UNIQUE,
+	PRIMARY KEY("LogSeverity_ID")
 );
-CREATE TABLE IF NOT EXISTS "DataLogOrigin" (
-	"DataLogOrigin_ID"	INTEGER NOT NULL,
-	"DataLogOrigin_Class"	TEXT NOT NULL,
-	"DataLogOrigin_Function"	TEXT NOT NULL,
-	"DataLogOrigin_Step"	TEXT NOT NULL,
-	PRIMARY KEY("DataLogOrigin_ID")
+CREATE TABLE IF NOT EXISTS "LogOrigin" (
+	"LogOrigin_ID"	INTEGER NOT NULL,
+	"LogOrigin_Class"	TEXT NOT NULL,
+	"LogOrigin_Function"	TEXT NOT NULL,
+	"LogOrigin_Step"	TEXT NOT NULL,
+	PRIMARY KEY("LogOrigin_ID")
 );
-CREATE TABLE IF NOT EXISTS "DataLog" (
-	"DataLog_ID"	INTEGER NOT NULL,
-	"DataLog_Timestamp"	INTEGER NOT NULL,
-	"DataLogSeverity_ID"	INTEGER NOT NULL,
-	"DataLogOrigin_ID"	INTEGER NOT NULL,
-	"DataLog_Message"	TEXT NOT NULL,
-	PRIMARY KEY("DataLog_ID" AUTOINCREMENT)
+CREATE TABLE IF NOT EXISTS "Log" (
+	"Log_ID"	INTEGER NOT NULL,
+	"Log_Timestamp"	INTEGER NOT NULL,
+	"LogSeverity_ID"	INTEGER NOT NULL,
+	"LogOrigin_ID"	INTEGER NOT NULL,
+	"Log_Message"	TEXT NOT NULL,
+	PRIMARY KEY("Log_ID" AUTOINCREMENT)
 );
-INSERT INTO "DataLogSeverity" VALUES (1,'Debug');
-INSERT INTO "DataLogSeverity" VALUES (2,'Informational');
-INSERT INTO "DataLogSeverity" VALUES (4,'Notice');
-INSERT INTO "DataLogSeverity" VALUES (8,'Warning');
-INSERT INTO "DataLogSeverity" VALUES (16,'Error');
-INSERT INTO "DataLogSeverity" VALUES (32,'Critical');
-INSERT INTO "DataLogSeverity" VALUES (64,'Alert');
-INSERT INTO "DataLogSeverity" VALUES (128,'Emergency');
-INSERT INTO "DataLogOrigin" VALUES (1,'ProgramMain','Main','');
-INSERT INTO "DataLogOrigin" VALUES (2,'GuiMain','GuiMain','');
-INSERT INTO "DataLogOrigin" VALUES (3,'GuiMain','DataLogEntryOrigin','');
-INSERT INTO "DataLogOrigin" VALUES (4,'DataLogEntry','DataLogEntryMessage','');
-INSERT INTO "DataLogOrigin" VALUES (5,'ProgramMain','Main','');
+INSERT INTO "LogSeverity" VALUES (1,'Debug');
+INSERT INTO "LogSeverity" VALUES (2,'Informational');
+INSERT INTO "LogSeverity" VALUES (4,'Notice');
+INSERT INTO "LogSeverity" VALUES (8,'Warning');
+INSERT INTO "LogSeverity" VALUES (16,'Error');
+INSERT INTO "LogSeverity" VALUES (32,'Critical');
+INSERT INTO "LogSeverity" VALUES (64,'Alert');
+INSERT INTO "LogSeverity" VALUES (128,'Emergency');
+INSERT INTO "LogOrigin" VALUES (1,'ProgramMain','Main','');
+INSERT INTO "LogOrigin" VALUES (2,'GuiMain','GuiMain','');
+INSERT INTO "LogOrigin" VALUES (3,'GuiMain','LogEntryOrigin','');
+INSERT INTO "LogOrigin" VALUES (4,'LogEntry','LogEntryMessage','');
+INSERT INTO "LogOrigin" VALUES (5,'ProgramMain','Main','');
 COMMIT;

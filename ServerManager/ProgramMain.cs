@@ -1,6 +1,6 @@
 namespace blog.dachs.ServerManager
 {
-    internal static class ProgramMain
+    public static class ProgramMain
     {
         /// <summary>
         ///  The main entry point for the application.
@@ -8,23 +8,29 @@ namespace blog.dachs.ServerManager
         [STAThread]
         static void Main()
         {
-            DataLog dataLog = new DataLog();
+            ThreadCollection threadCollection = new ThreadCollection();
+
+            Log log = new Log();
 
             try
             {
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Informational, DataLogOrigin.ProgramMain_Main, "starting ServerManager"));
+                log.WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ProgramMain_Main, "starting ServerManager"));
+
+                log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "create new ThreadDynDns"));
+                threadCollection.ThreadDynDns(log);
+
 
                 // To customize application configuration such as set high DPI settings or default font,
                 // see https://aka.ms/applicationconfiguration.
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ProgramMain_Main, "initializing ApplicationConfiguration"));
+                log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "initializing ApplicationConfiguration"));
                 ApplicationConfiguration.Initialize();
 
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Debug, DataLogOrigin.ProgramMain_Main, "creating new GuiMain"));
-                GuiMain GuiMain = new GuiMain(dataLog);
+                log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "creating new GuiMain"));
+                GuiMain GuiMain = new GuiMain(log);
             }
             catch (Exception ex)
             {
-                dataLog.WriteLog(new DataLogEntry(DataLogSeverity.Critical, DataLogOrigin.ProgramMain_Main, "caught exception: " + ex.Message));
+                log.WriteLog(new LogEntry(LogSeverity.Critical, LogOrigin.ProgramMain_Main, "caught exception: " + ex.Message.Replace("\"", "\"\"")));
             }
         }
     }

@@ -112,7 +112,7 @@
             // 
             tmrGuiWindowLog.Enabled = true;
             tmrGuiWindowLog.Interval = 60000;
-            tmrGuiWindowLog.Tick += tmrGuiWindowLog_Tick;
+            tmrGuiWindowLog.Tick += TmrGuiWindowLog_Tick;
             // 
             // GuiWindowLog
             // 
