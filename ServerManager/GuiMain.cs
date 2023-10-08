@@ -2,9 +2,9 @@
 {
     internal class GuiMain
     {
+        private readonly Log Log;
         private readonly NotifyIcon systemTrayIcon;
         private readonly Form windowLog;
-        private readonly Log Log;
 
         public GuiMain(Log Log)
         {

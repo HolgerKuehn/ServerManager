@@ -1,40 +1,65 @@
-﻿using System.Data;
-using System.Text;
-
-namespace blog.dachs.ServerManager
+﻿namespace blog.dachs.ServerManager
 {
+    using System.Data;
+    
     public class ThreadDynDns : ThreadWorker
     {
         private Log log;
-        private HandlerSqlite handlerSqlite;
-        private DynDnsDomainCollection dynDnsDomains;
+        private HandlerDatabase handlerDatabase;
+        private DynDnsServer dynDnsServer;
 
         public ThreadDynDns(Log log)
         {
             this.Log = log;
-            this.HandlerSqlite = new HandlerSqlite();
-            this.DynDnsDomains = new DynDnsDomainCollection();
+            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase();
 
-            string sqlCommand = string.Empty;
-
-            sqlCommand += "select a.DynDnsDomain_ID ";
-            sqlCommand += "from DynDnsDomain as a ";
-            sqlCommand += "where a.Configuration_ID = " + this.Log.ConfigurationID.ToString();
-
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading Domains"));
+            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServiceType"));
+            
+            string sqlCommand = this.HandlerDatabase.GetSqlCommand(DatabaseSqlCommand.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
+            sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Log.ConfigurationID.ToString());
+            
             Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand)); 
-            DataTable dataTable = this.HandlerSqlite.GetDataTable(sqlCommand);
-            DataRow dataRow = null;
-            int dynDnsDomainID = 0;
-            DynDnsDomain dynDnsDomain = null;
 
-            // iterate each Domain
+            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            DataRow dataRow = null;
+            DynDnsServiceType dynDnsServiceType = DynDnsServiceType.Server;
+
+            // get DynDnsServiceType for server 
             for (int row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
-                dynDnsDomainID = Convert.ToInt32(dataRow[0].ToString());
-                dynDnsDomain = new DynDnsDomain(this.Log, dynDnsDomainID);
-                this.DynDnsDomains.Add(dynDnsDomain);
+                dynDnsServiceType = (DynDnsServiceType)Convert.ToInt32(dataRow[0].ToString());
+            }
+
+
+            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServer"));
+
+            sqlCommand = this.HandlerDatabase.GetSqlCommand(DatabaseSqlCommand.ThreadDynDns_ThreadDynDns_DynDnsServer);
+            sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Log.ConfigurationID.ToString());
+
+            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
+
+            dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            dataRow = null;
+            int dynDnsServiceID = 0;
+
+            // get DynDnsServiceID for server 
+            for (int row = 0; row < dataTable.Rows.Count; row++)
+            {
+                dataRow = dataTable.Rows[row];
+                dynDnsServiceID = Convert.ToInt32(dataRow[0].ToString());
+            }
+
+            // create Server accordingly to it
+            switch (dynDnsServiceType)
+            {
+                case DynDnsServiceType.ServiceLocal:
+                    dynDnsServer = new DynDnsServerLocal(log, dynDnsServiceID);
+                    break;
+
+                case DynDnsServiceType.ServiceRemote:
+                    dynDnsServer = new DynDnsServerRemote(log, dynDnsServiceID);
+                    break;
             }
         }
 
@@ -44,26 +69,23 @@ namespace blog.dachs.ServerManager
             set { this.log = value; }
         }
 
-        public HandlerSqlite HandlerSqlite
+        public HandlerDatabase HandlerDatabase
         {
-            get { return this.handlerSqlite; }
-            set { this.handlerSqlite = value; }
+            get { return this.handlerDatabase; }
+            set { this.handlerDatabase = value; }
         }
 
-        public DynDnsDomainCollection DynDnsDomains
+        public DynDnsServer DynDnsServer
         {
-            get { return this.dynDnsDomains; }
-            set { this.dynDnsDomains = value; }
+            get { return this.dynDnsServer; }
+            set { this.dynDnsServer = value; }
         }
 
         public override void Work()
         {
             while (true)
             {
-                foreach (DynDnsDomain dynDnsDomain in this.DynDnsDomains)
-                {
                 
-                }
 
                 Thread.Sleep(120000);
             }

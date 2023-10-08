@@ -4,21 +4,32 @@ namespace blog.dachs.ServerManager
 {
     public class DynDnsDnsServer
     {
-        private Dictionary<DynDnsIpAddressVersion, DynDnsIpAddress> networkDnsServer;
+        private Dictionary<DynDnsIpAddressVersion, DynDnsIpAddress> dynDnsDnsServer;
 
         public DynDnsDnsServer()
         {
-            this.networkDnsServer = new Dictionary<DynDnsIpAddressVersion, DynDnsIpAddress>();
+            this.dynDnsDnsServer = new Dictionary<DynDnsIpAddressVersion, DynDnsIpAddress>();
         }
 
-        public DynDnsIpAddress GetNetworkDnsServer(DynDnsIpAddressVersion ipVersion)
+        public DynDnsIpAddress GetDynDnsDnsServer(DynDnsIpAddressVersion ipVersion)
         {
-            return this.networkDnsServer[ipVersion];
+            return this.dynDnsDnsServer[ipVersion];
         }
 
-        public void SetNetworkDnsServer(DynDnsIpAddressVersion DynDnsIpAddressVersion, DynDnsIpAddress networkIPAddress)
+        public void SetDynDnsDnsServer(DynDnsIpAddressVersion DynDnsIpAddressVersion, DynDnsIpAddress dynDnsDnsServerAddress)
         {
-            this.networkDnsServer[DynDnsIpAddressVersion] = networkIPAddress;
+            this.dynDnsDnsServer[DynDnsIpAddressVersion] = dynDnsDnsServerAddress;
+        }
+
+        public void SetDynDnsDnsServer(DynDnsIpAddressVersion DynDnsIpAddressVersion, DynDnsIpAddress dynDnsDnsServerAddress, byte dynDnsDnsServerIpAddressPrefixLength)
+        {
+            this.dynDnsDnsServer[DynDnsIpAddressVersion] = dynDnsDnsServerAddress;
+            this.SetDynDnsDnsServerIpAddressPrefixLength(DynDnsIpAddressVersion, dynDnsDnsServerIpAddressPrefixLength);
+        }
+
+        public void SetDynDnsDnsServerIpAddressPrefixLength(DynDnsIpAddressVersion DynDnsIpAddressVersion, byte dynDnsDnsServerIpAddressPrefixLength)
+        {
+            this.dynDnsDnsServer[DynDnsIpAddressVersion].PrefixLength = dynDnsDnsServerIpAddressPrefixLength;
         }
     }
 }

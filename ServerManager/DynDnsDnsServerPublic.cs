@@ -4,8 +4,8 @@
     {
         public DynDnsDnsServerPublic()
         {
-            this.SetNetworkDnsServer(DynDnsIpAddressVersion.IPv4, new DynDnsIpAddress("45.90.28.58"));
-            this.SetNetworkDnsServer(DynDnsIpAddressVersion.IPv6, new DynDnsIpAddress("2a07:a8c0::6d:cda2"));
+            this.SetDynDnsDnsServer(DynDnsIpAddressVersion.IPv4, new DynDnsIpAddress("45.90.28.58"), 32);
+            this.SetDynDnsDnsServer(DynDnsIpAddressVersion.IPv6, new DynDnsIpAddress("2a07:a8c0::6d:cda2"), 128);
         }
     }
 }

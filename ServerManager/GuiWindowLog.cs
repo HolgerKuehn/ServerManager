@@ -3,11 +3,11 @@ namespace blog.dachs.ServerManager
     public partial class GuiWindowLog : Form
     {
         private readonly Log log;
-        private readonly HandlerSqlite handlerSqlite;
+        private readonly HandlerDatabase handlerDatabase;
 
         public GuiWindowLog(Log log)
         {
-            this.handlerSqlite = new HandlerSqlite();
+            this.handlerDatabase = HandlerDatabase.GetHandlerDatabase();
             this.log = log;
 
             // initialze Log Window and default values
@@ -30,9 +30,9 @@ namespace blog.dachs.ServerManager
             get { return this.log; }
         }
 
-        public HandlerSqlite HandlerSqlite
+        public HandlerDatabase HandlerDatabase
         {
-            get { return this.handlerSqlite; }
+            get { return this.handlerDatabase; }
         }
 
         private void GuiWindowLog_Shown(object sender, EventArgs e)
@@ -58,7 +58,7 @@ namespace blog.dachs.ServerManager
 
             Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, "reading DataTable dgvGuiWindowLogLog"));
             Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, command));
-            dgvGuiWindowLogLog.DataSource = this.handlerSqlite.GetDataTable(command);
+            dgvGuiWindowLogLog.DataSource = this.HandlerDatabase.GetDataTable(command);
 
             Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, "setting column properties on dgvGuiWindowLogLog"));
             

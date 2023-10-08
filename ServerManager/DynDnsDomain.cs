@@ -6,7 +6,7 @@ namespace blog.dachs.ServerManager
     public class DynDnsDomain
     {
         private Log log;
-        private HandlerSqlite handlerSqlite;
+        private HandlerDatabase handlerDatabase;
         private int dynDnsDomainID;
         private string dynDnsDomainName;
         private string dynDnsDomainUser;
@@ -15,20 +15,18 @@ namespace blog.dachs.ServerManager
         public DynDnsDomain(Log log, int dynDnsDomainID)
         {
             this.Log = log;
-            this.handlerSqlite = new HandlerSqlite();
+            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase();
 
             this.DynDnsDomainID = dynDnsDomainID;
 
-            string sqlCommand = string.Empty;
-
-            
-            sqlCommand += "select a.DynDnsDomain_Name, a.DynDnsDomain_User, a.DynDnsDomain_Password ";
-            sqlCommand += "from DynDnsDomain as a ";
-            sqlCommand += "where a.DynDnsDomain_ID = " + this.DynDnsDomainID.ToString();
-
             Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "creating DynDnsDomain with DynDnsDomain_ID = " + this.DynDnsDomainID.ToString()));
+            
+            string sqlCommand = this.HandlerDatabase.GetSqlCommand(DatabaseSqlCommand.DynDnsDomain_DynDnsDomain);
+            sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.DynDnsDomainID.ToString());
+
             Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
-            DataTable dataTable = this.HandlerSqlite.GetDataTable(sqlCommand);
+
+            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             DataRow dataRow = null;
             string dynDnsDomainName = string.Empty;
             string dynDnsDomainUserBase64 = string.Empty;
@@ -72,10 +70,10 @@ namespace blog.dachs.ServerManager
             set { this.log = value; }
         }
 
-        public HandlerSqlite HandlerSqlite
+        public HandlerDatabase HandlerDatabase
         {
-            get { return this.handlerSqlite; }
-            set { this.handlerSqlite = value; }
+            get { return this.handlerDatabase; }
+            set { this.handlerDatabase = value; }
         }
 
         public int DynDnsDomainID

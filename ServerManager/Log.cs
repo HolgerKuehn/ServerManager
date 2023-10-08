@@ -25,26 +25,24 @@ namespace blog.dachs.ServerManager
         GuiWindowLog_TmrGuiWindowLog_Tick = 6,
         GuiWindowLog_GuiWindowLog_VisibleChanged = 7,
         ThreadDynDns_ThreadDynDns = 8,
-        DynDnsDomain_DynDnsDomain = 9
+        DynDnsDomain_DynDnsDomain = 9,
+        DynDnsServer_DynDnsServer = 10
     }
 
 public class Log
     {
-        private HandlerSqlite handlerSqlite;
+        private HandlerDatabase HandlerDatabase;
         private int configurationID;
         private LogSeverity minimumLogSeverity;
 
         public Log()
         {
-            this.handlerSqlite = new HandlerSqlite();
+            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase();
 
-            string sqlCommand = string.Empty;
+            string sqlCommand = this.HandlerDatabase.GetSqlCommand(DatabaseSqlCommand.Log_Log);
+            sqlCommand = sqlCommand.Replace("<MachineName>", Environment.MachineName);
 
-            sqlCommand += "select a.Configuration_ID, a.Configuration_MinimumLogSeverity ";
-            sqlCommand += "from Configuration as a ";
-            sqlCommand += "where a.Configuration_ServerName = \"" + Environment.MachineName + "\" ";
-
-            DataTable dataTable = this.handlerSqlite.GetDataTable(sqlCommand);
+            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             DataRow dataRow;
 
             for (int row = 0;  row < dataTable.Rows.Count; row++)
@@ -70,7 +68,7 @@ public class Log
         public void WriteLog(LogEntry logEntry)
         {
             if(this.MinimumLogSeverity <= logEntry.LogSeverity)
-                this.handlerSqlite.Command(logEntry.GetLogInsert());
+                this.HandlerDatabase.Command(logEntry.GetLogInsert());
         }
     }
 }

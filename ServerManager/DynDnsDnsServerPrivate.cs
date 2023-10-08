@@ -11,7 +11,14 @@ namespace blog.dachs.ServerManager
 
             foreach (NetworkInterface networkInterface in networkInterfaces)
             {
-                if (networkInterface.OperationalStatus == OperationalStatus.Up)
+                if (
+                    networkInterface.OperationalStatus == OperationalStatus.Up && 
+                    (
+                        networkInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                        networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
+                    ) &&
+                    !networkInterface.Description.Contains("Bluetooth")
+                )
                 {
                     IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
                     IPAddressCollection dnsAddresses = ipProperties.DnsAddresses;
@@ -21,7 +28,21 @@ namespace blog.dachs.ServerManager
                         DynDnsIpAddress networkIPAddress = new DynDnsIpAddress(dnsAdress.ToString());
                         if (networkIPAddress.IsValid)
                         {
-                            this.SetNetworkDnsServer(networkIPAddress.DynDnsIpAddressVersion, networkIPAddress);
+                            this.SetDynDnsDnsServer(networkIPAddress.DynDnsIpAddressVersion, networkIPAddress);
+                        }
+                    }
+
+                    UnicastIPAddressInformationCollection unicastIPAddressInformationCollection = ipProperties.UnicastAddresses;
+                    foreach (UnicastIPAddressInformation unicastIPAddressInformation in unicastIPAddressInformationCollection)
+                    {
+                        if (unicastIPAddressInformation.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            this.SetDynDnsDnsServerIpAddressPrefixLength(DynDnsIpAddressVersion.IPv4, (byte)unicastIPAddressInformation.PrefixLength);
+                        }
+
+                        if (unicastIPAddressInformation.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                        {
+                            this.SetDynDnsDnsServerIpAddressPrefixLength(DynDnsIpAddressVersion.IPv6, (byte)unicastIPAddressInformation.PrefixLength);
                         }
                     }
                 }
