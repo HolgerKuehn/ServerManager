@@ -2,7 +2,7 @@
 {
     public class DynDnsServerLocal : DynDnsServer
     {
-        public DynDnsServerLocal(Log log, int dynDnsSerciceID) : base(log, dynDnsSerciceID)
+        public DynDnsServerLocal(Configuration configuration, int dynDnsSerciceID) : base(configuration, dynDnsSerciceID)
         {
 
         }

@@ -1,3 +1,5 @@
+using System.Configuration;
+
 namespace blog.dachs.ServerManager
 {
     public static class ProgramMain
@@ -8,29 +10,28 @@ namespace blog.dachs.ServerManager
         [STAThread]
         static void Main()
         {
-            ThreadCollection threadCollection = new ThreadCollection();
-
-            Log log = new Log();
+            Configuration configuration = new Configuration();
+            ThreadCollection threadCollection = new ThreadCollection(configuration);
 
             try
             {
-                log.WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ProgramMain_Main, "starting ServerManager"));
+                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ProgramMain_Main, "starting ServerManager"));
 
-                log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "create new ThreadDynDns"));
-                threadCollection.ThreadDynDns(log);
+                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "create new ThreadDynDns"));
+                threadCollection.ThreadDynDns(configuration);
 
 
                 // To customize application configuration such as set high DPI settings or default font,
                 // see https://aka.ms/applicationconfiguration.
-                log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "initializing ApplicationConfiguration"));
+                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "initializing ApplicationConfiguration"));
                 ApplicationConfiguration.Initialize();
 
-                log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "creating new GuiMain"));
-                GuiMain GuiMain = new GuiMain(log);
+                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "creating new GuiMain"));
+                GuiMain GuiMain = new GuiMain(configuration);
             }
             catch (Exception ex)
             {
-                log.WriteLog(new LogEntry(LogSeverity.Critical, LogOrigin.ProgramMain_Main, "caught exception: " + ex.Message.Replace("\"", "\"\"")));
+                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Critical, LogOrigin.ProgramMain_Main, "caught exception: " + ex.Message.Replace("\"", "\"\"")));
             }
         }
     }

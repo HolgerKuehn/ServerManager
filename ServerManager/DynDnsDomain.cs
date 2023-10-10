@@ -3,34 +3,29 @@ using System.Text;
 
 namespace blog.dachs.ServerManager
 {
-    public class DynDnsDomain
+    public class DynDnsDomain : GlobalExtention
     {
-        private Log log;
-        private HandlerDatabase handlerDatabase;
         private int dynDnsDomainID;
         private string dynDnsDomainName;
         private string dynDnsDomainUser;
         private string dynDnsDomainPassword;
 
-        public DynDnsDomain(Log log, int dynDnsDomainID)
+        public DynDnsDomain(Configuration configuration, int dynDnsDomainID) : base(configuration)
         {
-            this.Log = log;
-            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase();
-
             this.DynDnsDomainID = dynDnsDomainID;
 
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "creating DynDnsDomain with DynDnsDomain_ID = " + this.DynDnsDomainID.ToString()));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "creating DynDnsDomain with DynDnsDomain_ID = " + this.DynDnsDomainID.ToString()));
             
-            string sqlCommand = this.HandlerDatabase.GetSqlCommand(DatabaseSqlCommand.DynDnsDomain_DynDnsDomain);
+            string sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsDomain_DynDnsDomain);
             sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.DynDnsDomainID.ToString());
 
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
             DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             DataRow dataRow = null;
-            string dynDnsDomainName = string.Empty;
-            string dynDnsDomainUserBase64 = string.Empty;
-            string dynDnsDomainPasswordBase64 = string.Empty;
+            string dynDnsDomainName;
+            string dynDnsDomainUserBase64;
+            string dynDnsDomainPasswordBase64;
 
             // reading values
             for (int row = 0; row < dataTable.Rows.Count; row++)
@@ -43,7 +38,7 @@ namespace blog.dachs.ServerManager
                 if (dynDnsDomainName != null)
                 {
                     this.DynDnsDomainName = dynDnsDomainName;
-                    Log.WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "created DynDnsDomain with DynDnsDomain_Name = " + this.DynDnsDomainName));
+                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "created DynDnsDomain with DynDnsDomain_Name = " + this.DynDnsDomainName));
                 }
 
                 if (dynDnsDomainUserBase64 != null)
@@ -62,18 +57,6 @@ namespace blog.dachs.ServerManager
             // reading servies
 
 
-        }
-
-        public Log Log
-        {
-            get { return this.log; }
-            set { this.log = value; }
-        }
-
-        public HandlerDatabase HandlerDatabase
-        {
-            get { return this.handlerDatabase; }
-            set { this.handlerDatabase = value; }
         }
 
         public int DynDnsDomainID

@@ -3,19 +3,32 @@
     using System;
     using System.Collections;
 
-    public class DynDnsDnsServerCollection : IList
+    public class DynDnsDnsServerCollection : GlobalExtention, IList
     {
         private List<DynDnsDnsServer> dynDnsDnsServers;
 
-        public DynDnsDnsServerCollection()
+        public DynDnsDnsServerCollection(Configuration configuration) : base(configuration)
         {
             this.DynDnsDnsServers = new List<DynDnsDnsServer>();
         }
 
-        public List<DynDnsDnsServer> DynDnsDnsServers
+        private List<DynDnsDnsServer> DynDnsDnsServers
         {
             get { return this.dynDnsDnsServers; }
             set { this.dynDnsDnsServers = value; }
+        }
+
+        public DynDnsDnsServer GetDynDnsDnsServer(DynDnsDnsServerType dynDnsDnsServerType)
+        {
+            DynDnsDnsServer dynDnsDnsServerResult = this.DynDnsDnsServers[0];
+
+            foreach (DynDnsDnsServer dynDnsDnsServer in this.DynDnsDnsServers)
+            {
+                if (dynDnsDnsServer.DynDnsDnsServerType == dynDnsDnsServerType)
+                    dynDnsDnsServerResult = dynDnsDnsServer;
+            }
+
+            return dynDnsDnsServerResult;
         }
 
         #region implementing IList

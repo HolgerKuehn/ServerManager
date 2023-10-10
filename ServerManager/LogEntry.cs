@@ -30,31 +30,5 @@
             get { return this.logMessage; }
             set { this.logMessage = value; }
         }
-
-        public string GetLogInsert()
-        { 
-            string sqlInsertHeader = string.Empty;
-            string sqlInsertValue = string.Empty;
-
-            sqlInsertHeader += "insert into Log ";
-            sqlInsertHeader += "   (";
-            sqlInsertValue  += "select ";
-
-            sqlInsertHeader +=                "Log_Timestamp, ";
-            sqlInsertValue  += "unixepoch() as Log_Timestamp, ";
-
-            sqlInsertHeader +=                                          "LogSeverity_ID, ";
-            sqlInsertValue  += ((int)this.logSeverity).ToString() + " as LogSeverity_ID, ";
-
-            sqlInsertHeader +=                                        "LogOrigin_ID, ";
-            sqlInsertValue  += ((int)this.LogOrigin).ToString() + " as LogOrigin_ID, ";
-
-            sqlInsertHeader +=                                "Log_Message";
-            sqlInsertValue  += "\"" + this.LogMessage + "\" as Log_Message";
-
-            sqlInsertHeader += ") ";
-
-            return sqlInsertHeader + sqlInsertValue;
-        }
     }
 }

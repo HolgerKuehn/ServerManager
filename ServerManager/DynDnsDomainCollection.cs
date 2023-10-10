@@ -3,11 +3,11 @@
     using System;
     using System.Collections;
 
-    public class DynDnsDomainCollection : IList
+    public class DynDnsDomainCollection : GlobalExtention, IList
     {
         private List<DynDnsDomain> dynDnsDomains;
 
-        public DynDnsDomainCollection()
+        public DynDnsDomainCollection(Configuration configuration) : base(configuration)
         {
             this.dynDnsDomains = new List<DynDnsDomain>();
         }

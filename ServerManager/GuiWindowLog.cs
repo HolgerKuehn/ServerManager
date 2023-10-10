@@ -1,20 +1,16 @@
+using System.Data;
+
 namespace blog.dachs.ServerManager
 {
-    public partial class GuiWindowLog : Form
+    public partial class GuiWindowLog : GuiExtention
     {
-        private readonly Log log;
-        private readonly HandlerDatabase handlerDatabase;
-
-        public GuiWindowLog(Log log)
+        public GuiWindowLog(Configuration configuration) : base(configuration)
         {
-            this.handlerDatabase = HandlerDatabase.GetHandlerDatabase();
-            this.log = log;
-
-            // initialze Log Window and default values
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog, "initializing GuiWindowLog"));
+            // initialze GetLog Window and default values
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog, "initializing GuiWindowLog"));
             InitializeComponent();
 
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog, "initializing clbGuiWindowLogSeverity"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog, "initializing clbGuiWindowLogSeverity"));
             clbGuiWindowLogSeverity.Items.Add(new GuiCheckedListBoxItem("Emergency", LogSeverity.Emergency), CheckState.Checked);
             clbGuiWindowLogSeverity.Items.Add(new GuiCheckedListBoxItem("Alert", LogSeverity.Alert), CheckState.Checked);
             clbGuiWindowLogSeverity.Items.Add(new GuiCheckedListBoxItem("Critical", LogSeverity.Critical), CheckState.Checked);
@@ -25,42 +21,25 @@ namespace blog.dachs.ServerManager
             clbGuiWindowLogSeverity.Items.Add(new GuiCheckedListBoxItem("Debug", LogSeverity.Debug), CheckState.Unchecked);
         }
 
-        public Log Log
-        {
-            get { return this.log; }
-        }
-
-        public HandlerDatabase HandlerDatabase
-        {
-            get { return this.handlerDatabase; }
-        }
 
         private void GuiWindowLog_Shown(object sender, EventArgs e)
         {
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog_Shown, "initializing clbGuiWindowLogSeverity"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog_Shown, "initializing clbGuiWindowLogSeverity"));
             this.Hide();
         }
 
 
         private void TmrGuiWindowLog_Tick(object sender, EventArgs e)
         {
-            string command = string.Empty;
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, "reading DataTable dgvGuiWindowLogLog"));
+            
+            string sqlCommand = this.HandlerDatabase.GetCommand(Command.GuiWindowLog_TmrGuiWindowLog_Tick);
 
-            command += "select a.Log_ID, datetime(a.Log_Timestamp, 'unixepoch', 'localtime') as Log_Timestamp, b.LogSeverity_Name, c.LogOrigin_Class, c.LogOrigin_Function, c.LogOrigin_Step, a.Log_Message ";
-            command += "from Log as a ";
-            command += "inner join LogSeverity as b on ";
-            command += "    a.LogSeverity_ID = b.LogSeverity_ID ";
-            command += "inner join LogOrigin as c on ";
-            command += "    a.LogOrigin_ID = c.LogOrigin_ID ";
-            command += "order by a.Log_ID desc ";
-            command += "limit 10000; ";
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, sqlCommand));
 
+            dgvGuiWindowLogLog.DataSource = this.HandlerDatabase.GetDataTable(sqlCommand);
 
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, "reading DataTable dgvGuiWindowLogLog"));
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, command));
-            dgvGuiWindowLogLog.DataSource = this.HandlerDatabase.GetDataTable(command);
-
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, "setting column properties on dgvGuiWindowLogLog"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, "setting column properties on dgvGuiWindowLogLog"));
             
             // Log_ID
             dgvGuiWindowLogLog.Columns[0].Visible = false;
@@ -100,13 +79,13 @@ namespace blog.dachs.ServerManager
         {
             if(this.Visible)
             {
-                Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog_VisibleChanged, "showing GuiWindowLog"));
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog_VisibleChanged, "showing GuiWindowLog"));
                 tmrGuiWindowLog.Enabled = true;
                 TmrGuiWindowLog_Tick(sender, e);
             }
             else
             {
-                Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog_VisibleChanged, "hiding GuiWindowLog"));
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_GuiWindowLog_VisibleChanged, "hiding GuiWindowLog"));
                 tmrGuiWindowLog.Enabled = false;
             }
         }

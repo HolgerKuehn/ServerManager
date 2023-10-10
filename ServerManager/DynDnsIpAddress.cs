@@ -22,19 +22,19 @@
         IPv6 = 3
     }
 
-    public class DynDnsIpAddress
+    public class DynDnsIpAddress : GlobalExtention
     {
         private bool isValid;
         private IPAddress ipAddress;
         private byte prefixLength;
         private IPAddress networkAddress;
 
-        public DynDnsIpAddress()
+        public DynDnsIpAddress(Configuration configuration) : base(configuration)
         {
             this.IpAddress = "0";
         }
 
-        public DynDnsIpAddress(string ipAddress): base()
+        public DynDnsIpAddress(Configuration configuration, string ipAddress) : this(configuration)
         {
             this.IpAddress = ipAddress;
         }
@@ -91,7 +91,7 @@
                 {
                     return DynDnsIpAddressType.NotValid;
                 }
-                else if (this.ipAddress.IsIPv6SiteLocal)
+                else if (this.ipAddress.IsIPv6LinkLocal)
                 {
                     return DynDnsIpAddressType.LinkLocal;
                 }

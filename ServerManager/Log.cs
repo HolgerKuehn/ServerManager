@@ -1,8 +1,13 @@
-﻿using System.Data;
-using System.Runtime.CompilerServices;
-
-namespace blog.dachs.ServerManager
+﻿namespace blog.dachs.ServerManager
 {
+    using System.Data;
+
+    public enum LogType
+    {
+        File = 1,
+        Database = 2
+    }
+
     public enum LogSeverity
     {
         Emergency = 128,
@@ -26,49 +31,17 @@ namespace blog.dachs.ServerManager
         GuiWindowLog_GuiWindowLog_VisibleChanged = 7,
         ThreadDynDns_ThreadDynDns = 8,
         DynDnsDomain_DynDnsDomain = 9,
-        DynDnsServer_DynDnsServer = 10
+        DynDnsServer_DynDnsServer = 10,
+        DynDnsNetworkObject_DynDnsNetworkObject = 11,
+        DynDnsNetworkObject_GetIpAddress = 12
     }
 
-public class Log
+    public abstract class Log : GlobalExtention
     {
-        private HandlerDatabase HandlerDatabase;
-        private int configurationID;
-        private LogSeverity minimumLogSeverity;
-
-        public Log()
+        public Log(Configuration configuration) : base(configuration)
         {
-            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase();
-
-            string sqlCommand = this.HandlerDatabase.GetSqlCommand(DatabaseSqlCommand.Log_Log);
-            sqlCommand = sqlCommand.Replace("<MachineName>", Environment.MachineName);
-
-            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
-            DataRow dataRow;
-
-            for (int row = 0;  row < dataTable.Rows.Count; row++)
-            {
-                dataRow = dataTable.Rows[row];
-                this.ConfigurationID = Convert.ToInt32(dataRow[0]);
-                this.MinimumLogSeverity = (LogSeverity) Convert.ToInt32(dataRow[1]);
-            }
         }
 
-        public LogSeverity MinimumLogSeverity
-        {
-            get { return this.minimumLogSeverity; }
-            set { this.minimumLogSeverity = value; }
-        }
-
-        public int ConfigurationID
-        {
-            get { return this.configurationID; }
-            set { this.configurationID = value; }
-        }
-        
-        public void WriteLog(LogEntry logEntry)
-        {
-            if(this.MinimumLogSeverity <= logEntry.LogSeverity)
-                this.HandlerDatabase.Command(logEntry.GetLogInsert());
-        }
+        public abstract void WriteLog(LogEntry logEntry);
     }
 }

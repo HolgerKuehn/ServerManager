@@ -4,21 +4,16 @@
     
     public class ThreadDynDns : ThreadWorker
     {
-        private Log log;
-        private HandlerDatabase handlerDatabase;
         private DynDnsServer dynDnsServer;
 
-        public ThreadDynDns(Log log)
+        public ThreadDynDns(Configuration configuration) : base(configuration)
         {
-            this.Log = log;
-            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase();
-
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServiceType"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServiceType"));
             
-            string sqlCommand = this.HandlerDatabase.GetSqlCommand(DatabaseSqlCommand.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
-            sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Log.ConfigurationID.ToString());
+            string sqlCommand = this.HandlerDatabase.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
+            sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
             
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand)); 
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand)); 
 
             DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             DataRow dataRow = null;
@@ -32,12 +27,12 @@
             }
 
 
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServer"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServer"));
 
-            sqlCommand = this.HandlerDatabase.GetSqlCommand(DatabaseSqlCommand.ThreadDynDns_ThreadDynDns_DynDnsServer);
-            sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Log.ConfigurationID.ToString());
+            sqlCommand = this.HandlerDatabase.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServer);
+            sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
 
-            Log.WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
 
             dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             dataRow = null;
@@ -54,25 +49,13 @@
             switch (dynDnsServiceType)
             {
                 case DynDnsServiceType.ServiceLocal:
-                    dynDnsServer = new DynDnsServerLocal(log, dynDnsServiceID);
+                    dynDnsServer = new DynDnsServerLocal(configuration, dynDnsServiceID);
                     break;
 
                 case DynDnsServiceType.ServiceRemote:
-                    dynDnsServer = new DynDnsServerRemote(log, dynDnsServiceID);
+                    dynDnsServer = new DynDnsServerRemote(configuration, dynDnsServiceID);
                     break;
             }
-        }
-
-        public Log Log
-        {
-            get { return this.log; }
-            set { this.log = value; }
-        }
-
-        public HandlerDatabase HandlerDatabase
-        {
-            get { return this.handlerDatabase; }
-            set { this.handlerDatabase = value; }
         }
 
         public DynDnsServer DynDnsServer
@@ -85,7 +68,7 @@
         {
             while (true)
             {
-                
+                this.DynDnsServer.GetIpAddress();
 
                 Thread.Sleep(120000);
             }

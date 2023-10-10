@@ -22,20 +22,13 @@
 
             }
         }
-
-        public override void Command(string sqlCommand)
-        {
-            SQLiteCommand sqliteCommand = new SQLiteCommand(sqlCommand, (SQLiteConnection)this.dbConnection);
-            sqliteCommand.ExecuteNonQuery();
-        }
-
-        public override string GetSqlCommand(DatabaseSqlCommand databaseSqlCommand)
+        public override string GetCommand(Command command)
         {
             string sqlCommand = string.Empty;
 
-            sqlCommand += "select a.DatabaseSqlCommand_Name ";
-            sqlCommand += "from DatabaseSqlCommand a ";
-            sqlCommand += "where a.DatabaseSqlCommand_ID = " + Convert.ToString((int)databaseSqlCommand) + " ";
+            sqlCommand += "select a.Command_Name ";
+            sqlCommand += "from Command a ";
+            sqlCommand += "where a.Command_ID = " + ((int)command).ToString() + " ";
 
             DataTable dataTable = this.GetDataTable(sqlCommand);
             DataRow dataRow;
@@ -50,6 +43,12 @@
                 sqlCommand = string.Empty;
 
             return sqlCommand;
+        }
+
+        public override void ExecuteCommand(string sqlCommand)
+        {
+            SQLiteCommand sqliteCommand = new SQLiteCommand(sqlCommand, (SQLiteConnection)this.dbConnection);
+            sqliteCommand.ExecuteNonQuery();
         }
 
         public override DataTable GetDataTable(string sqlCommand)

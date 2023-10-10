@@ -2,7 +2,7 @@
 {
     public class DynDnsServerRemote : DynDnsServer
     {
-        public DynDnsServerRemote(Log log, int dynDnsSerciceID) : base(log, dynDnsSerciceID)
+        public DynDnsServerRemote(Configuration configuration, int dynDnsSerciceID) : base(configuration, dynDnsSerciceID)
         {
 
         }

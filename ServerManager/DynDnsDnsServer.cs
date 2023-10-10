@@ -2,16 +2,41 @@
 
 namespace blog.dachs.ServerManager
 {
-    public class DynDnsDnsServer
+    public enum DynDnsDnsServerType
     {
+        Private = 1,
+        Public = 2
+    }
+
+    public abstract class DynDnsDnsServer : GlobalExtention
+    {
+        private DynDnsDnsServerType dynDnsDnsServerType;
         private Dictionary<DynDnsIpAddressVersion, DynDnsIpAddress> dynDnsDnsServer;
 
-        public DynDnsDnsServer()
+        public DynDnsDnsServer(Configuration configuration) : base(configuration)
         {
             this.dynDnsDnsServer = new Dictionary<DynDnsIpAddressVersion, DynDnsIpAddress>();
         }
 
-        public DynDnsIpAddress GetDynDnsDnsServer(DynDnsIpAddressVersion ipVersion)
+        public DynDnsDnsServerType DynDnsDnsServerType
+        {
+            get { return this.dynDnsDnsServerType; }
+            set { this.dynDnsDnsServerType = value; }
+        }
+
+        public DynDnsIpAddress GetDynDnsDnsServerIp()
+        {
+            if (System.Net.Sockets.Socket.OSSupportsIPv6)
+            {
+                return this.GetDynDnsDnsServerIp(DynDnsIpAddressVersion.IPv6);
+            }
+            else
+            {
+                return this.GetDynDnsDnsServerIp(DynDnsIpAddressVersion.IPv4);
+            }
+        }
+
+        public DynDnsIpAddress GetDynDnsDnsServerIp(DynDnsIpAddressVersion ipVersion)
         {
             return this.dynDnsDnsServer[ipVersion];
         }
