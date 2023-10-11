@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace blog.dachs.ServerManager
+﻿namespace blog.dachs.ServerManager
 {
-    public enum DynDnsDnsServerType
+    using System.Net.Sockets;
+
+    public enum DnsServerType
     {
         Private = 1,
         Public = 2
@@ -10,7 +10,7 @@ namespace blog.dachs.ServerManager
 
     public abstract class DynDnsDnsServer : GlobalExtention
     {
-        private DynDnsDnsServerType dynDnsDnsServerType;
+        private DnsServerType dynDnsDnsServerType;
         private Dictionary<DynDnsIpAddressVersion, DynDnsIpAddress> dynDnsDnsServer;
 
         public DynDnsDnsServer(Configuration configuration) : base(configuration)
@@ -18,7 +18,7 @@ namespace blog.dachs.ServerManager
             this.dynDnsDnsServer = new Dictionary<DynDnsIpAddressVersion, DynDnsIpAddress>();
         }
 
-        public DynDnsDnsServerType DynDnsDnsServerType
+        public DnsServerType DynDnsDnsServerType
         {
             get { return this.dynDnsDnsServerType; }
             set { this.dynDnsDnsServerType = value; }
@@ -26,7 +26,7 @@ namespace blog.dachs.ServerManager
 
         public DynDnsIpAddress GetDynDnsDnsServerIp()
         {
-            if (System.Net.Sockets.Socket.OSSupportsIPv6)
+            if (Socket.OSSupportsIPv6)
             {
                 return this.GetDynDnsDnsServerIp(DynDnsIpAddressVersion.IPv6);
             }

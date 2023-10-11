@@ -2,84 +2,154 @@
 {
     using System;
     using System.Collections;
+    using System.Data;
+    using System.Net;
 
     public class DynDnsIpAddressCollection : GlobalExtention, IList
     {
-        private List<DynDnsIpAddress> dynDnsIpAddresses;
+        private List<DynDnsIpAddress> ipAddressCollection;
 
         public DynDnsIpAddressCollection(Configuration configuration) : base(configuration)
         {
-            this.DynDnsIpAddresses = new List<DynDnsIpAddress>();
+            this.IpAddressCollection = new List<DynDnsIpAddress>();
         }
 
-        private List<DynDnsIpAddress> DynDnsIpAddresses
+        private List<DynDnsIpAddress> IpAddressCollection
         {
-            get { return this.dynDnsIpAddresses; }
-            set { this.dynDnsIpAddresses = value; }
+            get { return this.ipAddressCollection; }
+            set { this.ipAddressCollection = value; }
         }
 
-        public List<DynDnsIpAddress> GetDynDnsIpAddress(DynDnsIpAddressType DynDnsIpAddressType)
+        public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressType ipAddressType)
         {
-            return this.DynDnsIpAddresses;
+            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
+
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv4));
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv6));
+
+            return ipAddressCollection;
+        }
+
+        public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressType ipAddressType, DynDnsIpAddressVersion ipAddressVersion)
+        {
+            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
+
+            foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
+            {
+                if (ipAddress.DynDnsIpAddressType == ipAddressType && ipAddress.DynDnsIpAddressVersion == ipAddressVersion)
+                {
+                    ipAddressCollection.Add(ipAddress);
+                }
+            }
+
+            return ipAddressCollection;
+        }
+
+        public List<DynDnsIpAddressType> GetAvailableIpTypes()
+        {
+            List<DynDnsIpAddressType> ipAddressTypeCollection = new List<DynDnsIpAddressType>();
+
+            foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
+            {
+                if (!ipAddressTypeCollection.Contains(ipAddress.DynDnsIpAddressType))
+                {
+                    ipAddressTypeCollection.Add(ipAddress.DynDnsIpAddressType);
+                }
+            }
+
+            return ipAddressTypeCollection;
         }
 
         #region implementing IList
-        public object? this[int index] { get => ((IList)DynDnsIpAddresses)[index]; set => ((IList)DynDnsIpAddresses)[index] = value; }
+        public object? this[int index] { get => ((IList)IpAddressCollection)[index]; set => ((IList)IpAddressCollection)[index] = value; }
 
-        public bool IsFixedSize => ((IList)DynDnsIpAddresses).IsFixedSize;
+        public bool IsFixedSize => ((IList)IpAddressCollection).IsFixedSize;
 
-        public bool IsReadOnly => ((IList)DynDnsIpAddresses).IsReadOnly;
+        public bool IsReadOnly => ((IList)IpAddressCollection).IsReadOnly;
 
-        public int Count => ((ICollection)DynDnsIpAddresses).Count;
+        public int Count => ((ICollection)IpAddressCollection).Count;
 
-        public bool IsSynchronized => ((ICollection)DynDnsIpAddresses).IsSynchronized;
+        public bool IsSynchronized => ((ICollection)IpAddressCollection).IsSynchronized;
 
-        public object SyncRoot => ((ICollection)DynDnsIpAddresses).SyncRoot;
+        public object SyncRoot => ((ICollection)IpAddressCollection).SyncRoot;
 
         public int Add(object? value)
         {
-            return ((IList)DynDnsIpAddresses).Add(value);
+            return ((IList)IpAddressCollection).Add(value);
         }
 
         public void Clear()
         {
-            ((IList)DynDnsIpAddresses).Clear();
+            ((IList)IpAddressCollection).Clear();
         }
 
         public bool Contains(object? value)
         {
-            return ((IList)DynDnsIpAddresses).Contains(value);
+            return ((IList)IpAddressCollection).Contains(value);
         }
 
         public void CopyTo(Array array, int index)
         {
-            ((ICollection)DynDnsIpAddresses).CopyTo(array, index);
+            ((ICollection)IpAddressCollection).CopyTo(array, index);
         }
 
         public IEnumerator GetEnumerator()
         {
-            return ((IEnumerable)DynDnsIpAddresses).GetEnumerator();
+            return ((IEnumerable)IpAddressCollection).GetEnumerator();
         }
 
         public int IndexOf(object? value)
         {
-            return ((IList)DynDnsIpAddresses).IndexOf(value);
+            return ((IList)IpAddressCollection).IndexOf(value);
         }
 
         public void Insert(int index, object? value)
         {
-            ((IList)DynDnsIpAddresses).Insert(index, value);
+            ((IList)IpAddressCollection).Insert(index, value);
         }
 
         public void Remove(object? value)
         {
-            ((IList)DynDnsIpAddresses).Remove(value);
+            ((IList)IpAddressCollection).Remove(value);
         }
 
         public void RemoveAt(int index)
         {
-            ((IList)DynDnsIpAddresses).RemoveAt(index);
+            ((IList)IpAddressCollection).RemoveAt(index);
         }
         #endregion
+
+        public void Add(string ipAddress)
+        {
+            this.IpAddressCollection.Add(new DynDnsIpAddress(this.Configuration, ipAddress));
+        }
+
+        public void Add(DynDnsIpAddress ipAddress)
+        {
+            this.IpAddressCollection.Add(ipAddress);
+        }
+
+        public void AddRange(DynDnsIpAddressCollection ipAddressCollection)
+        {
+            foreach (DynDnsIpAddress ipAddress in ipAddressCollection)
+            {
+                this.Add(ipAddress);
+            }
+        }
+
+        public void Remove(DynDnsIpAddressType ipAddressType)
+        {
+            List<DynDnsIpAddress> ipAddressCollection = new List<DynDnsIpAddress>();
+
+            foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
+            {
+                if (ipAddress.DynDnsIpAddressType != ipAddressType)
+                {
+                    ipAddressCollection.Add(ipAddress);
+                }
+            }
+
+            this.IpAddressCollection = ipAddressCollection;
+        }
     }
 }

@@ -8,7 +8,7 @@
         DynDnsDomain_DynDnsDomain = 4,
         DynDnsServer_DynDnsServer = 5,
         GuiWindowLog_TmrGuiWindowLog_Tick = 6,
-        DynDnsNetworkObject_GetIpAddress = 7,
+        DynDnsNetworkObject_GetDnsIpAddress = 7,
         DynDnsNetworkObject_DynDnsNetworkObject = 8
     }
 }

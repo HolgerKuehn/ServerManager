@@ -39,7 +39,7 @@
             this.IpAddress = ipAddress;
         }
 
-        public bool IsValid
+        private bool IsValid
         {
             get { return this.isValid; }
             set { isValid = value; }

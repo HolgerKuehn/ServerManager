@@ -1,7 +1,5 @@
 ﻿namespace blog.dachs.ServerManager
 {
-    using System.Data;
-
     public enum LogType
     {
         File = 1,
@@ -33,7 +31,8 @@
         DynDnsDomain_DynDnsDomain = 9,
         DynDnsServer_DynDnsServer = 10,
         DynDnsNetworkObject_DynDnsNetworkObject = 11,
-        DynDnsNetworkObject_GetIpAddress = 12
+        DynDnsNetworkObject_GetDnsIpAddress = 12,
+        DynDnsNetworkObject_GetPublicIpAddress = 13
     }
 
     public abstract class Log : GlobalExtention

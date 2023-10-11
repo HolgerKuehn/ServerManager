@@ -5,26 +5,26 @@
 
     public class DynDnsDnsServerCollection : GlobalExtention, IList
     {
-        private List<DynDnsDnsServer> dynDnsDnsServers;
+        private List<DynDnsDnsServer> dnsServerCollection;
 
         public DynDnsDnsServerCollection(Configuration configuration) : base(configuration)
         {
-            this.DynDnsDnsServers = new List<DynDnsDnsServer>();
+            this.DnsServerCollection = new List<DynDnsDnsServer>();
         }
 
-        private List<DynDnsDnsServer> DynDnsDnsServers
+        private List<DynDnsDnsServer> DnsServerCollection
         {
-            get { return this.dynDnsDnsServers; }
-            set { this.dynDnsDnsServers = value; }
+            get { return this.dnsServerCollection; }
+            set { this.dnsServerCollection = value; }
         }
 
-        public DynDnsDnsServer GetDynDnsDnsServer(DynDnsDnsServerType dynDnsDnsServerType)
+        public DynDnsDnsServer GetDnsServer(DnsServerType dnsServerType)
         {
-            DynDnsDnsServer dynDnsDnsServerResult = this.DynDnsDnsServers[0];
+            DynDnsDnsServer dynDnsDnsServerResult = this.DnsServerCollection[0];
 
-            foreach (DynDnsDnsServer dynDnsDnsServer in this.DynDnsDnsServers)
+            foreach (DynDnsDnsServer dynDnsDnsServer in this.DnsServerCollection)
             {
-                if (dynDnsDnsServer.DynDnsDnsServerType == dynDnsDnsServerType)
+                if (dynDnsDnsServer.DynDnsDnsServerType == dnsServerType)
                     dynDnsDnsServerResult = dynDnsDnsServer;
             }
 
@@ -32,61 +32,61 @@
         }
 
         #region implementing IList
-        public object? this[int index] { get => ((IList)DynDnsDnsServers)[index]; set => ((IList)DynDnsDnsServers)[index] = value; }
+        public object? this[int index] { get => ((IList)DnsServerCollection)[index]; set => ((IList)DnsServerCollection)[index] = value; }
 
-        public bool IsFixedSize => ((IList)DynDnsDnsServers).IsFixedSize;
+        public bool IsFixedSize => ((IList)DnsServerCollection).IsFixedSize;
 
-        public bool IsReadOnly => ((IList)DynDnsDnsServers).IsReadOnly;
+        public bool IsReadOnly => ((IList)DnsServerCollection).IsReadOnly;
 
-        public int Count => ((ICollection)DynDnsDnsServers).Count;
+        public int Count => ((ICollection)DnsServerCollection).Count;
 
-        public bool IsSynchronized => ((ICollection)DynDnsDnsServers).IsSynchronized;
+        public bool IsSynchronized => ((ICollection)DnsServerCollection).IsSynchronized;
 
-        public object SyncRoot => ((ICollection)DynDnsDnsServers).SyncRoot;
+        public object SyncRoot => ((ICollection)DnsServerCollection).SyncRoot;
 
         public int Add(object? value)
         {
-            return ((IList)DynDnsDnsServers).Add(value);
+            return ((IList)DnsServerCollection).Add(value);
         }
 
         public void Clear()
         {
-            ((IList)DynDnsDnsServers).Clear();
+            ((IList)DnsServerCollection).Clear();
         }
 
         public bool Contains(object? value)
         {
-            return ((IList)DynDnsDnsServers).Contains(value);
+            return ((IList)DnsServerCollection).Contains(value);
         }
 
         public void CopyTo(Array array, int index)
         {
-            ((ICollection)DynDnsDnsServers).CopyTo(array, index);
+            ((ICollection)DnsServerCollection).CopyTo(array, index);
         }
 
         public IEnumerator GetEnumerator()
         {
-            return ((IEnumerable)DynDnsDnsServers).GetEnumerator();
+            return ((IEnumerable)DnsServerCollection).GetEnumerator();
         }
 
         public int IndexOf(object? value)
         {
-            return ((IList)DynDnsDnsServers).IndexOf(value);
+            return ((IList)DnsServerCollection).IndexOf(value);
         }
 
         public void Insert(int index, object? value)
         {
-            ((IList)DynDnsDnsServers).Insert(index, value);
+            ((IList)DnsServerCollection).Insert(index, value);
         }
 
         public void Remove(object? value)
         {
-            ((IList)DynDnsDnsServers).Remove(value);
+            ((IList)DnsServerCollection).Remove(value);
         }
 
         public void RemoveAt(int index)
         {
-            ((IList)DynDnsDnsServers).RemoveAt(index);
+            ((IList)DnsServerCollection).RemoveAt(index);
         }
         #endregion
     }

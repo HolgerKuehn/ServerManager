@@ -5,12 +5,11 @@
         private Configuration configuration;
         private HandlerDatabase handlerDatabase;
         private HandlerPowerShell handlerPowerShell;
+        private HandlerWebRequest handlerWebRequest;
 
         public GlobalExtention(Configuration configuration)
         {
             this.configuration = configuration;
-            this.handlerDatabase = HandlerDatabase.GetHandlerDatabase();
-            this.handlerPowerShell = new HandlerPowerShell(configuration);
         }
 
         public Configuration Configuration
@@ -21,14 +20,38 @@
 
         public HandlerDatabase HandlerDatabase
         {
-            get { return this.handlerDatabase; }
+            get
+            {
+                if (this.handlerDatabase == null)
+                    this.handlerDatabase = HandlerDatabase.GetHandlerDatabase(this.Configuration);
+
+                return this.handlerDatabase;
+            }
             set { this.handlerDatabase = value; }
         }
 
         public HandlerPowerShell HandlerPowerShell
         {
-            get { return this.handlerPowerShell; }
+            get
+            {
+                if (this.handlerPowerShell == null)
+                    this.handlerPowerShell = new HandlerPowerShell(this.Configuration);
+
+                return this.handlerPowerShell;
+            }
             set { this.handlerPowerShell = value; }
+        }
+
+        public HandlerWebRequest HandlerWebRequest
+        {
+            get
+            {
+                if (this.handlerWebRequest == null)
+                    this.handlerWebRequest = new HandlerWebRequest(this.Configuration);
+
+                return this.handlerWebRequest;
+            }
+            set { this.handlerWebRequest = value; }
         }
     }
 }

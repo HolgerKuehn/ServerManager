@@ -8,7 +8,7 @@
     {
         private readonly DbConnection dbConnection;
 
-        public HandlerSqlite()
+        public HandlerSqlite(Configuration configuration) : base(configuration)
         {
             string connectionString = "Data Source=" + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "blog.dachs", "ServerManager", "ServerManager.db");
             dbConnection = new SQLiteConnection(connectionString);

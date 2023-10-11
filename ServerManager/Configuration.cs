@@ -16,7 +16,7 @@
             this.Logs[LogType.File] = new LogFile(this);
             this.Logs[LogType.Database] = new LogDatabase(this);
 
-            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase();
+            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase(this);
 
             string sqlCommand = this.HandlerDatabase.GetCommand(Command.Configuration_Configuration);
             sqlCommand = sqlCommand.Replace("<MachineName>", Environment.MachineName);

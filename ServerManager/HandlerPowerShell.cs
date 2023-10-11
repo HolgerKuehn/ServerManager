@@ -2,11 +2,11 @@
 {
     using System.Diagnostics;
 
-    public class HandlerPowerShell
+    public class HandlerPowerShell : GlobalExtention
     {
         private Process process;
 
-        public HandlerPowerShell(Configuration configuration)
+        public HandlerPowerShell(Configuration configuration) : base(configuration)
         {
             this.Process = new Process();
         }

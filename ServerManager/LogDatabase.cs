@@ -4,7 +4,7 @@
     {
         public LogDatabase(Configuration configuration) : base(configuration)
         {
-            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase();
+            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase(configuration);
         }
 
         public override void WriteLog(LogEntry logEntry)

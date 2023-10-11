@@ -7,7 +7,7 @@ namespace blog.dachs.ServerManager
     {
         public DynDnsDnsServerPrivate(Configuration configuration) : base(configuration)
         {
-            this.DynDnsDnsServerType = DynDnsDnsServerType.Private;
+            this.DynDnsDnsServerType = DnsServerType.Private;
 
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
 
@@ -28,7 +28,7 @@ namespace blog.dachs.ServerManager
                     foreach (IPAddress dnsAdress in dnsAddresses)
                     {
                         DynDnsIpAddress networkIPAddress = new DynDnsIpAddress(this.Configuration, dnsAdress.ToString());
-                        if (networkIPAddress.IsValid)
+                        if (networkIPAddress.DynDnsIpAddressType != DynDnsIpAddressType.NotValid)
                         {
                             this.SetDynDnsDnsServer(networkIPAddress.DynDnsIpAddressVersion, networkIPAddress);
                         }
