@@ -1,12 +1,12 @@
 ﻿namespace blog.dachs.ServerManager
 {
-    public enum LogType
+    public enum LogType : byte
     {
         File = 1,
         Database = 2
     }
 
-    public enum LogSeverity
+    public enum LogSeverity : byte
     {
         Emergency = 128,
         Alert = 64,
@@ -18,7 +18,7 @@
         Debug = 1
     }
 
-    public enum LogOrigin
+    public enum LogOrigin : byte
     {
         ProgramMain_Main = 1,
         GuiMain_GuiMain = 2,
@@ -30,9 +30,10 @@
         ThreadDynDns_ThreadDynDns = 8,
         DynDnsDomain_DynDnsDomain = 9,
         DynDnsServer_DynDnsServer = 10,
-        DynDnsNetworkObject_DynDnsNetworkObject = 11,
-        DynDnsNetworkObject_GetDnsIpAddress = 12,
-        DynDnsNetworkObject_GetPublicIpAddress = 13
+        DynDnsService_DynDnsService = 11,
+        DynDnsService_GetDnsIpAddress = 12,
+        DynDnsService_GetPublicIpAddress = 13,
+        DynDnsService_PerpareIpAddressCollectionToDisc = 14
     }
 
     public abstract class Log : GlobalExtention

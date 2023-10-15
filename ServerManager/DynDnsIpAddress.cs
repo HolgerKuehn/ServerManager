@@ -3,19 +3,28 @@
     using System;
     using System.Net;
 
-    public enum DynDnsIpAddressType
+    public enum DynDnsIpAddressReferenceType : byte
+    {
+        DynDnsService = 1,
+        DynDnsFirewallRule = 2,
+        DynDnsIpAddress = 3
+    }
+
+    public enum DynDnsIpAddressType : byte
     {
         NotValid = 1,
         Public = 2,
         Private = 3,
         LinkLocal = 4,
         UniqueLocal = 5,
-        DnsServerPrivate = 6,
-        DnsServerPublic = 7,
-        Network = 8
+        DnsServerPublic = 6,
+        DnsServerPrivate = 7,
+        DnsServerLinkLocal = 8,
+        DnsServerUniqueLocal = 9,
+        Network = 10
     }
 
-    public enum DynDnsIpAddressVersion
+    public enum DynDnsIpAddressVersion : byte
     {
         NotValid = 1,
         IPv4 = 2,
@@ -28,6 +37,7 @@
         private IPAddress ipAddress;
         private byte prefixLength;
         private IPAddress networkAddress;
+        private DynDnsIpAddressType ipAddressType;
 
         public DynDnsIpAddress(Configuration configuration) : base(configuration)
         {
@@ -63,6 +73,7 @@
                     this.ipAddress = ipAddressTest;
                 }
 
+                this.IpAddressType = DynDnsIpAddressType.NotValid;
                 this.SetNetworkAddress();
             }
 
@@ -83,50 +94,60 @@
             get { return this.networkAddress.ToString() + "/" + this.PrefixLength.ToString(); }
         }
 
-        public DynDnsIpAddressType DynDnsIpAddressType
+        public DynDnsIpAddressType IpAddressType
         {
-            get
-            {
-                if (!this.isValid)
+            get {
+
+                if (this.ipAddressType == DynDnsIpAddressType.NotValid)
                 {
-                    return DynDnsIpAddressType.NotValid;
-                }
-                else if (this.ipAddress.IsIPv6LinkLocal)
-                {
-                    return DynDnsIpAddressType.LinkLocal;
-                }
-                else if (this.ipAddress.IsIPv6UniqueLocal)
-                {
-                    return DynDnsIpAddressType.UniqueLocal;
-                }
-                else if (
-                    this.ipAddress.ToString().StartsWith("10.") ||
-                    this.ipAddress.ToString().StartsWith("172.16.") ||
-                    this.ipAddress.ToString().StartsWith("172.17.") ||
-                    this.ipAddress.ToString().StartsWith("172.18.") ||
-                    this.ipAddress.ToString().StartsWith("172.19.") ||
-                    this.ipAddress.ToString().StartsWith("172.20.") ||
-                    this.ipAddress.ToString().StartsWith("172.21.") ||
-                    this.ipAddress.ToString().StartsWith("172.22.") ||
-                    this.ipAddress.ToString().StartsWith("172.23.") ||
-                    this.ipAddress.ToString().StartsWith("172.24.") ||
-                    this.ipAddress.ToString().StartsWith("172.25.") ||
-                    this.ipAddress.ToString().StartsWith("172.26.") ||
-                    this.ipAddress.ToString().StartsWith("172.27.") ||
-                    this.ipAddress.ToString().StartsWith("172.28.") ||
-                    this.ipAddress.ToString().StartsWith("172.29.") ||
-                    this.ipAddress.ToString().StartsWith("172.30.") ||
-                    this.ipAddress.ToString().StartsWith("172.31.") ||
-                    this.ipAddress.ToString().StartsWith("192.168.")
-                ) {
-                    return DynDnsIpAddressType.Private;
+                    if (!this.isValid)
+                    {
+                        this.ipAddressType = DynDnsIpAddressType.NotValid;
+                    }
+                    else if (this.ipAddress.IsIPv6LinkLocal)
+                    {
+                        this.ipAddressType = DynDnsIpAddressType.LinkLocal;
+                    }
+                    else if (this.ipAddress.IsIPv6UniqueLocal)
+                    {
+                        this.ipAddressType = DynDnsIpAddressType.UniqueLocal;
+                    }
+                    else if (
+                        this.ipAddress.ToString().StartsWith("10.") ||
+                        this.ipAddress.ToString().StartsWith("172.16.") ||
+                        this.ipAddress.ToString().StartsWith("172.17.") ||
+                        this.ipAddress.ToString().StartsWith("172.18.") ||
+                        this.ipAddress.ToString().StartsWith("172.19.") ||
+                        this.ipAddress.ToString().StartsWith("172.20.") ||
+                        this.ipAddress.ToString().StartsWith("172.21.") ||
+                        this.ipAddress.ToString().StartsWith("172.22.") ||
+                        this.ipAddress.ToString().StartsWith("172.23.") ||
+                        this.ipAddress.ToString().StartsWith("172.24.") ||
+                        this.ipAddress.ToString().StartsWith("172.25.") ||
+                        this.ipAddress.ToString().StartsWith("172.26.") ||
+                        this.ipAddress.ToString().StartsWith("172.27.") ||
+                        this.ipAddress.ToString().StartsWith("172.28.") ||
+                        this.ipAddress.ToString().StartsWith("172.29.") ||
+                        this.ipAddress.ToString().StartsWith("172.30.") ||
+                        this.ipAddress.ToString().StartsWith("172.31.") ||
+                        this.ipAddress.ToString().StartsWith("192.168.")
+                    )
+                    {
+                        this.ipAddressType = DynDnsIpAddressType.Private;
+                    }
+                    else
+                    {
+                        this.ipAddressType = DynDnsIpAddressType.Public;
+                    }
                 }
 
-                return DynDnsIpAddressType.Public;
+                return this.ipAddressType;
             }
+
+            set { this.ipAddressType = value; }
         }
 
-        public DynDnsIpAddressVersion DynDnsIpAddressVersion
+        public DynDnsIpAddressVersion IpAddressVersion
         {
             get
             {
@@ -162,7 +183,7 @@
             int numberOfAddressBlocks = 0;
             int numberOfBitsPerAddressBlocks = 0;
 
-            if (this.DynDnsIpAddressVersion == DynDnsIpAddressVersion.IPv4)
+            if (this.IpAddressVersion == DynDnsIpAddressVersion.IPv4)
             {
                 // set length according to protocol
                 numberOfAddressBlocks = 4;
@@ -182,7 +203,7 @@
                 }
             }
 
-            if (this.DynDnsIpAddressVersion == DynDnsIpAddressVersion.IPv6)
+            if (this.IpAddressVersion == DynDnsIpAddressVersion.IPv6)
             {
                 // set length according to protocol
                 numberOfAddressBlocks = 8;
@@ -256,7 +277,7 @@
                 networkAddressPart = networkAddressListBit.ElementAt(addressBlock);
 
 
-                if (this.DynDnsIpAddressVersion == DynDnsIpAddressVersion.IPv4)
+                if (this.IpAddressVersion == DynDnsIpAddressVersion.IPv4)
                 {
                     networkAddressPart = Convert.ToString(Convert.ToByte(networkAddressPart, 2));
                     networkAddress += networkAddressPart.ToLower();
@@ -266,7 +287,7 @@
                 }
 
 
-                if (this.DynDnsIpAddressVersion == DynDnsIpAddressVersion.IPv6)
+                if (this.IpAddressVersion == DynDnsIpAddressVersion.IPv6)
                 {
                     networkAddressPart = Convert.ToInt16(networkAddressPart, 2).ToString("X4");
                     networkAddress += networkAddressPart.ToLower();

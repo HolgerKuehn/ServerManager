@@ -36,7 +36,7 @@
 
             foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
             {
-                if (ipAddress.DynDnsIpAddressType == ipAddressType && ipAddress.DynDnsIpAddressVersion == ipAddressVersion)
+                if (ipAddress.IpAddressType == ipAddressType && ipAddress.IpAddressVersion == ipAddressVersion)
                 {
                     ipAddressCollection.Add(ipAddress);
                 }
@@ -51,9 +51,9 @@
 
             foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
             {
-                if (!ipAddressTypeCollection.Contains(ipAddress.DynDnsIpAddressType))
+                if (!ipAddressTypeCollection.Contains(ipAddress.IpAddressType))
                 {
-                    ipAddressTypeCollection.Add(ipAddress.DynDnsIpAddressType);
+                    ipAddressTypeCollection.Add(ipAddress.IpAddressType);
                 }
             }
 
@@ -143,13 +143,18 @@
 
             foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
             {
-                if (ipAddress.DynDnsIpAddressType != ipAddressType)
+                if (ipAddress.IpAddressType != ipAddressType)
                 {
                     ipAddressCollection.Add(ipAddress);
                 }
             }
 
             this.IpAddressCollection = ipAddressCollection;
+        }
+
+        public DynDnsIpAddress ElementAt(int index)
+        {
+            return this.IpAddressCollection[index];
         }
     }
 }

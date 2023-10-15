@@ -141,8 +141,8 @@ INSERT INTO "LogOrigin" ("LogOrigin_ID","LogOrigin_Class","LogOrigin_Function","
 INSERT INTO "LogOrigin" ("LogOrigin_ID","LogOrigin_Class","LogOrigin_Function","LogOrigin_Step") VALUES (8,'ThreadDynDns','ThreadDynDns','');
 INSERT INTO "LogOrigin" ("LogOrigin_ID","LogOrigin_Class","LogOrigin_Function","LogOrigin_Step") VALUES (9,'DynDnsDomain','DynDnsDomain','');
 INSERT INTO "LogOrigin" ("LogOrigin_ID","LogOrigin_Class","LogOrigin_Function","LogOrigin_Step") VALUES (10,'DynDnsServer','DynDnsServer','');
-INSERT INTO "LogOrigin" ("LogOrigin_ID","LogOrigin_Class","LogOrigin_Function","LogOrigin_Step") VALUES (11,'DynDnsNetworkObject','DynDnsNetworkObject','');
-INSERT INTO "LogOrigin" ("LogOrigin_ID","LogOrigin_Class","LogOrigin_Function","LogOrigin_Step") VALUES (12,'DynDnsNetworkObject','GetIpAddress','');
+INSERT INTO "LogOrigin" ("LogOrigin_ID","LogOrigin_Class","LogOrigin_Function","LogOrigin_Step") VALUES (11,'DynDnsService','DynDnsService','');
+INSERT INTO "LogOrigin" ("LogOrigin_ID","LogOrigin_Class","LogOrigin_Function","LogOrigin_Step") VALUES (12,'DynDnsService','GetIpAddress','');
 INSERT INTO "LogSeverity" ("LogSeverity_ID","LogSeverity_Name") VALUES (1,'Debug');
 INSERT INTO "LogSeverity" ("LogSeverity_ID","LogSeverity_Name") VALUES (2,'Informational');
 INSERT INTO "LogSeverity" ("LogSeverity_ID","LogSeverity_Name") VALUES (4,'Notice');
@@ -222,8 +222,8 @@ inner join LogOrigin as c on
 order by a.Log_ID desc
 
 limit 10000;');
-INSERT INTO "Command" ("Command_ID","Command_Class","Command_Function","Command_Step","CommandType_ID","Command_Name") VALUES (7,'DynDnsNetworkObject','GetIpAddress','',2,'Resolve-DNSName -Name <DomainName> -Server <DnsServer> | Select-Object IPAddress');
-INSERT INTO "Command" ("Command_ID","Command_Class","Command_Function","Command_Step","CommandType_ID","Command_Name") VALUES (8,'DynDnsNetworkObject','DynDnsNetworkObject','',1,'select a.DynDnsService_Name
+INSERT INTO "Command" ("Command_ID","Command_Class","Command_Function","Command_Step","CommandType_ID","Command_Name") VALUES (7,'DynDnsService','GetIpAddress','',2,'Resolve-DNSName -Name <DomainName> -Server <DnsServer> | Select-Object IPAddress');
+INSERT INTO "Command" ("Command_ID","Command_Class","Command_Function","Command_Step","CommandType_ID","Command_Name") VALUES (8,'DynDnsService','DynDnsService','',1,'select a.DynDnsService_Name
 
 from DynDnsService a
 

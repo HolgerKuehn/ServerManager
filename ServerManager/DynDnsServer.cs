@@ -1,9 +1,8 @@
 ﻿namespace blog.dachs.ServerManager
 {
     using System.Data;
-    using System.Diagnostics;
 
-    public class DynDnsServer : DynDnsNetworkObject
+    public class DynDnsServer : DynDnsService
     {
         private DynDnsDomainCollection dynDnsDomains;
 
