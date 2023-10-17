@@ -8,6 +8,8 @@ namespace blog.dachs.ServerManager
     {
         public DynDnsServerLocal(Configuration configuration, int dynDnsSerciceID) : base(configuration, dynDnsSerciceID)
         {
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "set private DNS-Server IP Addresses"));
+
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
 
             foreach (NetworkInterface networkInterface in networkInterfaces)

@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections;
-    using System.Data;
-    using System.Net;
 
     public class DynDnsIpAddressCollection : GlobalExtention, IList
     {
@@ -26,6 +24,23 @@
 
             ipAddressCollection.AddRange(this.GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv4));
             ipAddressCollection.AddRange(this.GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv6));
+
+            return ipAddressCollection;
+        }
+
+        public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressVersion ipAddressVersion)
+        {
+            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
+
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.Public, ipAddressVersion));
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.Private, ipAddressVersion));
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.UniqueLocal, ipAddressVersion));
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.LinkLocal, ipAddressVersion));
+
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic, ipAddressVersion));
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate, ipAddressVersion));
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal, ipAddressVersion));
+            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal, ipAddressVersion));
 
             return ipAddressCollection;
         }
@@ -127,6 +142,11 @@
         public void Add(DynDnsIpAddress ipAddress)
         {
             this.IpAddressCollection.Add(ipAddress);
+        }
+
+        public void Add(DynDnsIpAddressCollection ipAddressCollection)
+        {
+            this.AddRange(ipAddressCollection);
         }
 
         public void AddRange(DynDnsIpAddressCollection ipAddressCollection)

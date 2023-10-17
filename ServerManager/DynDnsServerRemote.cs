@@ -2,9 +2,17 @@
 {
     public class DynDnsServerRemote : DynDnsServer
     {
-        public DynDnsServerRemote(Configuration configuration, int dynDnsSerciceID) : base(configuration, dynDnsSerciceID)
+        public DynDnsServerRemote(Configuration configuration, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
         {
+        }
 
+        public override void GetIpAddress()
+        {
+            // get only public IP 
+            base.GetPublicIpAddress();
+
+            // invoke depending objects
+            base.GetIpAddress();
         }
     }
 }

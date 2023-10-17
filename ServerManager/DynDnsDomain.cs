@@ -3,21 +3,23 @@ using System.Text;
 
 namespace blog.dachs.ServerManager
 {
-    public class DynDnsDomain : GlobalExtention
+    public class DynDnsDomain : DynDnsService
     {
-        private int dynDnsDomainID;
-        private string dynDnsDomainName;
-        private string dynDnsDomainUser;
-        private string dynDnsDomainPassword;
+        private int id;
+        private string name;
+        private string user;
+        private string password;
 
-        public DynDnsDomain(Configuration configuration, int dynDnsDomainID) : base(configuration)
+        private DynDnsServiceCollection serviceCollection;
+
+        public DynDnsDomain(Configuration configuration, int dynDnsDomainID, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
         {
-            this.DynDnsDomainID = dynDnsDomainID;
+            this.ID = dynDnsDomainID;
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "creating DynDnsDomain with DynDnsDomain_ID = " + this.DynDnsDomainID.ToString()));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "creating DynDnsDomain with DynDnsDomain_ID = " + this.ID.ToString()));
             
-            string sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsDomain_DynDnsDomain);
-            sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.DynDnsDomainID.ToString());
+            string sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsDomainProperties);
+            sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.ID.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
@@ -37,50 +39,111 @@ namespace blog.dachs.ServerManager
 
                 if (dynDnsDomainName != null)
                 {
-                    this.DynDnsDomainName = dynDnsDomainName;
-                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "created DynDnsDomain with DynDnsDomain_Name = " + this.DynDnsDomainName));
+                    this.Name = dynDnsDomainName;
+                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "created DynDnsDomain with DynDnsDomain_Name = " + this.Name));
                 }
 
                 if (dynDnsDomainUserBase64 != null)
                 {
-                    this.DynDnsDomainUser = Encoding.UTF8.GetString(Convert.FromBase64String(dynDnsDomainUserBase64));
+                    this.User = Encoding.UTF8.GetString(Convert.FromBase64String(dynDnsDomainUserBase64));
                 }
 
                 if (dynDnsDomainPasswordBase64 != null)
                 {
-                    this.DynDnsDomainPassword = Encoding.UTF8.GetString(Convert.FromBase64String(dynDnsDomainPasswordBase64));
+                    this.Password = Encoding.UTF8.GetString(Convert.FromBase64String(dynDnsDomainPasswordBase64));
                 }
             }
 
             // reading updater URI
 
             // reading servies
+            this.ServiceCollection = new DynDnsServiceCollection(this.Configuration);
 
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "reading services for DynDnsDomain with DynDnsDomain_Name = " + this.Name));
 
+            sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsServices);
+            sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.ID.ToString());
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
+
+            dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            dataRow = null;
+            int serviceID = 0;
+            DynDnsServiceType dynDnsServiceType;
+            DynDnsService dynDnsService = null;
+
+            // iterate each Service
+            for (int row = 0; row < dataTable.Rows.Count; row++)
+            {
+                dataRow = dataTable.Rows[row];
+                serviceID = Convert.ToInt32(dataRow[0].ToString());
+                dynDnsServiceType = (DynDnsServiceType)Convert.ToByte(dataRow[1].ToString());
+
+                // create Service accordingly to dynDnsServiceTypeID
+                switch (dynDnsServiceType)
+                {
+                    case DynDnsServiceType.ServiceLocal:
+                        dynDnsService = new DynDnsServiceLocal(this.Configuration, serviceID);
+                        break;
+
+                    case DynDnsServiceType.ServiceRemote:
+                        dynDnsService = new DynDnsServiceRemote(this.Configuration, serviceID);
+                        break;
+                }
+
+                this.ServiceCollection.Add(dynDnsService);
+            }
         }
 
-        public int DynDnsDomainID
+        public int ID
         {
-            get { return this.dynDnsDomainID; }
-            set { this.dynDnsDomainID = value; }
+            get { return this.id; }
+            set { this.id = value; }
         }
 
-        public string DynDnsDomainName
+        public string Name
         {
-            get { return this.dynDnsDomainName; }
-            set { this.dynDnsDomainName = value; }
+            get { return this.name; }
+            set { this.name = value; }
         }
 
-        public string DynDnsDomainUser
+        public string User
         {
-            get { return this.dynDnsDomainUser; }
-            set { this.dynDnsDomainUser = value; }
+            get { return this.user; }
+            set { this.user = value; }
         }
 
-        public string DynDnsDomainPassword
+        public string Password
         {
-            get { return this.dynDnsDomainPassword; }
-            set { this.dynDnsDomainPassword = value; }
+            get { return this.password; }
+            set { this.password = value; }
+        }
+
+        public DynDnsServiceCollection ServiceCollection
+        {
+            get { return serviceCollection; }
+            set { this.serviceCollection = value; }
+        }
+
+        public override void GetIpAddress()
+        {
+            foreach (DynDnsService service in this.ServiceCollection)
+            {
+                service.GetIpAddress();
+            }
+        }
+
+        public override void SetDnsServer()
+        {
+            foreach (DynDnsService service in this.ServiceCollection)
+            {
+                service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic));
+                service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate));
+                service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal));
+                service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal));
+
+                service.SetDnsServer();
+            }
         }
     }
 }

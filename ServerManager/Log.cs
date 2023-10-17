@@ -33,7 +33,11 @@
         DynDnsService_DynDnsService = 11,
         DynDnsService_GetDnsIpAddress = 12,
         DynDnsService_GetPublicIpAddress = 13,
-        DynDnsService_PerpareIpAddressCollectionToDisc = 14
+        DynDnsService_PrepareIpAddressCollectionToDisc = 14,
+        DynDnsService_WriteIpAddressCollectionToDisc = 15,
+        DynDnsServerLocal_DynDnsServerLocal = 16,
+        DynDnsServer_GetPublicIpAddress = 17,
+        DynDnsService_UpdatePublicDnsIpAddress = 18
     }
 
     public abstract class Log : GlobalExtention

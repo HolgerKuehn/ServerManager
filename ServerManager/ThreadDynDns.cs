@@ -66,9 +66,12 @@
 
         public override void Work()
         {
+            this.DynDnsServer.SetDnsServer();
+
             while (true)
             {
                 this.DynDnsServer.GetIpAddress();
+                this.DynDnsServer.UpdatePublicDnsIpAddress();
 
                 Thread.Sleep(120000);
             }
