@@ -13,7 +13,7 @@
             string sqlCommand = this.HandlerDatabase.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
             
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand)); 
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand)); 
 
             DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             DataRow dataRow = null;
@@ -32,7 +32,7 @@
             sqlCommand = this.HandlerDatabase.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServer);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
 
             dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             dataRow = null;
@@ -71,6 +71,7 @@
             while (true)
             {
                 this.DynDnsServer.GetIpAddress();
+                
                 this.DynDnsServer.UpdatePublicDnsIpAddress();
 
                 Thread.Sleep(120000);

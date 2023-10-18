@@ -47,15 +47,55 @@
 
         public override void ExecuteCommand(string sqlCommand)
         {
+            bool retry = true;
             SQLiteCommand sqliteCommand = new SQLiteCommand(sqlCommand, (SQLiteConnection)this.dbConnection);
-            sqliteCommand.ExecuteNonQuery();
+
+            while (retry)
+            {
+                retry = false;
+
+                try
+                {
+                    sqliteCommand.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    // database locked
+                    if (ex.ErrorCode == 5)
+                    { 
+                        retry = true;
+                        Thread.Sleep(5000);
+                    }
+                }
+            }
+
         }
 
         public override DataTable GetDataTable(string sqlCommand)
         {
+            bool retry = true;
             DataTable dataTable = new DataTable();
             SQLiteDataAdapter sqliteDataAdapter = new SQLiteDataAdapter(sqlCommand, (SQLiteConnection)this.dbConnection);
-            sqliteDataAdapter.Fill(dataTable);
+
+
+            while (retry)
+            {
+                retry = false;
+
+                try
+                {
+                    sqliteDataAdapter.Fill(dataTable);
+                }
+                catch (SQLiteException ex)
+                {
+                    // database locked
+                    if (ex.ErrorCode == 5)
+                    {
+                        retry = true;
+                        Thread.Sleep(5000);
+                    }
+                }
+            }
 
             return dataTable;
         }

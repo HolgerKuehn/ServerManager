@@ -31,7 +31,7 @@
             string sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsServer_DynDnsServer);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
 
             DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             DataRow dataRow = null;
@@ -121,6 +121,16 @@
                 domain.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal));
 
                 domain.SetDnsServer();
+            }
+        }
+
+        public override void UpdatePublicDnsIpAddress()
+        {
+            base.UpdatePublicDnsIpAddress();
+
+            foreach(DynDnsDomain domain in this.DomainCollection)
+            {
+                domain.UpdatePublicDnsIpAddress();
             }
         }
     }

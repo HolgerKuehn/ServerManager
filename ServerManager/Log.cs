@@ -8,14 +8,15 @@
 
     public enum LogSeverity : byte
     {
-        Emergency = 128,
-        Alert = 64,
-        Critical = 32,
-        Error = 16,
-        Warning = 8,
+        SQL = 1,
+        Debug = 2,
+        Informational = 3,
         Notice = 4,
-        Informational = 2,
-        Debug = 1
+        Warning = 5,
+        Error = 6,
+        Critical = 7,
+        Alert = 8,
+        Emergency = 9
     }
 
     public enum LogOrigin : byte
@@ -37,7 +38,8 @@
         DynDnsService_WriteIpAddressCollectionToDisc = 15,
         DynDnsServerLocal_DynDnsServerLocal = 16,
         DynDnsServer_GetPublicIpAddress = 17,
-        DynDnsService_UpdatePublicDnsIpAddress = 18
+        DynDnsService_UpdatePublicDnsIpAddress = 18,
+        DynDnsServiceLocal_UpdatePublicDnsIpAddress = 19
     }
 
     public abstract class Log : GlobalExtention

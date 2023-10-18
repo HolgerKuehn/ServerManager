@@ -16,8 +16,10 @@
         DynDnsService_WriteIpAddressCollectionToDisc_ReadIpAddressID = 12,
         DynDnsDomain_DynDnsDomain_DynDnsServices = 13,
         DynDnsServer_GetIpAddress = 14,
-        DynDnsService_UpdatePublicDnsIpAddress_NonPublicIpAddressType = 15,
-        DynDnsService_UpdatePublicDnsIpAddress_ReadRemoteServiceID = 16,
-        DynDnsService_UpdatePublicDnsIpAddress_NonRemoteService = 17
+        DynDnsService_UpdatePublicDnsIpAddress_UpdateIpAddress = 15,
+        DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDNonPublicIp = 16,
+        DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp = 17,
+        DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID = 18,
+        DynDnsDomain_DynDnsDomain_ReadUpdateUri = 19
     }
 }

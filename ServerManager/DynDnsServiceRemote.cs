@@ -1,4 +1,6 @@
 ﻿
+using System.Data;
+
 namespace blog.dachs.ServerManager
 {
     public class DynDnsServiceRemote : DynDnsService
@@ -13,5 +15,13 @@ namespace blog.dachs.ServerManager
             // get only DNS IP 
             base.GetPublicIpAddress();
         }
+
+        public override void UpdatePublicDnsIpAddress()
+        {
+            base.UpdatePublicDnsIpAddress();
+
+            this.UpdatePublicDnsIpAddress(Command.DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp, "set public IPs from " + this.Name + " (RemoteService) as updated");
+        }
+
     }
 }
