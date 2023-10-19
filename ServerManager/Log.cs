@@ -39,7 +39,8 @@
         DynDnsServerLocal_DynDnsServerLocal = 16,
         DynDnsServer_GetPublicIpAddress = 17,
         DynDnsService_UpdatePublicDnsIpAddress = 18,
-        DynDnsServiceLocal_UpdatePublicDnsIpAddress = 19
+        DynDnsServiceLocal_UpdatePublicDnsIpAddress = 19,
+        DynDnsService_WriteLogForChangedIpAddress = 20
     }
 
     public abstract class Log : GlobalExtention

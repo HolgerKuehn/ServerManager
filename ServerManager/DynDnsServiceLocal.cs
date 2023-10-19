@@ -61,7 +61,7 @@ namespace blog.dachs.ServerManager
                 if (ipAddressCollection.Count > 0)
                 {
                     url = url.Replace("<ip4addr>", ipAddressCollection.ElementAt(0).IpAddress.ToString());
-                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "updated Public IPs for " + this.Name + " to " + ipAddressCollection.ElementAt(0).IpAddress.ToString()));
+                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "updated Public IPv4 IP for " + this.Name + " to " + ipAddressCollection.ElementAt(0).IpAddress.ToString()));
                 }
                 else
                 {
@@ -72,7 +72,7 @@ namespace blog.dachs.ServerManager
                 if (ipAddressCollection.Count > 0)
                 {
                     url = url.Replace("<ip6addr>", ipAddressCollection.ElementAt(0).IpAddress.ToString());
-                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "updated Public IPs for " + this.Name + " to " + ipAddressCollection.ElementAt(0).IpAddress.ToString()));
+                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "updated Public IPV6 IP for " + this.Name + " to " + ipAddressCollection.ElementAt(0).IpAddress.ToString()));
                 }
                 else
                 {

@@ -14,7 +14,7 @@
             systemTrayIcon.Visible = true;
 
             systemTrayIcon.ContextMenuStrip = new ContextMenuStrip();
-            systemTrayIcon.ContextMenuStrip.Items.Add("GetLog", Image.FromFile("Icon\\48.ico"), SystemTrayIcon_OnLogClicked);
+            systemTrayIcon.ContextMenuStrip.Items.Add("Log", Image.FromFile("Icon\\48.ico"), SystemTrayIcon_OnLogClicked);
 
             // initialize log window
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiMain_GuiMain, "initializing GuiWindowLog"));

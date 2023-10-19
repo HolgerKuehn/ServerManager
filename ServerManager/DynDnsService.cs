@@ -44,7 +44,10 @@
                 dynDnsServiceName = dataRow[0].ToString();
                 
                 if (dynDnsServiceName != null)
+                {
                     this.Name = dynDnsServiceName;
+                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsService_DynDnsService, "created DynDnsService with DynDnsService_Name = " + this.Name));
+                }
             }
         }
 
@@ -246,6 +249,35 @@
             }
         }
 
+        public void WriteLogForChangedIpAddress()
+        {
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, "write changed IPs for " + this.Name + " to log"));
+
+            string sqlCommandWriteLogForChangedIpAddress = this.HandlerDatabase.GetCommand(Command.DynDnsService_WriteLogForChangedIpAddress);
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, sqlCommandWriteLogForChangedIpAddress));
+
+            sqlCommandWriteLogForChangedIpAddress = sqlCommandWriteLogForChangedIpAddress.Replace("<DynDnsServiceID>", Convert.ToString(this.DynDnsServiceID));
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, sqlCommandWriteLogForChangedIpAddress));
+
+            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommandWriteLogForChangedIpAddress);
+            DataRow dataRow = null;
+            DynDnsIpAddressType ipAddressTypeID = 0;
+            DynDnsIpAddressVersion ipAddressVersion = 0;
+            string ipAddress = string.Empty;
+
+            for (int row = 0; row < dataTable.Rows.Count; row++)
+            {
+                dataRow = dataTable.Rows[row];
+                ipAddressTypeID = (DynDnsIpAddressType)Convert.ToByte(dataRow[0].ToString());
+                ipAddressVersion = (DynDnsIpAddressVersion)Convert.ToByte(dataRow[1].ToString());
+                ipAddress = dataRow[2].ToString();
+
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, "Service \"" + this.Name + "\" changend " + ipAddressTypeID.ToString() + " IP on " + ipAddressVersion + " to " + ipAddress));
+            }
+        }
+
         public virtual void UpdatePublicDnsIpAddress()
         {
             this.UpdatePublicDnsIpAddress(Command.DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDNonPublicIp, "set non-public IPs from " + this.Name + " as updated");
@@ -300,7 +332,6 @@
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_UpdatePublicDnsIpAddress, sqlCommandUpdateIpAddressReplace));
             this.HandlerDatabase.ExecuteCommand(sqlCommandUpdateIpAddressReplace);
         }
-
 
         public virtual void UpdatePublicDnsIpAddress(string updateUri, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion)
         {

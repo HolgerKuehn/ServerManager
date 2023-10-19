@@ -20,6 +20,7 @@
         DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDNonPublicIp = 16,
         DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp = 17,
         DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID = 18,
-        DynDnsDomain_DynDnsDomain_ReadUpdateUri = 19
+        DynDnsDomain_DynDnsDomain_ReadUpdateUri = 19,
+        DynDnsService_WriteLogForChangedIpAddress = 20
     }
 }

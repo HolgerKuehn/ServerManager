@@ -60,7 +60,7 @@ namespace blog.dachs.ServerManager
             // reading updater URI
             this.UpdateUri = new Dictionary<DynDnsIpAddressVersion, string>();
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "reading update URIs for DynDnsDomain with DynDnsDomain_Name = " + this.Name));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "reading update URIs for DynDnsDomain with DynDnsDomain_Name = " + this.Name));
 
             sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsDomain_DynDnsDomain_ReadUpdateUri);
             sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.ID.ToString());

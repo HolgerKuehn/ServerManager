@@ -15,7 +15,7 @@ namespace blog.dachs.ServerManager
 
             try
             {
-                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ProgramMain_Main, "starting ServerManager"));
+                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ProgramMain_Main, "starting ServerManager on \"" + Environment.MachineName + "\""));
 
                 configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "create new ThreadDynDns"));
                 threadCollection.ThreadDynDns(configuration);

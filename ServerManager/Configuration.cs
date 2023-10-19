@@ -24,11 +24,21 @@
             DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
             DataRow dataRow;
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            if (dataTable.Rows.Count != 0)
             {
-                dataRow = dataTable.Rows[row];
-                this.ConfigurationID = Convert.ToInt32(dataRow[0]);
-                this.MinimumLogSeverity = (LogSeverity)Convert.ToInt32(dataRow[1]);
+                for (int row = 0; row < dataTable.Rows.Count; row++)
+                {
+                    dataRow = dataTable.Rows[row];
+                    this.ConfigurationID = Convert.ToInt32(dataRow[0]);
+                    this.MinimumLogSeverity = (LogSeverity)Convert.ToInt32(dataRow[1]);
+                }
+            }
+            else
+            {
+                string message = "No Configuration for MachineName \"" + Environment.MachineName + "\" found";
+                string title = "Missing Configuration";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                MessageBox.Show(message, title, buttons, MessageBoxIcon.Warning);
             }
         }
 

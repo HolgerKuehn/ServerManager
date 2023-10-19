@@ -71,7 +71,7 @@
             while (true)
             {
                 this.DynDnsServer.GetIpAddress();
-                
+                this.DynDnsServer.WriteLogForChangedIpAddress();
                 this.DynDnsServer.UpdatePublicDnsIpAddress();
 
                 Thread.Sleep(120000);
