@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.DirectoryServices.ActiveDirectory;
 using System.Net;
 using System.Text;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
@@ -169,12 +170,25 @@ namespace blog.dachs.ServerManager
         {
             foreach (DynDnsService service in this.ServiceCollection)
             {
-                service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic));
+                DynDnsIpAddressCollection ipAddressCollection = service.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic);
+                if (ipAddressCollection.Count == 0)
+                {
+                    service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic));
+                }
+
                 service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate));
                 service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal));
                 service.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal));
 
                 service.SetDnsServer();
+            }
+        }
+
+        public override void WriteLogForChangedIpAddress()
+        {
+            foreach (DynDnsService service in this.ServiceCollection)
+            {
+                service.WriteLogForChangedIpAddress();
             }
         }
 

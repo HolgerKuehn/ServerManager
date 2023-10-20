@@ -31,16 +31,18 @@
         ThreadDynDns_ThreadDynDns = 8,
         DynDnsDomain_DynDnsDomain = 9,
         DynDnsServer_DynDnsServer = 10,
+        DynDnsServer_GetPublicIpAddress = 17,
+        DynDnsServer_SetDnsServer = 21,
+        DynDnsServerLocal_DynDnsServerLocal = 16,
         DynDnsService_DynDnsService = 11,
         DynDnsService_GetDnsIpAddress = 12,
         DynDnsService_GetPublicIpAddress = 13,
         DynDnsService_PrepareIpAddressCollectionToDisc = 14,
-        DynDnsService_WriteIpAddressCollectionToDisc = 15,
-        DynDnsServerLocal_DynDnsServerLocal = 16,
-        DynDnsServer_GetPublicIpAddress = 17,
+        DynDnsService_ReadIpAddressCollectionFromDisc = 22,
         DynDnsService_UpdatePublicDnsIpAddress = 18,
-        DynDnsServiceLocal_UpdatePublicDnsIpAddress = 19,
-        DynDnsService_WriteLogForChangedIpAddress = 20
+        DynDnsService_WriteIpAddressCollectionToDisc = 15,
+        DynDnsService_WriteLogForChangedIpAddress = 20,
+        DynDnsServiceLocal_UpdatePublicDnsIpAddress = 19
     }
 
     public abstract class Log : GlobalExtention

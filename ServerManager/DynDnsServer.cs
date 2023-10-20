@@ -9,21 +9,6 @@
 
         public DynDnsServer(Configuration configuration, int dynDnsSerciceID) : base (configuration, dynDnsSerciceID)
         {
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServer_DynDnsServer, "set public DNS-Server IP Addresses"));
-
-            DynDnsIpAddress dynDnsIpAddress;
-
-            dynDnsIpAddress = new DynDnsIpAddress(this.Configuration, "45.90.28.58");
-            dynDnsIpAddress.IpAddressType = DynDnsIpAddressType.DnsServerPublic;
-            dynDnsIpAddress.PrefixLength = 32;
-            this.IpAddressCollection.Add(dynDnsIpAddress);
-
-            dynDnsIpAddress = new DynDnsIpAddress(this.Configuration, "2a07:a8c0::6d:cda2");
-            dynDnsIpAddress.IpAddressType = DynDnsIpAddressType.DnsServerPublic;
-            dynDnsIpAddress.PrefixLength = 64;
-            this.IpAddressCollection.Add(dynDnsIpAddress);
-
-
             this.DomainCollection = new DynDnsDomainCollection(this.Configuration);
             
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServer_DynDnsServer, "reading Domains"));
@@ -43,6 +28,7 @@
             {
                 dataRow = dataTable.Rows[row];
                 domainID = Convert.ToInt32(dataRow[0].ToString());
+                serviceID = Convert.ToInt32(dataRow[1].ToString());
                 DynDnsDomain domain = new DynDnsDomain(this.Configuration, domainID, serviceID);
                 this.DomainCollection.Add(domain);
             }
@@ -113,14 +99,31 @@
 
         public override void SetDnsServer()
         {
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServer_SetDnsServer, "set public DNS-Server IP Addresses"));
+
             foreach (DynDnsDomain domain in this.DomainCollection)
             {
-                domain.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic));
+                DynDnsIpAddressCollection ipAddressCollection = domain.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic);
+                if (ipAddressCollection.Count == 0)
+                {
+                    domain.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic));
+                }
+
                 domain.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate));
                 domain.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal));
                 domain.IpAddressCollection.Add(this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal));
 
                 domain.SetDnsServer();
+            }
+        }
+
+        public override void WriteLogForChangedIpAddress()
+        {
+            base.WriteLogForChangedIpAddress();
+
+            foreach (DynDnsDomain domain in this.DomainCollection)
+            {
+                domain.WriteLogForChangedIpAddress();
             }
         }
 
