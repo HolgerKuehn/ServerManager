@@ -22,6 +22,10 @@
         DynDnsService_UpdatePublicDnsIpAddress_UpdateIpAddress = 15,
         DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDNonPublicIp = 16,
         DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp = 17,
-        DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID = 18
+        DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID = 18,
+        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromPowerShell = 22,
+        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_WriteFirewallRuleCollection = 23,
+        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromDisc = 24,
+        DynDnsFirewallRule_DynDnsFirewallRule = 25
     }
 }

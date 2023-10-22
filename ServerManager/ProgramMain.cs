@@ -1,5 +1,3 @@
-using System.Configuration;
-
 namespace blog.dachs.ServerManager
 {
     public static class ProgramMain
@@ -11,16 +9,14 @@ namespace blog.dachs.ServerManager
         static void Main()
         {
             Configuration configuration = new Configuration();
-            ThreadCollection threadCollection = new ThreadCollection(configuration);
-
+            
             try
             {
                 configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ProgramMain_Main, "starting ServerManager on \"" + Environment.MachineName + "\""));
 
                 configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "create new ThreadDynDns"));
-                threadCollection.ThreadDynDns(configuration);
-
-
+                configuration.ThreadCollection.ThreadDynDns(configuration);
+                
                 // To customize application configuration such as set high DPI settings or default font,
                 // see https://aka.ms/applicationconfiguration.
                 configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "initializing ApplicationConfiguration"));

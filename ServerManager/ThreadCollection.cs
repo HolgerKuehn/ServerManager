@@ -24,5 +24,15 @@
             ThreadWorker.Add(threadDynDns);
         }
 
+        public void ThreadFirewallRuleBaseProperties(Configuration configuration, DynDnsServerLocal server)
+        {
+            ThreadFirewallRuleBaseProperties threadFirewallRuleBaseProperties = new ThreadFirewallRuleBaseProperties(configuration, server);
+            Thread threadFirewallRuleBasePropertiesThread = new Thread(threadFirewallRuleBaseProperties.Work);
+            threadFirewallRuleBasePropertiesThread.Name = "ThreadFirewallRuleBaseProperties";
+            threadFirewallRuleBasePropertiesThread.Start();
+
+            ThreadWorker.Add(threadFirewallRuleBaseProperties);
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace blog.dachs.ServerManager
 {
+    using System.Configuration;
     using System.Data;
 
     public class Configuration
@@ -7,6 +8,7 @@
         private int configurationID;
         private Dictionary<LogType, Log> logs;
         private LogSeverity minimumLogSeverity;
+        ThreadCollection threadCollection;
         private HandlerDatabase handlerDatabase;
 
 
@@ -15,6 +17,8 @@
             this.Logs = new Dictionary<LogType, Log>();
             this.Logs[LogType.File] = new LogFile(this);
             this.Logs[LogType.Database] = new LogDatabase(this);
+
+            this.ThreadCollection = new ThreadCollection(this);
 
             this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase(this);
 
@@ -71,5 +75,10 @@
             set { this.minimumLogSeverity = value; }
         }
 
+        public ThreadCollection ThreadCollection
+        {
+            get { return this.threadCollection; }
+            set { this.threadCollection = value; }
+        }
     }
 }

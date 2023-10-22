@@ -60,6 +60,9 @@ namespace blog.dachs.ServerManager
                     }
                 }
             }
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "create new ThreadFirewallRuleBaseProperties"));
+            this.Configuration.ThreadCollection.ThreadFirewallRuleBaseProperties(configuration, this);
         }
 
         public override void UpdatePublicDnsIpAddress()

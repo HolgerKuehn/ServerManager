@@ -29,6 +29,7 @@
 
         public string Request(string url, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion = DynDnsIpAddressVersion.IPv6)
         {
+            string response = string.Empty;
             HttpClient httpClient = this.HttpClientCollection[ipAddressVersion];
 
             if (networkCredential.UserName != "")
@@ -38,7 +39,13 @@
                 httpClient.DefaultRequestHeaders.Authorization = networkCredentialHeader;
             }
 
-            string response = httpClient.GetStringAsync(url).Result;
+            try
+            {
+                response = httpClient.GetStringAsync(url).Result;
+            }
+            catch (Exception ex)
+            {
+            }
 
             return response;
         }
