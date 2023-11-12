@@ -54,7 +54,7 @@
 
             foreach (string firewallRule_Name in firewallRuleCollection)
             {
-                if (firewallRule_Name != string.Empty)
+                if (firewallRule_Name.Trim() != string.Empty)
                 {
                     sqlCommandWriteFirewallReplace = sqlCommandWriteFirewallRuleOriginal;
                     sqlCommandWriteFirewallReplace = sqlCommandWriteFirewallReplace.Replace("<DynDnsFirewallRule_Name>", firewallRule_Name.Trim());

@@ -22,6 +22,7 @@
         public DynDnsService(Configuration configuration, int dynDnsServiceID) : base(configuration)
         {
             this.IpAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
+            this.IpAddressCollection.ReferenceType = DynDnsIpAddressReferenceType.DynDnsService;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_DynDnsService, "reading DynDnsService properties"));
 
@@ -55,7 +56,11 @@
         public int DynDnsServiceID
         {
             get { return this.dynDnsServiceID; }
-            set { this.dynDnsServiceID = value; }
+            set
+            {
+                this.dynDnsServiceID = value;
+                this.IpAddressCollection.ReferenceId = value;
+            }
         }
 
         public string Name
@@ -155,52 +160,12 @@
 
         private void ReadIpAddressCollectionFromDisc()
         {
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_ReadIpAddressCollectionFromDisc, "read IPs for " + this.Name + " from disc"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_ReadIpAddressCollectionFromDisc, "read IPs for Service " + this.Name + " from disc"));
+            this.IpAddressCollection.ReadIpAddressCollectionFromDisc();
 
-            string sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsService_ReadIpAddressCollectionFromDisc);
-
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, sqlCommand));
-
-            sqlCommand = sqlCommand.Replace("<DynDnsServiceID>", Convert.ToString(this.DynDnsServiceID));
-
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, sqlCommand));
-
-            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
-            DataRow dataRow = null;
-            string ipAddressName = string.Empty;
-            DynDnsIpAddress ipAddress = null;
-            byte ipAddressPrefixLength = 0;
-            DynDnsIpAddressType ipAddressTypeID = 0;
-            string networkAddressName = string.Empty;
-            string networkAddressPrefixLength = string.Empty;
-            
-
-            for (int row = 0; row < dataTable.Rows.Count; row++)
-            {
-                dataRow = dataTable.Rows[row];
-                ipAddressTypeID = (DynDnsIpAddressType)Convert.ToByte(dataRow[0].ToString());
-                ipAddressName = dataRow[1].ToString();
-                networkAddressName = dataRow[2].ToString();
-
-                if (ipAddressName != null)
-                {
-                    ipAddress = new DynDnsIpAddress(this.Configuration, ipAddressName);
-                    ipAddress.IpAddressType = ipAddressTypeID;
-
-                    if(networkAddressName != null && networkAddressName.Contains("/"))
-                    {
-                        networkAddressPrefixLength = networkAddressName.Substring(networkAddressName.IndexOf("/", StringComparison.Ordinal) + 1);
-                        ipAddressPrefixLength = Convert.ToByte(networkAddressPrefixLength);
-                        ipAddress.PrefixLength = ipAddressPrefixLength;
-                    }
-
-                    this.ipAddressCollection.Add(ipAddress);
-                }
-            }
-
-
+            // check for DnsServer and add default if not presemt
             DynDnsIpAddressCollection ipAddressDnsServer = this.ipAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic);
-
+            
             if (ipAddressDnsServer.Count == 0)
             {
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_ReadIpAddressCollectionFromDisc, "set Public DNS-Server for " + this.Name));

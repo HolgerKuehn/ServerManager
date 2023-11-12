@@ -73,6 +73,8 @@
 
             // get private IP
             DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
+            ipAddressCollection.ReferenceType = DynDnsIpAddressReferenceType.DynDnsService;
+            ipAddressCollection.ReferenceId = this.DynDnsServiceID;
 
             if (Socket.OSSupportsIPv6)
             {

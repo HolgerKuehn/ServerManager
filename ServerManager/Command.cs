@@ -26,6 +26,10 @@
         DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromPowerShell = 22,
         DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_WriteFirewallRuleCollection = 23,
         DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromDisc = 24,
-        DynDnsFirewallRule_DynDnsFirewallRule = 25
+        DynDnsFirewallRule_DynDnsFirewallRule = 25,
+        DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName = 26,
+        DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled = 27,
+        DynDnsFirewallRule_ReadFirewallRuleBaseProperties_RemoteAddress = 28,
+        DynDnsIpCollection_ReadIpAddressCollectionFromDisc = 29
     }
 }

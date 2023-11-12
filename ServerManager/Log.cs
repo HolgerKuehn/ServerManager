@@ -44,7 +44,9 @@
         DynDnsService_WriteLogForChangedIpAddress = 20,
         DynDnsServiceLocal_UpdatePublicDnsIpAddress = 19,
         DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell = 23,
-        DynDnsFirewallRule_DynDnsFirewallRule = 24
+        DynDnsFirewallRule_DynDnsFirewallRule = 24,
+        DynDnsFirewallRule_ReadFirewallRuleBaseProperties = 25,
+        DynDnsIpCollection_ReadIpAddressCollectionFromDisc = 26
     }
 
     public abstract class Log : GlobalExtention

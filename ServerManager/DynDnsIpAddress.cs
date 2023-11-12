@@ -31,8 +31,12 @@
         IPv6 = 3
     }
 
-    public class DynDnsIpAddress : GlobalExtention
+    public class DynDnsIpAddress : GlobalExtention, IComparable
     {
+        private DynDnsIpAddressReferenceType referenceType;
+        private int referenceId;
+        private int ipAddressIndex;
+
         private bool isValid;
         private IPAddress ipAddress;
         private byte prefixLength;
@@ -47,6 +51,24 @@
         public DynDnsIpAddress(Configuration configuration, string ipAddress) : this(configuration)
         {
             this.IpAddress = ipAddress;
+        }
+
+        public DynDnsIpAddressReferenceType ReferenceType
+        {
+            get { return this.referenceType; }
+            set { this.referenceType = value; }
+        }
+
+        public int ReferenceId
+        {
+            get { return this.referenceId; }
+            set { this.referenceId = value; }
+        }
+
+        public int IpAddressIndex
+        {
+            get { return this.ipAddressIndex; }
+            set { this.ipAddressIndex = value; }
         }
 
         private bool IsValid
@@ -305,5 +327,22 @@
                 this.networkAddress = ipAddressTest;
             }
         }
+
+        #region IComparable
+
+        public int CompareTo(object? obj)
+        {
+            DynDnsIpAddress ipAddress = (DynDnsIpAddress)obj;
+
+            if (ipAddress == null) return 0;
+
+            if ((byte)this.IpAddressType < (byte)ipAddress.IpAddressType) return -1;
+            else if ((byte)this.IpAddressType > (byte)ipAddress.IpAddressType) return +1;
+            else if ((byte)this.IpAddressVersion < (byte)ipAddress.IpAddressVersion) return -1;
+            else if ((byte)this.IpAddressVersion > (byte)ipAddress.IpAddressVersion) return +1;
+            else return String.Compare(this.IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
+        }
+
+        #endregion
     }
 }

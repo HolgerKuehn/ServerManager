@@ -5,11 +5,11 @@
     using System.Net.Sockets;
     using System.Text;
 
-    public class HandlerWebRequest : GlobalExtention
+    public class WebRequest : GlobalExtention
     {
         private Dictionary<DynDnsIpAddressVersion, HttpClient> httpClientCollection;
 
-        public HandlerWebRequest(Configuration configuration) : base(configuration)
+        public WebRequest(Configuration configuration) : base(configuration)
         {
             this.HttpClientCollection = new Dictionary<DynDnsIpAddressVersion, HttpClient>();
             this.HttpClientCollection[DynDnsIpAddressVersion.IPv4] = this.GetHttpClient(DynDnsIpAddressVersion.IPv4);

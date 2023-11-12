@@ -9,7 +9,7 @@
         private Dictionary<LogType, Log> logs;
         private LogSeverity minimumLogSeverity;
         ThreadCollection threadCollection;
-        private HandlerDatabase handlerDatabase;
+        private Database handlerDatabase;
 
 
         public Configuration()
@@ -20,7 +20,7 @@
 
             this.ThreadCollection = new ThreadCollection(this);
 
-            this.HandlerDatabase = HandlerDatabase.GetHandlerDatabase(this);
+            this.HandlerDatabase = Database.GetHandlerDatabase(this);
 
             string sqlCommand = this.HandlerDatabase.GetCommand(Command.Configuration_Configuration);
             sqlCommand = sqlCommand.Replace("<MachineName>", Environment.MachineName);
@@ -57,7 +57,7 @@
             return this.Logs[logType];
         }
 
-        public HandlerDatabase HandlerDatabase
+        public Database HandlerDatabase
         {
             get { return this.handlerDatabase; }
             set { this.handlerDatabase = value; }

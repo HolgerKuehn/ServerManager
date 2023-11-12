@@ -55,6 +55,9 @@ namespace blog.dachs.ServerManager
                 }
 
                 this.RemoteAddresses = new DynDnsIpAddressCollection(this.Configuration);
+                this.RemoteAddresses.ReferenceType = DynDnsIpAddressReferenceType.DynDnsFirewallRule;
+                this.RemoteAddresses.ReferenceId = this.FirewallRuleID;
+
                 this.Services = new DynDnsServiceCollection(this.Configuration);
                 this.Active = false;
             }
@@ -102,5 +105,43 @@ namespace blog.dachs.ServerManager
             set { this.active = value; }
         }
 
+        public void ReadFirewallRuleBaseProperties()
+        {
+            string pshCommand;
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, "read base properties from firewall rule \"" + this.Name + "\""));
+
+            // read DisplayName
+            pshCommand = this.HandlerDatabase.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName);
+            pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", this.Name);
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
+            List<string> firewallRuleDisplayName = this.HandlerPowerShell.Command(pshCommand);
+
+            // remove caption
+            firewallRuleDisplayName.RemoveRange(0, 3);
+
+            // add DisplayName to firewallRule
+            if (firewallRuleDisplayName[0] != null)
+                this.DisplayName = firewallRuleDisplayName[0];
+
+            // read Enabled
+            pshCommand = this.HandlerDatabase.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled);
+            pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", this.Name);
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
+            List<string> firewallRuleEnabled = this.HandlerPowerShell.Command(pshCommand);
+
+            // remove caption
+            firewallRuleEnabled.RemoveRange(0, 3);
+
+            // add Enabled to firewallRule
+            if (firewallRuleEnabled[0] != null && firewallRuleEnabled[0].Trim().ToLower() == "false")
+            {
+                this.Enabled = false;
+            }
+            else
+            {
+                this.Enabled = true;
+            }
+        }
     }
 }

@@ -28,6 +28,11 @@
 
                 firewallRuleCollection.Clear();
                 firewallRuleCollection.ReadFirewallRuleCollectionFromPowerShell();
+                
+                foreach (DynDnsFirewallRule firewallRule in firewallRuleCollection)
+                {
+                    firewallRule.ReadFirewallRuleBaseProperties();
+                }
                 //server.FirewallRuleCollection = firewallRuleCollection;
 
                 Thread.Sleep(21600000);

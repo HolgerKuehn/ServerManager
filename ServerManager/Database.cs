@@ -2,9 +2,9 @@
 {
     using System.Data;
 
-    public abstract class HandlerDatabase : GlobalExtention
+    public abstract class Database : GlobalExtention
     {
-        protected HandlerDatabase(Configuration configuration) : base(configuration)
+        protected Database(Configuration configuration) : base(configuration)
         {
         }
 
@@ -14,9 +14,9 @@
 
         public abstract DataTable GetDataTable(string sqlCommand);
 
-        public static HandlerDatabase GetHandlerDatabase(Configuration configuration)
+        public static Database GetHandlerDatabase(Configuration configuration)
         {
-            return new HandlerSqlite(configuration);
+            return new Sqlite(configuration);
         }
     }
 }

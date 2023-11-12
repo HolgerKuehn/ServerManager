@@ -4,11 +4,11 @@
     using System.Data.Common;
     using System.Data.SQLite;
     
-    public class HandlerSqlite : HandlerDatabase
+    public class Sqlite : Database
     {
         private readonly DbConnection dbConnection;
 
-        public HandlerSqlite(Configuration configuration) : base(configuration)
+        public Sqlite(Configuration configuration) : base(configuration)
         {
             string connectionString = "Data Source=" + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "blog.dachs", "ServerManager", "ServerManager.db");
             dbConnection = new SQLiteConnection(connectionString);

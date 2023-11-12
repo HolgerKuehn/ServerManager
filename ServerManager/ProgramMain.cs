@@ -1,3 +1,5 @@
+using System.Windows.Forms;
+
 namespace blog.dachs.ServerManager
 {
     public static class ProgramMain
@@ -9,7 +11,7 @@ namespace blog.dachs.ServerManager
         static void Main()
         {
             Configuration configuration = new Configuration();
-            
+
             try
             {
                 configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ProgramMain_Main, "starting ServerManager on \"" + Environment.MachineName + "\""));
