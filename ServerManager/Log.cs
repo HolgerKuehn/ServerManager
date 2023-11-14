@@ -46,7 +46,13 @@
         DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell = 23,
         DynDnsFirewallRule_DynDnsFirewallRule = 24,
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties = 25,
-        DynDnsIpCollection_ReadIpAddressCollectionFromDisc = 26
+        DynDnsIpCollection_ReadIpAddressCollectionFromDisc = 26,
+        ThreadBackup_ThreadBackup = 27,
+        BackupCollection_BackupCollection = 28,
+        Backup_Backup = 29,
+        BackupSourceFile_PrepareOnDisc = 30,
+        BackupSourceFile_ReadBackupFileIdFromDisc = 31,
+        BackupSourceFile_WriteToDisc = 32
     }
 
     public abstract class Log : GlobalExtention

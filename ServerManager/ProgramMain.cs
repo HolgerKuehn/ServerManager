@@ -18,7 +18,10 @@ namespace blog.dachs.ServerManager
 
                 configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "create new ThreadDynDns"));
                 configuration.ThreadCollection.ThreadDynDns(configuration);
-                
+
+                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "create new ThreadBackup"));
+                configuration.ThreadCollection.ThreadBackup(configuration);
+
                 // To customize application configuration such as set high DPI settings or default font,
                 // see https://aka.ms/applicationconfiguration.
                 configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ProgramMain_Main, "initializing ApplicationConfiguration"));

@@ -100,7 +100,7 @@
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, "read IPs for ReferenceType " + this.ReferenceType + " and ReferenceID " + this.ReferenceId + " from disc"));
 
-            string sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsIpCollection_ReadIpAddressCollectionFromDisc);
+            string sqlCommand = this.Database.GetCommand(Command.DynDnsIpCollection_ReadIpAddressCollectionFromDisc);
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, sqlCommand));
 
@@ -109,7 +109,7 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, sqlCommand));
 
-            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
             string ipAddressName = string.Empty;
             DynDnsIpAddress ipAddress = null;

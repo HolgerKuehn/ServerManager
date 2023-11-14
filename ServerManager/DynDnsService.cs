@@ -29,12 +29,12 @@
             this.DynDnsServiceID = dynDnsServiceID;
             this.Name = string.Empty;
 
-            string sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsService_DynDnsService);
+            string sqlCommand = this.Database.GetCommand(Command.DynDnsService_DynDnsService);
             sqlCommand = sqlCommand.Replace("<DynDnsServiceID>", this.DynDnsServiceID.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_DynDnsService, sqlCommand));
 
-            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
             string dynDnsServiceName = string.Empty;
 
@@ -87,7 +87,7 @@
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_GetDnsIpAddress, "request DNS IP for " + this.Name));
 
-            string powerShellCommand = this.HandlerDatabase.GetCommand(Command.DynDnsService_GetDnsIpAddress);
+            string powerShellCommand = this.Database.GetCommand(Command.DynDnsService_GetDnsIpAddress);
             powerShellCommand = powerShellCommand.Replace("<DomainName>", this.name);
 
             if (Socket.OSSupportsIPv6)
@@ -101,7 +101,7 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_GetDnsIpAddress, powerShellCommand));
 
-            List<string> ipAddressList = this.HandlerPowerShell.Command(powerShellCommand);
+            List<string> ipAddressList = this.PowerShell.Command(powerShellCommand);
 
             foreach (string ipAddress in ipAddressList)
             {
@@ -188,7 +188,7 @@
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, "prepare Database for IP-Collection from " + this.Name + " (IP Address)"));
 
-            string sqlCommandOriginal = this.HandlerDatabase.GetCommand(Command.DynDnsService_PerpareIpAddressCollectionToDisc_IpAddress);
+            string sqlCommandOriginal = this.Database.GetCommand(Command.DynDnsService_PerpareIpAddressCollectionToDisc_IpAddress);
             string sqlCommandReplace;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, sqlCommandOriginal));
@@ -203,14 +203,14 @@
 
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, sqlCommandReplace));
 
-                this.HandlerDatabase.ExecuteCommand(sqlCommandReplace);
+                this.Database.ExecuteCommand(sqlCommandReplace);
             }
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, "prepare Database for IP-Collection from " + this.Name + " (Network Address)"));
 
-            string sqlCommandNetwork = this.HandlerDatabase.GetCommand(Command.DynDnsService_PerpareIpAddressCollectionToDisc_NetworkAddress);
+            string sqlCommandNetwork = this.Database.GetCommand(Command.DynDnsService_PerpareIpAddressCollectionToDisc_NetworkAddress);
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, sqlCommandNetwork));
-            this.HandlerDatabase.ExecuteCommand(sqlCommandNetwork);
+            this.Database.ExecuteCommand(sqlCommandNetwork);
         }
 
         public void WriteIpAddressCollectionToDisc()
@@ -224,9 +224,9 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_WriteIpAddressCollectionToDisc, "write IP-Collection from " + this.Name + " to disc"));
 
-            string sqlCommandReadIpAddressIDOriginal = this.HandlerDatabase.GetCommand(command);
+            string sqlCommandReadIpAddressIDOriginal = this.Database.GetCommand(command);
             string sqlCommandReadIpAddressIDReplace;
-            string sqlCommandWriteIpAddressOriginal = this.HandlerDatabase.GetCommand(Command.DynDnsService_WriteIpAddressCollectionToDisc_WriteIpAddress);
+            string sqlCommandWriteIpAddressOriginal = this.Database.GetCommand(Command.DynDnsService_WriteIpAddressCollectionToDisc_WriteIpAddress);
             string sqlCommandWriteIpAddressReplace;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteIpAddressCollectionToDisc, sqlCommandReadIpAddressIDOriginal));
@@ -243,7 +243,7 @@
 
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteIpAddressCollectionToDisc, sqlCommandReadIpAddressIDReplace));
 
-                DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommandReadIpAddressIDReplace);
+                DataTable dataTable = this.Database.GetDataTable(sqlCommandReadIpAddressIDReplace);
                 DataRow dataRow = null;
                 string dynDnsIpAddressIpAddressID = string.Empty;
                 string dynDnsIpAddressNetworkID = string.Empty;
@@ -263,7 +263,7 @@
                     sqlCommandWriteIpAddressReplace = sqlCommandWriteIpAddressReplace.Replace("<DynDnsIpAddressID>", dynDnsIpAddressIpAddressID);
                 
                     this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteIpAddressCollectionToDisc, sqlCommandWriteIpAddressReplace));
-                    this.HandlerDatabase.ExecuteCommand(sqlCommandWriteIpAddressReplace);
+                    this.Database.ExecuteCommand(sqlCommandWriteIpAddressReplace);
 
                     // set Network-Address
                     sqlCommandWriteIpAddressReplace = sqlCommandWriteIpAddressOriginal;
@@ -271,7 +271,7 @@
                     sqlCommandWriteIpAddressReplace = sqlCommandWriteIpAddressReplace.Replace("<DynDnsIpAddressID>", dynDnsIpAddressNetworkID);
 
                     this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteIpAddressCollectionToDisc, sqlCommandWriteIpAddressReplace));
-                    this.HandlerDatabase.ExecuteCommand(sqlCommandWriteIpAddressReplace);
+                    this.Database.ExecuteCommand(sqlCommandWriteIpAddressReplace);
                 }
             }
         }
@@ -280,7 +280,7 @@
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, "write changed IPs for " + this.Name + " to log"));
 
-            string sqlCommandWriteLogForChangedIpAddress = this.HandlerDatabase.GetCommand(Command.DynDnsService_WriteLogForChangedIpAddress);
+            string sqlCommandWriteLogForChangedIpAddress = this.Database.GetCommand(Command.DynDnsService_WriteLogForChangedIpAddress);
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, sqlCommandWriteLogForChangedIpAddress));
 
@@ -288,7 +288,7 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_WriteLogForChangedIpAddress, sqlCommandWriteLogForChangedIpAddress));
 
-            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommandWriteLogForChangedIpAddress);
+            DataTable dataTable = this.Database.GetDataTable(sqlCommandWriteLogForChangedIpAddress);
             DataRow dataRow = null;
             DynDnsIpAddressType ipAddressTypeID = 0;
             DynDnsIpAddressVersion ipAddressVersion = 0;
@@ -319,7 +319,7 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_WriteIpAddressCollectionToDisc, logMessage));
 
-            string sqlCommandReadIpAddressIDCommand = this.HandlerDatabase.GetCommand(command);
+            string sqlCommandReadIpAddressIDCommand = this.Database.GetCommand(command);
 
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_UpdatePublicDnsIpAddress, sqlCommandReadIpAddressIDCommand));
@@ -327,7 +327,7 @@
             sqlCommandReadIpAddressIDCommand = sqlCommandReadIpAddressIDCommand.Replace("<DynDnsIpAddressReferenceID>", this.DynDnsServiceID.ToString());
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_UpdatePublicDnsIpAddress, sqlCommandReadIpAddressIDCommand));
 
-            dataTable = this.HandlerDatabase.GetDataTable(sqlCommandReadIpAddressIDCommand);
+            dataTable = this.Database.GetDataTable(sqlCommandReadIpAddressIDCommand);
             dataRow = null;
 
             for (int row = 0; row < dataTable.Rows.Count; row++)
@@ -349,7 +349,7 @@
 
         public virtual void UpdatePublicDnsIpAddress(string dynDnsIpAddressId)
         {
-            string sqlCommandUpdateIpAddressOriginal = this.HandlerDatabase.GetCommand(Command.DynDnsService_UpdatePublicDnsIpAddress_UpdateIpAddress);
+            string sqlCommandUpdateIpAddressOriginal = this.Database.GetCommand(Command.DynDnsService_UpdatePublicDnsIpAddress_UpdateIpAddress);
             string sqlCommandUpdateIpAddressReplace = string.Empty;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_UpdatePublicDnsIpAddress, sqlCommandUpdateIpAddressOriginal));
@@ -357,7 +357,7 @@
             sqlCommandUpdateIpAddressReplace = sqlCommandUpdateIpAddressOriginal;
             sqlCommandUpdateIpAddressReplace = sqlCommandUpdateIpAddressReplace.Replace("<DynDnsIpAddressID>", dynDnsIpAddressId);
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_UpdatePublicDnsIpAddress, sqlCommandUpdateIpAddressReplace));
-            this.HandlerDatabase.ExecuteCommand(sqlCommandUpdateIpAddressReplace);
+            this.Database.ExecuteCommand(sqlCommandUpdateIpAddressReplace);
         }
 
         public virtual void UpdatePublicDnsIpAddress(string updateUri, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion)

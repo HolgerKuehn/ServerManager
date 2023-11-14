@@ -3,9 +3,10 @@
     public abstract class GlobalExtention
     {
         private Configuration configuration;
-        private Database handlerDatabase;
-        private PowerShell handlerPowerShell;
-        private WebRequest handlerWebRequest;
+        private Database database;
+        private PowerShell powerShell;
+        private WebRequest webRequest;
+        private bool changed;
 
         public GlobalExtention(Configuration configuration)
         {
@@ -18,40 +19,46 @@
             set { this.configuration = value; }
         }
 
-        public Database HandlerDatabase
+        public Database Database
         {
             get
             {
-                if (this.handlerDatabase == null)
-                    this.handlerDatabase = Database.GetHandlerDatabase(this.Configuration);
+                if (this.database == null)
+                    this.database = Database.GetHandlerDatabase(this.Configuration);
 
-                return this.handlerDatabase;
+                return this.database;
             }
-            set { this.handlerDatabase = value; }
+            set { this.database = value; }
         }
 
-        public PowerShell HandlerPowerShell
+        public PowerShell PowerShell
         {
             get
             {
-                if (this.handlerPowerShell == null)
-                    this.handlerPowerShell = new PowerShell(this.Configuration);
+                if (this.powerShell == null)
+                    this.powerShell = new PowerShell(this.Configuration);
 
-                return this.handlerPowerShell;
+                return this.powerShell;
             }
-            set { this.handlerPowerShell = value; }
+            set { this.powerShell = value; }
         }
 
-        public WebRequest HandlerWebRequest
+        public WebRequest WebRequest
         {
             get
             {
-                if (this.handlerWebRequest == null)
-                    this.handlerWebRequest = new WebRequest(this.Configuration);
+                if (this.webRequest == null)
+                    this.webRequest = new WebRequest(this.Configuration);
 
-                return this.handlerWebRequest;
+                return this.webRequest;
             }
-            set { this.handlerWebRequest = value; }
+            set { this.webRequest = value; }
+        }
+
+        public bool Changed
+        {
+            get { return this.changed; }
+            set { this.changed = value; }
         }
     }
 }

@@ -22,12 +22,12 @@ namespace blog.dachs.ServerManager
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "creating DynDnsDomain with DynDnsDomain_ID = " + this.ID.ToString()));
             
-            string sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsDomainProperties);
+            string sqlCommand = this.Database.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsDomainProperties);
             sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.ID.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
-            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
             string dynDnsDomainName;
             string dynDnsDomainUserBase64;
@@ -63,12 +63,12 @@ namespace blog.dachs.ServerManager
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "reading update URIs for DynDnsDomain with DynDnsDomain_Name = " + this.Name));
 
-            sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsDomain_DynDnsDomain_ReadUpdateUri);
+            sqlCommand = this.Database.GetCommand(Command.DynDnsDomain_DynDnsDomain_ReadUpdateUri);
             sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.ID.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
-            dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            dataTable = this.Database.GetDataTable(sqlCommand);
             dataRow = null;
             DynDnsIpAddressVersion ipAddressVersion;
             string updateUri = string.Empty;
@@ -88,12 +88,12 @@ namespace blog.dachs.ServerManager
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "reading services for DynDnsDomain with DynDnsDomain_Name = " + this.Name));
 
-            sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsServices);
+            sqlCommand = this.Database.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsServices);
             sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.ID.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
-            dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            dataTable = this.Database.GetDataTable(sqlCommand);
             dataRow = null;
             int serviceID = 0;
             DynDnsServiceType dynDnsServiceType;

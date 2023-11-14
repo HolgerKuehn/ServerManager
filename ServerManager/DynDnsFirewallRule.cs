@@ -21,11 +21,11 @@ namespace blog.dachs.ServerManager
             this.FirewallRuleID = firewallRuleID;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_DynDnsFirewallRule, "read firewall rule properties"));
-            sqlCommandReadFirewallRule = this.HandlerDatabase.GetCommand(Command.DynDnsFirewallRule_DynDnsFirewallRule);
+            sqlCommandReadFirewallRule = this.Database.GetCommand(Command.DynDnsFirewallRule_DynDnsFirewallRule);
             sqlCommandReadFirewallRule = sqlCommandReadFirewallRule.Replace("<DynDnsFirewallRuleID>", this.FirewallRuleID.ToString());
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_DynDnsFirewallRule, sqlCommandReadFirewallRule));
 
-            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommandReadFirewallRule);
+            DataTable dataTable = this.Database.GetDataTable(sqlCommandReadFirewallRule);
             DataRow dataRow = null;
             string firewallRuleName = string.Empty;
             string firewallRuleDisplayName = string.Empty;
@@ -112,10 +112,10 @@ namespace blog.dachs.ServerManager
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, "read base properties from firewall rule \"" + this.Name + "\""));
 
             // read DisplayName
-            pshCommand = this.HandlerDatabase.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName);
+            pshCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName);
             pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", this.Name);
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
-            List<string> firewallRuleDisplayName = this.HandlerPowerShell.Command(pshCommand);
+            List<string> firewallRuleDisplayName = this.PowerShell.Command(pshCommand);
 
             // remove caption
             firewallRuleDisplayName.RemoveRange(0, 3);
@@ -125,10 +125,10 @@ namespace blog.dachs.ServerManager
                 this.DisplayName = firewallRuleDisplayName[0];
 
             // read Enabled
-            pshCommand = this.HandlerDatabase.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled);
+            pshCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled);
             pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", this.Name);
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
-            List<string> firewallRuleEnabled = this.HandlerPowerShell.Command(pshCommand);
+            List<string> firewallRuleEnabled = this.PowerShell.Command(pshCommand);
 
             // remove caption
             firewallRuleEnabled.RemoveRange(0, 3);

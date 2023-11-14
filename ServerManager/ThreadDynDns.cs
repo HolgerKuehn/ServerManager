@@ -10,12 +10,12 @@
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServiceType"));
             
-            string sqlCommand = this.HandlerDatabase.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
+            string sqlCommand = this.Database.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
             
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand)); 
 
-            DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
             DynDnsServiceType dynDnsServiceType = DynDnsServiceType.Server;
 
@@ -29,12 +29,12 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServer"));
 
-            sqlCommand = this.HandlerDatabase.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServer);
+            sqlCommand = this.Database.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServer);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
 
-            dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            dataTable = this.Database.GetDataTable(sqlCommand);
             dataRow = null;
             int dynDnsServiceID = 0;
 

@@ -32,13 +32,13 @@ namespace blog.dachs.ServerManager
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "checking for updateable Public IPs (" + ipAddressVersion.ToString() + ") for " + this.Name));
 
-            sqlCommand = this.HandlerDatabase.GetCommand(Command.DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID);
+            sqlCommand = this.Database.GetCommand(Command.DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID);
             sqlCommand = sqlCommand.Replace("<DynDnsServiceID>", this.DynDnsServiceID.ToString());
             sqlCommand = sqlCommand.Replace("<DynDnsIpAddressVersionID>", Convert.ToByte(ipAddressVersion).ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, sqlCommand));
 
-            dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
+            dataTable = this.Database.GetDataTable(sqlCommand);
             dataRow = null;
 
             for (int row = 0; row < dataTable.Rows.Count; row++)
@@ -79,7 +79,7 @@ namespace blog.dachs.ServerManager
                     url = url.Replace("<ip6addr>", "::1");
                 }
 
-                this.HandlerWebRequest.Request(url, networkCredential, ipAddressVersion);
+                this.WebRequest.Request(url, networkCredential, ipAddressVersion);
 
 
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "set Public IPs for " + this.Name + " as updated"));

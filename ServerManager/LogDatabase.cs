@@ -4,7 +4,7 @@
     {
         public LogDatabase(Configuration configuration) : base(configuration)
         {
-            this.HandlerDatabase = Database.GetHandlerDatabase(configuration);
+            this.Database = Database.GetHandlerDatabase(configuration);
         }
 
         public override void WriteLog(LogEntry logEntry)
@@ -32,7 +32,7 @@
 
                 sqlInsertHeader += ") ";
 
-                this.HandlerDatabase.ExecuteCommand(sqlInsertHeader + sqlInsertValue);
+                this.Database.ExecuteCommand(sqlInsertHeader + sqlInsertValue);
             }
         }
     }

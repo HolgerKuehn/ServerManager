@@ -14,6 +14,16 @@
             set { threadWorker = value; }
         }
 
+        public void ThreadBackup(Configuration configuration)
+        {
+            ThreadBackup threadBackup = new ThreadBackup(configuration);
+            Thread threadBackupThread = new Thread(threadBackup.Work);
+            threadBackupThread.Name = "ThreadBackup";
+            threadBackupThread.Start();
+
+            ThreadWorker.Add(threadBackup);
+        }
+
         public void ThreadDynDns(Configuration configuration)
         {
             ThreadDynDns threadDynDns = new ThreadDynDns(configuration);
@@ -33,6 +43,5 @@
 
             ThreadWorker.Add(threadFirewallRuleBaseProperties);
         }
-
     }
 }

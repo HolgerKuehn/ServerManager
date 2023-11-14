@@ -30,6 +30,11 @@
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName = 26,
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled = 27,
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties_RemoteAddress = 28,
-        DynDnsIpCollection_ReadIpAddressCollectionFromDisc = 29
+        DynDnsIpCollection_ReadIpAddressCollectionFromDisc = 29,
+        BackupCollection_BackupCollection = 30,
+        Backup_Backup = 31,
+        BackupSourceFile_PrepareOnDisc = 32,
+        BackupSourceFile_ReadBackupFileIdFromDisc = 33,
+        BackupSourceFile_WriteToDisc = 34
     }
 }
