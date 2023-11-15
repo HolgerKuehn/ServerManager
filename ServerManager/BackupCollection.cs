@@ -45,7 +45,8 @@
             foreach (Backup backup in this.Collection)
             {
                 backup.ReadFileList();
-                backup.WriteChangedToDisc();
+                backup.WriteFileListToDisc();
+                backup.CreateDestination();
             }
         }
 

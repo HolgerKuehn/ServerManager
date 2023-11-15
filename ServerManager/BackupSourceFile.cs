@@ -191,13 +191,13 @@ namespace blog.dachs.ServerManager
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceFile_WriteToDisc, "write properties for " + this.FullRelativePath + " to disc"));
             sqlCommand = this.Database.GetCommand(Command.BackupSourceFile_WriteToDisc);
-            
+
             sqlCommand = sqlCommand.Replace("<BackupSourceFileID>", this.BackupFileId.ToString());
-            sqlCommand = sqlCommand.Replace("<BackupSourceFileCreationDate>", new DateTimeOffset(this.CreationDate.ToUniversalTime()).ToUnixTimeSeconds().ToString());
-            sqlCommand = sqlCommand.Replace("<BackupSourceFileModifyDate>", new DateTimeOffset(this.LastWriteDate.ToUniversalTime()).ToUnixTimeSeconds().ToString());
-            sqlCommand = sqlCommand.Replace("<BackupSourceFileLastSeenDate>", new DateTimeOffset(this.LastSeenDate.ToUniversalTime()).ToUnixTimeSeconds().ToString());
-            sqlCommand = sqlCommand.Replace("<BackupSourceFileDeleted>", "0");
             sqlCommand = sqlCommand.Replace("<BackupSourceFileSize>", this.Size.ToString());
+            sqlCommand = sqlCommand.Replace("<BackupSourceFileCreationDate>", ((DateTimeOffset)this.CreationDate.ToLocalTime()).ToUnixTimeSeconds().ToString());
+            sqlCommand = sqlCommand.Replace("<BackupSourceFileLastWriteDate>", ((DateTimeOffset)this.LastWriteDate.ToLocalTime()).ToUnixTimeSeconds().ToString());
+            sqlCommand = sqlCommand.Replace("<BackupSourceFileLastAccessDate>", ((DateTimeOffset)this.LastAccessDate.ToLocalTime()).ToUnixTimeSeconds().ToString());
+            sqlCommand = sqlCommand.Replace("<BackupSourceFileLastSeenDate>", ((DateTimeOffset)this.LastSeenDate.ToLocalTime()).ToUnixTimeSeconds().ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.BackupSourceFile_WriteToDisc, sqlCommand));
             this.Database.ExecuteCommand(sqlCommand);

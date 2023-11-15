@@ -4,18 +4,18 @@
     using System.Collections;
     using System.Linq;
 
-    public class BackupFileCollection : GlobalExtention, IList
+    public class BackupSourceFileCollection : GlobalExtention, IList
     {
         private Backup backup;
         private Dictionary<string, BackupSourceFile> collection;
 
-        public BackupFileCollection(Configuration configuration, Backup backup) : base(configuration)
+        public BackupSourceFileCollection(Configuration configuration, Backup backup) : base(configuration)
         {
             this.Collection = new Dictionary<string, BackupSourceFile>();
             this.backup = backup;
 
             // read backups from disk
-            //this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupFileCollection_BackupFileCollection, "reading BackupFileCollection"));
+            //this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupFileCollection_BackupFileCollection, "reading BackupSourceFileCollection"));
 
             //string sqlCommand = this.Database.GetCommand(Command.BackupFileCollection_BackupFileCollection);
             //sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
@@ -54,7 +54,8 @@
             {
                 FileInfo fileInfo = new FileInfo(filePath);
 
-                if (fileInfo.DirectoryName != null) {
+                if (fileInfo.DirectoryName != null)
+                {
                     BackupSourceFile backupFile = new BackupSourceFile(this.Configuration);
                     backupFile.Backup = backup;
                     backupFile.RelativePath = fileInfo.DirectoryName.Replace(backup.SourceBasePath + "\\", string.Empty);
@@ -80,10 +81,13 @@
                         this.Add(backupFile);
                     }
                 }
+                else
+                { 
+                }
             }
         }
 
-        public void WriteChangedToDisc()
+        public void WriteToDisc()
         {
             BackupSourceFile backupSourceFile;
 
@@ -159,16 +163,16 @@
 
         public void Add(BackupSourceFile backupFile)
         {
-            if (!this.Collection.ContainsKey(backupFile.RelativePath))
-                this.Collection.Add(backupFile.RelativePath, backupFile);
+            if (!this.Collection.ContainsKey(backupFile.FullRelativePath))
+                this.Collection.Add(backupFile.FullRelativePath, backupFile);
         }
 
-        public void Add(BackupFileCollection collection)
+        public void Add(BackupSourceFileCollection collection)
         {
             this.AddRange(collection);
         }
 
-        public void AddRange(BackupFileCollection collection)
+        public void AddRange(BackupSourceFileCollection collection)
         {
             foreach (Backup backup in collection)
             {

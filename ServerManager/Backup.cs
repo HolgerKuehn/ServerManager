@@ -10,7 +10,10 @@ namespace blog.dachs.ServerManager
 		private string destinationDevicePath;
 		private string destinationBasePath;
 		private string keePassFile;
-		private BackupFileCollection backupFileCollection;
+        private int destinationNameDepth;
+
+		private BackupSourceFileCollection backupSourceFileCollection;
+        private BackupDestinationCollection backupDestinationCollection;
 
         public Backup(Configuration configuration, int backupId) : base(configuration)
         {
@@ -58,7 +61,8 @@ namespace blog.dachs.ServerManager
                     this.KeePassFile = keePassFile;
             }
 
-			this.backupFileCollection = new BackupFileCollection(this.Configuration, this);
+			this.backupSourceFileCollection = new BackupSourceFileCollection(this.Configuration, this);
+			this.backupDestinationCollection = new BackupDestinationCollection(this.Configuration, this);
         }
 
         public int BackupId
@@ -97,21 +101,35 @@ namespace blog.dachs.ServerManager
 			set { this.keePassFile = value; }
 		}
 
-        public BackupFileCollection BackupFileCollection
+        public BackupSourceFileCollection BackupSourceFileCollection
         {
-            get { return this.backupFileCollection; }
-            set { this.backupFileCollection = value; }
+            get { return this.backupSourceFileCollection; }
+            set { this.backupSourceFileCollection = value; }
+        }
+
+        public int DestinationNameDepth
+        {
+            get { return this.destinationNameDepth; }
+            set { this.destinationNameDepth = value; }
         }
 
         public void ReadFileList()
 		{
-			this.BackupFileCollection.ReadFromFilesystem();
+			this.BackupSourceFileCollection.ReadFromFilesystem();
             // FindDeletedFiles();
         }
 
-        public void WriteChangedToDisc()
+        public void WriteFileListToDisc()
         {
-            this.BackupFileCollection.WriteChangedToDisc();
+            this.BackupSourceFileCollection.WriteToDisc();
+        }
+
+        public void CreateDestination()
+        {
+            foreach (BackupSourceFile backupSourceFile in this.backupSourceFileCollection)
+            {
+
+            }
         }
     }
 }
