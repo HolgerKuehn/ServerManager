@@ -22,7 +22,7 @@
         {
             while (true)
             {
-                this.BackupCollection.RunBackup();
+                this.BackupCollection.DoBackup();
 
                 Thread.Sleep(120000);
             }

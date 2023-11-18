@@ -40,13 +40,12 @@
             set { this.backupCollection = value; }
         }
 
-        public void RunBackup()
+        public void DoBackup()
         {
             foreach (Backup backup in this.Collection)
             {
-                backup.ReadFileList();
-                backup.WriteFileListToDisc();
-                backup.CreateDestination();
+                backup.ReadFromFilesystem();
+                backup.WriteToDisc();
             }
         }
 

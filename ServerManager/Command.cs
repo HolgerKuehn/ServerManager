@@ -34,7 +34,10 @@
         BackupCollection_BackupCollection = 30,
         Backup_Backup = 31,
         BackupSourceFile_PrepareOnDisc = 32,
-        BackupSourceFile_ReadBackupFileIdFromDisc = 33,
-        BackupSourceFile_WriteToDisc = 34
+        BackupSourceFile_ReadFromDisc = 33,
+        BackupSourceFile_WriteToDisc = 34,
+        BackupSource_PrepareOnDisc = 35,
+        BackupSource_ReadFromDisc = 36,
+        BackupSource_WriteToDisc = 37
     }
 }

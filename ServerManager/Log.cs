@@ -51,8 +51,11 @@
         BackupCollection_BackupCollection = 28,
         Backup_Backup = 29,
         BackupSourceFile_PrepareOnDisc = 30,
-        BackupSourceFile_ReadBackupFileIdFromDisc = 31,
-        BackupSourceFile_WriteToDisc = 32
+        BackupSourceFile_ReadFromDisc = 31,
+        BackupSourceFile_WriteToDisc = 32,
+        BackupSource_PrepareOnDisc = 33,
+        BackupSource_ReadFromDisc = 34,
+        BackupSource_WriteToDisc = 35
     }
 
     public abstract class Log : GlobalExtention

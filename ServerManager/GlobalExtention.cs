@@ -6,6 +6,7 @@
         private Database database;
         private PowerShell powerShell;
         private WebRequest webRequest;
+        private KeePass keePass;
         private bool changed;
 
         public GlobalExtention(Configuration configuration)
@@ -53,6 +54,18 @@
                 return this.webRequest;
             }
             set { this.webRequest = value; }
+        }
+
+        public KeePass KeePass
+        {
+            get
+            {
+                if (this.keePass == null)
+                    this.keePass = new KeePass(this.Configuration);
+
+                return this.keePass;
+            }
+            set { this.keePass = value; }
         }
 
         public bool Changed

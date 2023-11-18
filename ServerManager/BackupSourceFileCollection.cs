@@ -6,40 +6,19 @@
 
     public class BackupSourceFileCollection : GlobalExtention, IList
     {
-        private Backup backup;
+        private BackupSource backupSource;
         private Dictionary<string, BackupSourceFile> collection;
 
-        public BackupSourceFileCollection(Configuration configuration, Backup backup) : base(configuration)
+        public BackupSourceFileCollection(Configuration configuration, BackupSource backupSource) : base(configuration)
         {
             this.Collection = new Dictionary<string, BackupSourceFile>();
-            this.backup = backup;
-
-            // read backups from disk
-            //this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupFileCollection_BackupFileCollection, "reading BackupSourceFileCollection"));
-
-            //string sqlCommand = this.Database.GetCommand(Command.BackupFileCollection_BackupFileCollection);
-            //sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
-
-            //this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.BackupFileCollection_BackupFileCollection, sqlCommand));
-
-            //DataTable dataTable = this.Database.GetDataTable(sqlCommand);
-            //DataRow dataRow = null;
-            //int backupId;
-
-            //// get BackupID 
-            //for (int row = 0; row < dataTable.Rows.Count; row++)
-            //{
-            //    dataRow = dataTable.Rows[row];
-            //    backupId = Convert.ToInt32(dataRow[0].ToString());
-
-            //    this.Collection.Add(new Backup(this.Configuration, backupId));
-            //}
+            this.BackupSource = backupSource;
         }
 
-        private Backup Backup
+        private BackupSource BackupSource
         {
-            get { return this.backup; }
-            set { this.backup = value; }
+            get { return this.backupSource; }
+            set { this.backupSource = value; }
         }
 
         private Dictionary<string, BackupSourceFile> Collection
@@ -50,16 +29,25 @@
 
         public void ReadFromFilesystem()
         {
-            foreach (string filePath in Directory.EnumerateFiles(this.Backup.SourceBasePath, "*.*", SearchOption.AllDirectories))
+            foreach (string filePath in Directory.EnumerateFiles(this.BackupSource.FullAbsolutePath, "*.*", SearchOption.AllDirectories))
             {
                 FileInfo fileInfo = new FileInfo(filePath);
 
                 if (fileInfo.DirectoryName != null)
                 {
                     BackupSourceFile backupFile = new BackupSourceFile(this.Configuration);
-                    backupFile.Backup = backup;
-                    backupFile.RelativePath = fileInfo.DirectoryName.Replace(backup.SourceBasePath + "\\", string.Empty);
-                    backupFile.FileName = fileInfo.Name;
+                    backupFile.BackupSource = this.backupSource;
+                    
+                    if (fileInfo.DirectoryName == BackupSource.FullAbsolutePath)
+                    {
+                        backupFile.Path = string.Empty;
+                    }
+                    else
+                    {
+                        backupFile.Path = fileInfo.DirectoryName.Replace(BackupSource.FullAbsolutePath + "\\", string.Empty);
+                    }
+                    
+                    backupFile.Name = fileInfo.Name;
                     backupFile.CreationDate = fileInfo.CreationTime;
                     backupFile.LastAccessDate = fileInfo.LastAccessTime;
                     backupFile.LastWriteDate = fileInfo.LastWriteTime;
@@ -77,12 +65,9 @@
                     else
                     {
                         backupFile.PrepareOnDisc();
-                        backupFile.ReadBackupFileIdFromDisc();
+                        backupFile.ReadFromDisc();
                         this.Add(backupFile);
                     }
-                }
-                else
-                { 
                 }
             }
         }
@@ -99,6 +84,19 @@
                 {
                     backupSourceFile.WriteToDisc();
                 }
+            }
+        }
+
+        public void CreateBackup()
+        {
+            BackupSourceFileCollection filesToBackup = this.GetFilesToBackup();
+            BackupSourceFile fileToBackup;
+
+            for (int i = 0; i < filesToBackup.Count; i++)
+            {
+                fileToBackup = filesToBackup.ElementAt(i);
+
+                
             }
         }
 
@@ -183,6 +181,24 @@
         public BackupSourceFile ElementAt(int index)
         {
             return this.Collection[this.Collection.ElementAt(index).Key];
+        }
+
+        public BackupSourceFileCollection GetFilesToBackup()
+        {
+            BackupSourceFileCollection backupSourceFileCollection = new BackupSourceFileCollection(Configuration, this.BackupSource);
+            BackupSourceFile backupSourceFile;
+
+            for (int i = 0; i < this.Collection.Count; i++)
+            {
+                backupSourceFile = this.ElementAt(i);
+
+                if (backupSourceFile.LastWriteDate > backupSourceFile.LastBackupDate)
+                {
+                    backupSourceFileCollection.Add(backupSourceFile);
+                }
+            }
+
+            return backupSourceFileCollection;
         }
     }
 }
