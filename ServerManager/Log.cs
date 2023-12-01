@@ -55,7 +55,16 @@
         BackupSourceFile_WriteToDisc = 32,
         BackupSource_PrepareOnDisc = 33,
         BackupSource_ReadFromDisc = 34,
-        BackupSource_WriteToDisc = 35
+        BackupSource_WriteToDisc = 35,
+        BackupSet_PrepareOnDisc = 36,
+        BackupSet_ReadFromDisc = 37,
+        BackupSet_WriteToDisc = 38,
+        BackupSetSourceFile_PrepareOnDisc = 39,
+        BackupSetSourceFile_ReadFromDisc = 40,
+        BackupSetSourceFile_WriteToDisc = 41,
+        KeePassDatabase_KeePassDatabase = 42,
+        KeePassDatabase_WriteToDisc = 43,
+        KeePassDatabaseCollection_KeePassDatabaseCollection = 44
     }
 
     public abstract class Log : GlobalExtention

@@ -4,9 +4,11 @@
     {
         private Configuration configuration;
         private Database database;
+        private CommandLine commandLine;
+        private SevenZip sevenZip;
         private PowerShell powerShell;
         private WebRequest webRequest;
-        private KeePass keePass;
+        private KeePassDatabaseCollection keePass;
         private bool changed;
 
         public GlobalExtention(Configuration configuration)
@@ -30,6 +32,30 @@
                 return this.database;
             }
             set { this.database = value; }
+        }
+
+        public CommandLine CommandLine
+        {
+            get
+            {
+                if (this.commandLine == null)
+                    this.commandLine = new CommandLine(this.Configuration);
+
+                return this.commandLine;
+            }
+            set { this.commandLine = value; }
+        }
+
+        public SevenZip SevenZip
+        {
+            get
+            {
+                if (this.sevenZip == null)
+                    this.sevenZip = new SevenZip(this.Configuration);
+
+                return this.sevenZip;
+            }
+            set { this.sevenZip = value; }
         }
 
         public PowerShell PowerShell
@@ -56,12 +82,12 @@
             set { this.webRequest = value; }
         }
 
-        public KeePass KeePass
+        public KeePassDatabaseCollection KeePass
         {
             get
             {
                 if (this.keePass == null)
-                    this.keePass = new KeePass(this.Configuration);
+                    this.keePass = new KeePassDatabaseCollection(this.Configuration);
 
                 return this.keePass;
             }

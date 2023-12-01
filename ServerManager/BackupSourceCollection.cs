@@ -6,11 +6,11 @@
     public class BackupSourceCollection : GlobalExtention, IList
     {
         private Backup backup;
-        private Dictionary<string, BackupSource> sourceCollection;
+        private List<BackupSource> sourceCollection;
 
         public BackupSourceCollection(Configuration configuration, Backup backup) : base(configuration)
         {
-            this.SourceCollection = new Dictionary<string, BackupSource>();
+            this.SourceCollection = new List<BackupSource>();
             this.backup = backup;
         }
 
@@ -20,13 +20,13 @@
             set { this.backup = value; }
         }
 
-        private Dictionary<string, BackupSource> SourceCollection
+        private List<BackupSource> SourceCollection
         {
             get { return this.sourceCollection; }
             set { this.sourceCollection = value; }
         }
 
-        public void ReadFromFilesystem()
+        public void CreateBackup()
         {
             BackupSource backupSource;
 
@@ -59,35 +59,8 @@
                 backupSource.Backup = backup;
                 backupSource.Path = directoryInfo.FullName.Replace(backup.SourceBasePath + "\\", string.Empty);
  
-                if (!this.SourceCollection.ContainsKey(backupSource.FullRelativePath))
-                {
-                    backupSource.PrepareOnDisc();
-                    backupSource.ReadFromDisc();
-                    this.Add(backupSource);
-                }
-            }
-
-
-            // propergate to Source
-            for (int i = 0; i < this.SourceCollection.Count; i++)
-            {
-                backupSource = this.ElementAt(i);
-                backupSource.ReadFromFilesystem();
-            }
-        }
-
-        public void WriteToDisc()
-        {
-            BackupSource backupSource;
-
-            for (int i = 0; i < this.SourceCollection.Count; i++)
-            {
-                backupSource = this.ElementAt(i);
-
-                if (backupSource.Changed)
-                {
-                    backupSource.WriteToDisc();
-                }
+                backupSource.CreateBackup();
+                this.Add(backupSource);
             }
         }
 
@@ -152,8 +125,7 @@
 
         public void Add(BackupSource backupSource)
         {
-            if (!this.SourceCollection.ContainsKey(backupSource.FullRelativePath))
-                this.SourceCollection.Add(backupSource.FullRelativePath, backupSource);
+            this.SourceCollection.Add(backupSource);
         }
 
         public void Add(BackupSourceCollection collection)
@@ -171,7 +143,7 @@
 
         public BackupSource ElementAt(int index)
         {
-            return this.SourceCollection[this.SourceCollection.ElementAt(index).Key];
+            return this.SourceCollection[index];
         }
     }
 }

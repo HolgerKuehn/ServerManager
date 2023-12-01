@@ -7,11 +7,11 @@
     public class BackupSourceFileCollection : GlobalExtention, IList
     {
         private BackupSource backupSource;
-        private Dictionary<string, BackupSourceFile> collection;
+        private List<BackupSourceFile> collection;
 
         public BackupSourceFileCollection(Configuration configuration, BackupSource backupSource) : base(configuration)
         {
-            this.Collection = new Dictionary<string, BackupSourceFile>();
+            this.Collection = new List<BackupSourceFile>();
             this.BackupSource = backupSource;
         }
 
@@ -21,82 +21,49 @@
             set { this.backupSource = value; }
         }
 
-        private Dictionary<string, BackupSourceFile> Collection
+        private List<BackupSourceFile> Collection
         {
             get { return this.collection; }
             set { this.collection = value; }
         }
 
-        public void ReadFromFilesystem()
+        public void CreateBackup()
         {
+            FileInfo fileInfo;
+            BackupSourceFile sourceFile;
+            string path;
+            string name;
+
             foreach (string filePath in Directory.EnumerateFiles(this.BackupSource.FullAbsolutePath, "*.*", SearchOption.AllDirectories))
             {
-                FileInfo fileInfo = new FileInfo(filePath);
+                path = string.Empty;
+                name = string.Empty;
+
+                fileInfo = new FileInfo(filePath);
 
                 if (fileInfo.DirectoryName != null)
                 {
-                    BackupSourceFile backupFile = new BackupSourceFile(this.Configuration);
-                    backupFile.BackupSource = this.backupSource;
+                    if (fileInfo.DirectoryName != BackupSource.FullAbsolutePath)
+                    {
+                        path = fileInfo.DirectoryName.Replace(BackupSource.FullAbsolutePath + "\\", string.Empty);
+                    }
+
+                    name = fileInfo.Name;
+
+                    sourceFile = new BackupSourceFile(this.Configuration, this.backupSource, path, name);
                     
-                    if (fileInfo.DirectoryName == BackupSource.FullAbsolutePath)
-                    {
-                        backupFile.Path = string.Empty;
-                    }
-                    else
-                    {
-                        backupFile.Path = fileInfo.DirectoryName.Replace(BackupSource.FullAbsolutePath + "\\", string.Empty);
-                    }
-                    
-                    backupFile.Name = fileInfo.Name;
-                    backupFile.CreationDate = fileInfo.CreationTime;
-                    backupFile.LastAccessDate = fileInfo.LastAccessTime;
-                    backupFile.LastWriteDate = fileInfo.LastWriteTime;
-                    backupFile.LastSeenDate = DateTime.Now;
-                    backupFile.Size = fileInfo.Length;
+                    // set additional data
+                    sourceFile.CreationDate = fileInfo.CreationTime;
+                    sourceFile.LastAccessDate = fileInfo.LastAccessTime;
+                    sourceFile.LastWriteDate = fileInfo.LastWriteTime;
+                    sourceFile.LastSeenDate = DateTime.Now;
+                    sourceFile.Size = fileInfo.Length;
 
-                    if (this.Collection.ContainsKey(backupFile.FullRelativePath))
-                    {
-                        this.Collection[backupFile.FullRelativePath].CreationDate = backupFile.CreationDate;
-                        this.Collection[backupFile.FullRelativePath].LastAccessDate = backupFile.LastAccessDate;
-                        this.Collection[backupFile.FullRelativePath].LastWriteDate = backupFile.LastWriteDate;
-                        this.Collection[backupFile.FullRelativePath].LastSeenDate = backupFile.LastSeenDate;
-                        this.Collection[backupFile.FullRelativePath].Size = backupFile.Size;
-                    }
-                    else
-                    {
-                        backupFile.PrepareOnDisc();
-                        backupFile.ReadFromDisc();
-                        this.Add(backupFile);
-                    }
+                    sourceFile.PrepareOnDisc();
+                    sourceFile.ReadFromDisc();
+                    sourceFile.WriteToDisc();
+                    this.Add(sourceFile);
                 }
-            }
-        }
-
-        public void WriteToDisc()
-        {
-            BackupSourceFile backupSourceFile;
-
-            for (int i=0; i < this.Collection.Count; i++)
-            {
-                backupSourceFile = this.ElementAt(i);
-                
-                if (backupSourceFile.Changed)
-                {
-                    backupSourceFile.WriteToDisc();
-                }
-            }
-        }
-
-        public void CreateBackup()
-        {
-            BackupSourceFileCollection filesToBackup = this.GetFilesToBackup();
-            BackupSourceFile fileToBackup;
-
-            for (int i = 0; i < filesToBackup.Count; i++)
-            {
-                fileToBackup = filesToBackup.ElementAt(i);
-
-                
             }
         }
 
@@ -161,8 +128,7 @@
 
         public void Add(BackupSourceFile backupFile)
         {
-            if (!this.Collection.ContainsKey(backupFile.FullRelativePath))
-                this.Collection.Add(backupFile.FullRelativePath, backupFile);
+            this.Collection.Add(backupFile);
         }
 
         public void Add(BackupSourceFileCollection collection)
@@ -180,18 +146,15 @@
 
         public BackupSourceFile ElementAt(int index)
         {
-            return this.Collection[this.Collection.ElementAt(index).Key];
+            return this.Collection[index];
         }
 
         public BackupSourceFileCollection GetFilesToBackup()
         {
             BackupSourceFileCollection backupSourceFileCollection = new BackupSourceFileCollection(Configuration, this.BackupSource);
-            BackupSourceFile backupSourceFile;
-
-            for (int i = 0; i < this.Collection.Count; i++)
+            
+            foreach(BackupSourceFile backupSourceFile in this.Collection)
             {
-                backupSourceFile = this.ElementAt(i);
-
                 if (backupSourceFile.LastWriteDate > backupSourceFile.LastBackupDate)
                 {
                     backupSourceFileCollection.Add(backupSourceFile);

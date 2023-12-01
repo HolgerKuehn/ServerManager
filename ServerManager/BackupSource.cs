@@ -7,6 +7,7 @@
         private int sourceId;
         private Backup backup;
         private string path;
+        private string password;
         private BackupSourceFileCollection backupSourceFileCollection;
         private BackupSetCollection backupSetCollection;
 
@@ -15,6 +16,7 @@
             this.SourceId = 0;
             this.Backup = backup;
             this.Path = string.Empty;
+            this.Password= string.Empty;
             this.SourceFileCollection = new BackupSourceFileCollection(configuration, this);
             this.SetCollection = new BackupSetCollection(configuration, this);
         }
@@ -65,6 +67,20 @@
             set { }
         }
 
+        public string Password
+        {
+            get { return this.password; }
+            set
+            {
+                if (this.Password != null && !this.Password.Equals(value))
+                {
+                    this.Changed = true;
+                }
+
+                this.password = value;
+            }
+        }
+
         public BackupSourceFileCollection SourceFileCollection
         {
             get { return this.backupSourceFileCollection; }
@@ -77,20 +93,32 @@
             set { this.backupSetCollection = value; }
         }
 
-        public void ReadFromFilesystem()
+        public void CreateBackup()
         {
-            DateTime date = DateTime.UtcNow;
-            BackupSet backupSet = new BackupSet(this.Configuration, this);
+            this.PrepareOnDisc();
+            this.ReadFromDisc();
+            this.WriteToDisc();
 
-            backupSet.Path = this.Path;
-            backupSet.Name = date.Year.ToString().PadLeft(4, '0') + date.Month.ToString().PadLeft(2, '0') + date.Day.ToString().PadLeft(2, '0') + date.Hour.ToString().PadLeft(2, '0') + date.Minute.ToString().PadLeft(2, '0');
+            this.SourceFileCollection.CreateBackup();
 
-            this.SetCollection.Add(backupSet);
+            if(this.SourceFileCollection.GetFilesToBackup().Count > 0)
+            {
+                KeePassEntry keePassEntry = this.Backup.KeePassDatabase.GetEntry(this.Path);
+                this.Password = keePassEntry.Password;
 
-            this.SourceFileCollection.ReadFromFilesystem();
+                DateTime date = DateTime.UtcNow;
+                BackupSet backupSet = new BackupSet(this.Configuration, this);
+
+                backupSet.Path = this.Path;
+                backupSet.Name = date.Year.ToString().PadLeft(4, '0') + date.Month.ToString().PadLeft(2, '0') + date.Day.ToString().PadLeft(2, '0') + date.Hour.ToString().PadLeft(2, '0') + date.Minute.ToString().PadLeft(2, '0');
+
+                backupSet.CreateBackup();
+                
+                this.SetCollection.Add(backupSet);
+            }
         }
 
-        public void PrepareOnDisc()
+        private void PrepareOnDisc()
         {
             string sqlCommand;
 
@@ -103,11 +131,11 @@
             this.Database.ExecuteCommand(sqlCommand);
         }
 
-        public void ReadFromDisc()
+        private void ReadFromDisc()
         {
             string sqlCommand;
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSource_ReadFromDisc, "read Id for BackupSource " + this.FullRelativePath));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSource_ReadFromDisc, "read Id for Source " + this.FullRelativePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSource_ReadFromDisc);
             sqlCommand = sqlCommand.Replace("<BackupID>", this.Backup.BackupId.ToString());
             sqlCommand = sqlCommand.Replace("<BackupSourcePath>", this.Path);
@@ -125,9 +153,8 @@
             }
         }
 
-        public void WriteToDisc()
+        private void WriteToDisc()
         {
-            this.SourceFileCollection.WriteToDisc();
         }
     }
 }

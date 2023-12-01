@@ -38,6 +38,15 @@
         BackupSourceFile_WriteToDisc = 34,
         BackupSource_PrepareOnDisc = 35,
         BackupSource_ReadFromDisc = 36,
-        BackupSource_WriteToDisc = 37
+        BackupSource_WriteToDisc = 37,
+        BackupSet_PrepareOnDisc = 38,
+        BackupSet_ReadFromDisc = 39,
+        BackupSet_WriteToDisc = 40,
+        BackupSetSourceFile_PrepareOnDisc = 41,
+        BackupSetSourceFile_ReadFromDisc = 42,
+        BackupSetSourceFile_WriteToDisc = 43,
+        KeePassDatabase_KeePassDatabase = 44,
+        KeePassDatabase_WriteToDisc = 45,
+        KeePassDatabaseCollection_KeePassDatabaseCollection = 46
     }
 }

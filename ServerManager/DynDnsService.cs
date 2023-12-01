@@ -186,7 +186,7 @@
 
         private void PrepareIpAddressCollectionToDisc(DynDnsIpAddressCollection ipAddressCollection)
         {
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, "prepare Database for IP-SourceFileCollection from " + this.Name + " (IP Address)"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, "prepare Database for IP-SetSourceFileCollection from " + this.Name + " (IP Address)"));
 
             string sqlCommandOriginal = this.Database.GetCommand(Command.DynDnsService_PerpareIpAddressCollectionToDisc_IpAddress);
             string sqlCommandReplace;
@@ -206,7 +206,7 @@
                 this.Database.ExecuteCommand(sqlCommandReplace);
             }
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, "prepare Database for IP-SourceFileCollection from " + this.Name + " (Network Address)"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, "prepare Database for IP-SetSourceFileCollection from " + this.Name + " (Network Address)"));
 
             string sqlCommandNetwork = this.Database.GetCommand(Command.DynDnsService_PerpareIpAddressCollectionToDisc_NetworkAddress);
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_PrepareIpAddressCollectionToDisc, sqlCommandNetwork));
@@ -222,7 +222,7 @@
         {
             this.PrepareIpAddressCollectionToDisc(ipAddressCollection);
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_WriteIpAddressCollectionToDisc, "write IP-SourceFileCollection from " + this.Name + " to disc"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_WriteIpAddressCollectionToDisc, "write IP-SetSourceFileCollection from " + this.Name + " to disc"));
 
             string sqlCommandReadIpAddressIDOriginal = this.Database.GetCommand(command);
             string sqlCommandReadIpAddressIDReplace;

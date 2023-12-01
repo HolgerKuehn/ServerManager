@@ -10,13 +10,14 @@ namespace blog.dachs.ServerManager
         private int sourceNameDepth;
         private string destinationDevicePath;
 		private string destinationBasePath;
+        private KeePassDatabase keePassDatabase;
         private BackupSourceCollection backupSourceCollection;
 
         public Backup(Configuration configuration, int backupId) : base(configuration)
         {
 			this.backupId = backupId;
 
-            // read backupSource properties from disk
+            // read set properties from disk
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.Backup_Backup, "reading Backup properties"));
 
             string sqlCommand = this.Database.GetCommand(Command.Backup_Backup);
@@ -31,8 +32,9 @@ namespace blog.dachs.ServerManager
             int sourceNameDepth;
             string destinationDevicePath;
             string destinationBasePath;
+            string keePassDatabase;
 
-            // get BackupID 
+            // get Backup properties 
             for (int row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
@@ -41,8 +43,9 @@ namespace blog.dachs.ServerManager
                 sourceNameDepth = Convert.ToInt32(dataRow[2].ToString());
                 destinationDevicePath = dataRow[3].ToString();
                 destinationBasePath = dataRow[4].ToString();
+                keePassDatabase = dataRow[5].ToString();
 
-				if (name != null)
+                if (name != null)
 					this.Name = name;
 				
 				if (sourceBasePath != null)
@@ -55,6 +58,9 @@ namespace blog.dachs.ServerManager
 
                 if (destinationBasePath != null)
                     this.DestinationBasePath = destinationBasePath;
+
+                if (keePassDatabase != null)
+                    this.KeePassDatabase = this.KeePass.GetKeePassDatabase(keePassDatabase);
             }
 
 			this.BackupSourceCollection = new BackupSourceCollection(this.Configuration, this);
@@ -96,20 +102,26 @@ namespace blog.dachs.ServerManager
 			set { this.destinationBasePath = value; }
 		}
 
+        public KeePassDatabase KeePassDatabase
+        {
+            get { return this.keePassDatabase; }
+            set { this.keePassDatabase = value; }
+        }
+        
         public BackupSourceCollection BackupSourceCollection
         {
             get { return this.backupSourceCollection; }
             set { this.backupSourceCollection = value; }
         }
 
-        public void ReadFromFilesystem()
+        public void CrerateBackup()
 		{
-			this.BackupSourceCollection.ReadFromFilesystem();
-        }
+            // reset collection
+            this.BackupSourceCollection.Clear();
+            GC.Collect();
 
-        public void WriteToDisc()
-        {
-            this.BackupSourceCollection.WriteToDisc();
+            // and read new list from filesystem
+            this.BackupSourceCollection.CreateBackup();
         }
     }
 }

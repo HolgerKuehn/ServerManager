@@ -6,11 +6,11 @@
     public class BackupSetCollection : GlobalExtention, IList
     {
         private BackupSource backupSource;
-        private Dictionary<string, BackupSet> setCollection;
+        private List<BackupSet> setCollection;
 
         public BackupSetCollection(Configuration configuration, BackupSource backupSource) : base(configuration)
         {
-            this.SetCollection = new Dictionary<string, BackupSet>();
+            this.SetCollection = new List<BackupSet>();
             this.backupSource = backupSource;
         }
 
@@ -20,12 +20,11 @@
             set { this.backupSource = value; }
         }
 
-        private Dictionary<string, BackupSet> SetCollection
+        private List<BackupSet> SetCollection
         {
             get { return this.setCollection; }
             set { this.setCollection = value; }
         }
-
 
         #region implementing IList
         public object? this[int index] { get => ((IList)SetCollection)[index]; set => ((IList)SetCollection)[index] = value; }
@@ -88,8 +87,7 @@
 
         public void Add(BackupSet backupSet)
         {
-            if (!this.SetCollection.ContainsKey(backupSet.FullAbsolutePath))
-                this.SetCollection.Add(backupSet.FullAbsolutePath, backupSet);
+            this.SetCollection.Add(backupSet);
         }
 
         public void Add(BackupSetCollection collection)
@@ -107,7 +105,7 @@
 
         public BackupSet ElementAt(int index)
         {
-            return this.SetCollection[this.SetCollection.ElementAt(index).Key];
+            return this.SetCollection[index];
         }
     }
 }

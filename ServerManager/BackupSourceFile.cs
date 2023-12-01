@@ -15,9 +15,21 @@ namespace blog.dachs.ServerManager
         private DateTime lastBackupDate;
         private long size;
 
-        public BackupSourceFile(Configuration configuration) : base(configuration)
+        public BackupSourceFile(Configuration configuration, BackupSource backupSource, string path, string name) : base(configuration)
         {
-        }
+            this.backupSourceFileId = 0;
+
+            this.BackupSource = backupSource;
+            this.Path = path;
+            this.Name = name;
+
+            this.CreationDate = DateTime.MinValue;
+            this.lastAccessDate = DateTime.MinValue;
+            this.lastWriteDate = DateTime.MinValue;
+            this.lastSeenDate = DateTime.MinValue;
+            this.lastBackupDate = DateTime.MinValue;
+            this.size = 0;
+    }
 
         public int BackupSourceFileId
         {
@@ -69,13 +81,41 @@ namespace blog.dachs.ServerManager
 
         public string FullAbsolutePath
         {
-            get { return this.BackupSource.FullAbsolutePath + "\\" + this.Path + "\\" + this.Name; }
+            get
+            {
+                string path;
+
+                path = this.BackupSource.FullAbsolutePath;
+
+                if (this.Path != string.Empty)
+                {
+                    path += "\\" + this.Path;
+                }
+
+                path += "\\" + this.Name;
+
+                return path;
+            }
             set { }
         }
 
         public string FullRelativePath
         {
-            get { return this.BackupSource.FullRelativePath + "\\" + this.Path + "\\" + this.Name; }
+            get
+            {
+                string path;
+
+                path = this.BackupSource.FullRelativePath;
+
+                if (this.Path != string.Empty)
+                {
+                    path += "\\" + this.Path;
+                }
+
+                path += "\\" + this.Name;
+
+                return path;
+            }
             set { }
         }
 
@@ -208,7 +248,7 @@ namespace blog.dachs.ServerManager
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceFile_WriteToDisc, "write properties for " + this.FullRelativePath + " to disc"));
             sqlCommand = this.Database.GetCommand(Command.BackupSourceFile_WriteToDisc);
 
-            sqlCommand = sqlCommand.Replace("<BackupSourceSourceFileId>", this.BackupSourceFileId.ToString());
+            sqlCommand = sqlCommand.Replace("<BackupSourceFileID>", this.BackupSourceFileId.ToString());
             sqlCommand = sqlCommand.Replace("<BackupSourceFileSize>", this.Size.ToString());
             sqlCommand = sqlCommand.Replace("<BackupSourceFileCreationDate>", ((DateTimeOffset)this.CreationDate.ToLocalTime()).ToUnixTimeSeconds().ToString());
             sqlCommand = sqlCommand.Replace("<BackupSourceFileLastWriteDate>", ((DateTimeOffset)this.LastWriteDate.ToLocalTime()).ToUnixTimeSeconds().ToString());
