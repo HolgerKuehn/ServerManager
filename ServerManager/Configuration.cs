@@ -1,6 +1,5 @@
 ﻿namespace blog.dachs.ServerManager
 {
-    using System.Configuration;
     using System.Data;
 
     public class Configuration
@@ -36,13 +35,6 @@
                     this.ConfigurationID = Convert.ToInt32(dataRow[0]);
                     this.MinimumLogSeverity = (LogSeverity)Convert.ToInt32(dataRow[1]);
                 }
-            }
-            else
-            {
-                string message = "No Configuration for MachineName \"" + Environment.MachineName + "\" found";
-                string title = "Missing Configuration";
-                MessageBoxButtons buttons = MessageBoxButtons.OK;
-                MessageBox.Show(message, title, buttons, MessageBoxIcon.Warning);
             }
         }
 

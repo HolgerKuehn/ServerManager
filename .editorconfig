@@ -55,6 +55,7 @@ dotnet_style_qualification_for_property = false:silent
 dotnet_style_qualification_for_event = false:silent
 tab_width = 4
 indent_size = 4
+dotnet_style_prefer_collection_expression = true:suggestion
 [*.cs]
 #### Benennungsstile ####
 

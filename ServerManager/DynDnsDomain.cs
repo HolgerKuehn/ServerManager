@@ -1,11 +1,9 @@
-﻿using System.Data;
-using System.DirectoryServices.ActiveDirectory;
-using System.Net;
-using System.Text;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
-
-namespace blog.dachs.ServerManager
+﻿namespace blog.dachs.ServerManager
 {
+    using System.Data;
+    using System.Net;
+    using System.Text;
+
     public class DynDnsDomain : DynDnsService
     {
         private int id;

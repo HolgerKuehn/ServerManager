@@ -57,7 +57,15 @@
 
                 backupSource = new BackupSource(this.Configuration, this.Backup);
                 backupSource.Backup = backup;
-                backupSource.Path = directoryInfo.FullName.Replace(backup.SourceBasePath + "\\", string.Empty);
+                
+                if (directoryInfo.FullName == backup.SourceBasePath)
+                {
+                    backupSource.Path = string.Empty;
+                }
+                else
+                {
+                    backupSource.Path = directoryInfo.FullName.Replace(backup.SourceBasePath + "\\", string.Empty);
+                }
  
                 backupSource.CreateBackup();
                 this.Add(backupSource);

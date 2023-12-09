@@ -142,7 +142,7 @@
                         {
                             setSourceFile.State = BackupSetSourceFileState.validated;
                             setSourceFile.WriteToDisc();
-                        }
+                        } 
                     }
                 }
 

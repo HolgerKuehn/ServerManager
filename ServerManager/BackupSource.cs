@@ -57,7 +57,19 @@
 
         public string FullAbsolutePath
         {
-            get { return this.Backup.SourceBasePath + "\\" + this.Path; }
+            get 
+            {
+                string path;
+                
+                path = this.Backup.SourceBasePath;
+                
+                if (this.Path != string.Empty)
+                {
+                    path += "\\" + this.Path;
+                }
+
+                return path;
+            }
             set { }
         }
 

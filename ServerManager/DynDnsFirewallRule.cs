@@ -117,12 +117,15 @@ namespace blog.dachs.ServerManager
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
             List<string> firewallRuleDisplayName = this.PowerShell.Command(pshCommand);
 
-            // remove caption
-            firewallRuleDisplayName.RemoveRange(0, 3);
+            if (firewallRuleDisplayName.Count > 3)
+            {
+                // remove caption
+                firewallRuleDisplayName.RemoveRange(0, 3);
 
-            // add DisplayName to firewallRule
-            if (firewallRuleDisplayName[0] != null)
-                this.DisplayName = firewallRuleDisplayName[0];
+                // add DisplayName to firewallRule
+                if (firewallRuleDisplayName[0] != null)
+                    this.DisplayName = firewallRuleDisplayName[0];
+            }
 
             // read Enabled
             pshCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled);
@@ -131,16 +134,19 @@ namespace blog.dachs.ServerManager
             List<string> firewallRuleEnabled = this.PowerShell.Command(pshCommand);
 
             // remove caption
-            firewallRuleEnabled.RemoveRange(0, 3);
+            if (firewallRuleDisplayName.Count > 3)
+            {
+                firewallRuleEnabled.RemoveRange(0, 3);
 
-            // add Enabled to firewallRule
-            if (firewallRuleEnabled[0] != null && firewallRuleEnabled[0].Trim().ToLower() == "false")
-            {
-                this.Enabled = false;
-            }
-            else
-            {
-                this.Enabled = true;
+                // add Enabled to firewallRule
+                if (firewallRuleEnabled[0] != null && firewallRuleEnabled[0].Trim().ToLower() == "false")
+                {
+                    this.Enabled = false;
+                }
+                else
+                {
+                    this.Enabled = true;
+                }
             }
         }
     }

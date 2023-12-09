@@ -1,6 +1,3 @@
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
-
 namespace blog.dachs.ServerManager
 {
     public static class ProgramMain

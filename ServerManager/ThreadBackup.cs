@@ -20,12 +20,12 @@
 
         public override void Work()
         {
-            while (true)
-            {
-                this.BackupCollection.CreateBackup();
+            //while (true)
+            //{
+            //    this.BackupCollection.CreateBackup();
 
-                Thread.Sleep(120000);
-            }
+            //    Thread.Sleep(120000);
+            //}
         }
     }
 }
