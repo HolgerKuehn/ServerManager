@@ -101,13 +101,26 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_GetDnsIpAddress, powerShellCommand));
 
-            List<string> ipAddressList = this.PowerShell.Command(powerShellCommand);
+            ProcessOutput ipAddressList = this.PowerShell.ExecuteCommand(powerShellCommand);
 
-            foreach (string ipAddress in ipAddressList)
+            int i = 4;
+            while (true)
             {
-                this.IpAddressCollection.Add(ipAddress.Trim());
+                string ipAddress = this.CommandLine.GetProcessOutput(ipAddressList, i);
+                
+                if (ipAddress != null)
+                {
+                    this.IpAddressCollection.Add(ipAddress.Trim());
+                } 
+                else
+                {
+                    break;
+                }
+
+                i++;
             }
 
+            this.CommandLine.DeleteProcessOutput(ipAddressList);
             this.SetIpAddressPrefix();
         }
 

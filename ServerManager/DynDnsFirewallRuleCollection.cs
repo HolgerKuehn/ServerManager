@@ -39,11 +39,8 @@
             string pshCommand = this.Database.GetCommand(Command.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromPowerShell);
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, pshCommand));
 
-            // read firewallRuleCollection from PowerShell and add them to disc
-            List<string> firewallRuleCollection = this.PowerShell.Command(pshCommand);
-
-            // remove caption
-            firewallRuleCollection.RemoveRange(0, 3);
+            // read powerShellOutput from PowerShell and add them to disc
+            ProcessOutput powerShellOutput = this.PowerShell.ExecuteCommand(pshCommand);
 
             // add new firewall rules
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, "add firewall rule to disc"));
@@ -52,39 +49,49 @@
             string sqlCommandWriteFirewallReplace;
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, sqlCommandWriteFirewallRuleOriginal));
 
-            foreach (string firewallRule_Name in firewallRuleCollection)
+            int i = 4; 
+            while (true)
             {
-                if (firewallRule_Name.Trim() != string.Empty)
+                string firewallRuleName = this.PowerShell.CommandLine.GetProcessOutput(powerShellOutput, i);
+                if (firewallRuleName == null)
+                {
+                    break;
+                }
+                else if (firewallRuleName.Trim() != string.Empty)
                 {
                     sqlCommandWriteFirewallReplace = sqlCommandWriteFirewallRuleOriginal;
-                    sqlCommandWriteFirewallReplace = sqlCommandWriteFirewallReplace.Replace("<DynDnsFirewallRule_Name>", firewallRule_Name.Trim());
+                    sqlCommandWriteFirewallReplace = sqlCommandWriteFirewallReplace.Replace("<DynDnsFirewallRuleName>", firewallRuleName.Trim());
                     this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, sqlCommandWriteFirewallReplace));
 
                     this.Database.ExecuteCommand(sqlCommandWriteFirewallReplace);
                 }
+
+                i++;
             }
 
+            this.PowerShell.CommandLine.DeleteProcessOutput(powerShellOutput);
 
-            // read firewall rules from disc
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, "read firewall rules from disc"));
 
-            string sqlCommandReadFirewallRule = this.Database.GetCommand(Command.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromDisc);
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, sqlCommandReadFirewallRule));
+            //// read firewall rules from disc
+            //this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, "read firewall rules from disc"));
 
-            DataTable dataTable = this.Database.GetDataTable(sqlCommandReadFirewallRule);
-            DataRow dataRow = null;
-            int firewallRuleID = 0;
-            DynDnsFirewallRule firewallRule = null;
+            //string sqlCommandReadFirewallRule = this.Database.GetCommand(Command.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromDisc);
+            //this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, sqlCommandReadFirewallRule));
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
-            {
-                dataRow = dataTable.Rows[row];
-                firewallRuleID = Convert.ToInt32(dataRow[0].ToString());
+            //DataTable dataTable = this.Database.GetDataTable(sqlCommandReadFirewallRule);
+            //DataRow dataRow = null;
+            //int firewallRuleID = 0;
+            //DynDnsFirewallRule firewallRule = null;
 
-                firewallRule = new DynDnsFirewallRule(this.Configuration, firewallRuleID);
+            //for (int row = 0; row < dataTable.Rows.Count; row++)
+            //{
+            //    dataRow = dataTable.Rows[row];
+            //    firewallRuleID = Convert.ToInt32(dataRow[0].ToString());
 
-                this.FirewallRules.Add(firewallRule);
-            }
+            //    firewallRule = new DynDnsFirewallRule(this.Configuration, firewallRuleID);
+
+            //    this.FirewallRules.Add(firewallRule);
+            //}
         }
 
         #region implement IList

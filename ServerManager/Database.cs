@@ -14,6 +14,8 @@
 
         public abstract DataTable GetDataTable(string sqlCommand);
 
+        public abstract DataRow? GetDataRow(string sqlCommand, int row, string filter = "");
+
         public static Database GetHandlerDatabase(Configuration configuration)
         {
             return new Sqlite(configuration);

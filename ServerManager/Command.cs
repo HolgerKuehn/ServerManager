@@ -47,6 +47,11 @@
         BackupSetSourceFile_WriteToDisc = 43,
         KeePassDatabase_KeePassDatabase = 44,
         KeePassDatabase_WriteToDisc = 45,
-        KeePassDatabaseCollection_KeePassDatabaseCollection = 46
+        KeePassDatabaseCollection_KeePassDatabaseCollection = 46,
+        CommandLine_Command_Insert = 47,
+        CommandLine_Command_Select = 48,
+        CommandLine_Command_Delete = 49,
+        BackupSourceCollection_ReadFileList = 50,
+        BackupSourceFileCollection_ReadFileList = 51
     }
 }

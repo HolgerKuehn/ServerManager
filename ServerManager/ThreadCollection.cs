@@ -1,17 +1,36 @@
-﻿namespace blog.dachs.ServerManager
+﻿/// <summary>
+/// Namespace for ServiceManager
+/// Copyright Holger Kühn, 2023
+/// </summary>
+namespace blog.dachs.ServerManager
 {
+    using blog.dachs.ServerManager.Backup;
+
+    /// <summary>
+    /// Manages all Thread used in ServerManager
+    /// </summary>
     public class ThreadCollection : GlobalExtention
     {
-        private static List<ThreadWorker> threadWorker = new List<ThreadWorker>();
+        /// <summary>
+        /// list of active threads
+        /// </summary>
+        private static List<ThreadWorker> threadWorkers = new List<ThreadWorker>();
 
+        /// <summary>
+        /// initializes ThreadCollection
+        /// </summary>
+        /// <param name="configuration"></param>
         public ThreadCollection(Configuration configuration) : base(configuration)
         {
         }
 
-        private static List<ThreadWorker> ThreadWorker
+        /// <summary>
+        /// Gets and sets list of active threads
+        /// </summary>
+        private static List<ThreadWorker> ThreadWorkers
         {
-            get { return threadWorker; }
-            set { threadWorker = value; }
+            get { return threadWorkers; }
+            set { threadWorkers = value; }
         }
 
         public void ThreadBackup(Configuration configuration)
@@ -21,9 +40,13 @@
             threadBackupThread.Name = "ThreadBackup";
             threadBackupThread.Start();
 
-            ThreadWorker.Add(threadBackup);
+            ThreadWorkers.Add(threadBackup);
         }
 
+        /// <summary>
+        /// starts DynDns Client
+        /// </summary>
+        /// <param name="configuration"></param>
         public void ThreadDynDns(Configuration configuration)
         {
             ThreadDynDns threadDynDns = new ThreadDynDns(configuration);
@@ -31,7 +54,7 @@
             threadDnsThread.Name = "ThreadDynDns";
             threadDnsThread.Start();
 
-            ThreadWorker.Add(threadDynDns);
+            ThreadWorkers.Add(threadDynDns);
         }
 
         public void ThreadFirewallRuleBaseProperties(Configuration configuration, DynDnsServerLocal server)
@@ -41,7 +64,15 @@
             threadFirewallRuleBasePropertiesThread.Name = "ThreadFirewallRuleBaseProperties";
             threadFirewallRuleBasePropertiesThread.Start();
 
-            ThreadWorker.Add(threadFirewallRuleBaseProperties);
+            ThreadWorkers.Add(threadFirewallRuleBaseProperties);
+        }
+
+        public void TerminateThreads()
+        {
+            foreach (ThreadWorker threadWorker in ThreadWorkers)
+            {
+                threadWorker.Terminate = true;
+            }
         }
     }
 }

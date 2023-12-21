@@ -2,6 +2,7 @@
 using System.Data;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Security;
 
 namespace blog.dachs.ServerManager
 {
@@ -109,15 +110,25 @@ namespace blog.dachs.ServerManager
 
         public string GeneratePassword()
         {
+            string sqlCommandOriginal = string.Empty;
+            string sqlCommandProcess = string.Empty;
+            string? password;
+            string? result;
+
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath; ;
             processStartInfo.Arguments = "-c:GenPw -count:1 -profile:\"ServerManager\"";
 
-            List<string> result = this.CommandLine.Command(processStartInfo);
+            ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
             
-            if (result.Count == 2 && result[1].StartsWith("OK:"))
+            password = this.CommandLine.GetProcessOutput(kPScriptOutput, 1);
+            result = this.CommandLine.GetProcessOutput(kPScriptOutput, 2);
+            
+            this.CommandLine.DeleteProcessOutput(kPScriptOutput);
+
+            if (password != null && result != null && result.StartsWith("OK:"))
             {
-                return result[0];
+                return password;
             }
 
             throw new Exception("GeneratePassword failed");
@@ -125,44 +136,72 @@ namespace blog.dachs.ServerManager
 
         public List<string> GetListOfEntries(string title, string path = "")
         {
+            string outputLine;
+            List<string> listOfEntries = new List<string>();
+            
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath; ;
             processStartInfo.Arguments = "-c:ListEntries \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password.Decrypt() + "  -ref-Title:\"" + title + "\" -refx-GroupPath:\"" + path + "\"";
 
-            List<string> kPScriptOutput = this.CommandLine.Command(processStartInfo);
-            List<string> result = new List<string>();
+            ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
 
             // search for existing entry
-            foreach (string line in kPScriptOutput)
+            int row = 0;
+            while (true)
             {
-                if (line.StartsWith("S: Title = "))
+                outputLine = this.CommandLine.GetProcessOutput(kPScriptOutput, row, "a.ProcessOutput_Text like 'S: Title = %'");
+
+                if (outputLine != null)
                 {
-                    result.Add(line.Substring(11));
+                    listOfEntries.Add(outputLine.Substring(11));
+                }
+                else if (outputLine == null)
+                {
+                    break;
                 }
             }
 
-            return result;
+            this.CommandLine.DeleteProcessOutput(kPScriptOutput);
+
+            return listOfEntries;
         }
 
         public KeePassEntry GetEntry(string title, string path = "")
         {
+            string? outputLine;
+            KeePassEntry keePassEntry = new KeePassEntry("", path);
+
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath; ;
             processStartInfo.Arguments = "-c:ListEntries \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password.Decrypt() + "  -ref-Title:\"" + title + "\" -refx-GroupPath:\"" + path + "\"";
 
-            List<string> result = this.CommandLine.Command(processStartInfo);
-
-            KeePassEntry keePassEntry = new KeePassEntry("", path);
+            ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
 
             // search for existing entry
-            foreach(string line in result)
+            int row = 0;
+            while (true)
             {
-                if (line.StartsWith("S: Password = ")) { keePassEntry.Password = line.Substring(14).Encrypt(); } else 
-                if (line.StartsWith("S: Title = ")) { keePassEntry.Title = line.Substring(11); }
+                outputLine = this.CommandLine.GetProcessOutput(kPScriptOutput, row, "(a.ProcessOutput_Text like 'S: Password = %' or a.ProcessOutput_Text like 'S: Title = %')");
+                
+                if (outputLine != null && outputLine.StartsWith("S: Password = "))
+                {
+                    keePassEntry.Password = outputLine.Substring(14).Encrypt();
+                }
+                else if (outputLine != null && outputLine.StartsWith("S: Title = "))
+                {
+                    keePassEntry.Title = outputLine.Substring(11);
+                }
+                else if (outputLine == null)
+                {
+                    break;
+                }
             }
 
+            this.CommandLine.DeleteProcessOutput(kPScriptOutput);
+
+
             // if empty, create new one
-            if(keePassEntry.Title == string.Empty)
+            if (keePassEntry.Title == string.Empty)
             {
                 keePassEntry.Title = title;
                 keePassEntry.Password = this.GeneratePassword().Encrypt();
@@ -180,7 +219,8 @@ namespace blog.dachs.ServerManager
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath; ;
             processStartInfo.Arguments = "-c:AddEntry \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password.Decrypt() + "  -Title:\"" + keePassEntry.Title + "\" -UserName:\"\" -Password:\"" + keePassEntry.Password.Decrypt() + "\"";
             
-            this.CommandLine.Command(processStartInfo);
+            ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
+            this.CommandLine.DeleteProcessOutput(kPScriptOutput);
         }
     }
 }

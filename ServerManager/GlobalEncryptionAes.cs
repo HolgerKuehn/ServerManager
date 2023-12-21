@@ -184,7 +184,7 @@
         /// generates 32 bytes or 256 bit entropy
         /// </summary>
         /// <returns>random 32 bytes or 256 bit entropy</returns>
-        private static byte[] Generate256BitsOfRandomEntropy()
+        public static byte[] Generate256BitsOfRandomEntropy()
         {
             byte[] randomBytes = new byte[32];
 

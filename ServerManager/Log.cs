@@ -64,7 +64,10 @@
         BackupSetSourceFile_WriteToDisc = 41,
         KeePassDatabase_KeePassDatabase = 42,
         KeePassDatabase_WriteToDisc = 43,
-        KeePassDatabaseCollection_KeePassDatabaseCollection = 44
+        KeePassDatabaseCollection_KeePassDatabaseCollection = 44,
+        ServiceWorker_Task = 45,
+        BackupSourceCollection_ReadFileList = 46,
+        BackupSourceFileCollection_ReadFileList = 47
     }
 
     public abstract class Log : GlobalExtention

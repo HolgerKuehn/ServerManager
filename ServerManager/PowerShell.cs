@@ -8,13 +8,13 @@ namespace blog.dachs.ServerManager
         {
         }
 
-        public List<string> Command(string command)
+        public ProcessOutput ExecuteCommand(string command)
         {
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = "powershell.exe";
-            processStartInfo.Arguments = "-Command \"" + command.Replace("\"", "\'").ReplaceLineEndings("; ") + "\"";
+            processStartInfo.Arguments = "-Command \"$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); " + command.Replace("\"", "\'").ReplaceLineEndings("; ") + "\"";
 
-            return this.CommandLine.Command(processStartInfo);
+            return this.CommandLine.ExecuteCommand(processStartInfo);
         }
     }
 }

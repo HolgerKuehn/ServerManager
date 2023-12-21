@@ -1,19 +1,18 @@
-﻿using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq.Expressions;
-
-namespace blog.dachs.ServerManager
+﻿namespace blog.dachs.ServerManager
 {
+    using System.Diagnostics;
+    using System.Text;
+    using blog.dachs.ServerManager.Backup;
+
     public class SevenZip : GlobalExtention
     {
         public SevenZip(Configuration configuration) : base(configuration)
         {
         }
 
-        public List<string> Compress(BackupSet backupSet)
+        public ProcessOutput Compress(BackupSet backupSet)
         {
-            List<string> result = new List<string>();
+            ProcessOutput processOutput = new ProcessOutput(0);
 
             // write FileList
             DirectoryInfo directoryInfo = new DirectoryInfo(backupSet.FullAbsolutePath);
@@ -52,17 +51,16 @@ namespace blog.dachs.ServerManager
             
             processStartInfo.Arguments += " " + backupSet.Name + ".7z @FileList.txt";
 
-            result = this.CommandLine.Command(processStartInfo);
+            processOutput = this.CommandLine.ExecuteCommand(processStartInfo);
 
             // delete FileList
             File.Delete(backupSet.FullAbsolutePath + "\\FileList.txt");
 
-            return result;
+            return processOutput;
         }
 
         public BackupSetSourceFileCollection FilesInArchive(BackupSet backupSet)
         {
-            List<string> resultList = new List<string>();
             List<string> filesInArchive = new List<string>();
             BackupSetSourceFileCollection setSourceFileCollection = new BackupSetSourceFileCollection(this.Configuration, backupSet);
 
@@ -79,30 +77,40 @@ namespace blog.dachs.ServerManager
 
             processStartInfo.Arguments += " -sccUTF-8 -slt";
 
-            resultList = this.CommandLine.Command(processStartInfo);
+            ProcessOutput processOutput = this.CommandLine.ExecuteCommand(processStartInfo);
 
-            foreach (string line in resultList)
+            int i = 0;
+            while (true)
             {
-                if (line.StartsWith("Path = "))
+                string outputLine = this.CommandLine.GetProcessOutput(processOutput, i, "a.ProcessOutput_Text like 'Path = %'");
+
+                if (outputLine != null)
                 {
                     foreach (BackupSetSourceFile setSourceFile in backupSet.SetSourceFileCollection)
                     {
                         BackupSourceFile sourceFile = setSourceFile.SourceFile;
 
-                        if (sourceFile.FullAbsolutePath.Substring(3).Equals(line.Substring(7), StringComparison.CurrentCulture))
+                        if (sourceFile.FullAbsolutePath.Substring(3).Equals(outputLine.Substring(7), StringComparison.CurrentCulture))
                         {
                             setSourceFileCollection.Add(setSourceFile);
                         }
                     }
+                } 
+                else
+                {
+                    break;
                 }
+
+                i++;
             }
+
+            this.CommandLine.DeleteProcessOutput(processOutput);
 
             return setSourceFileCollection;
         }
 
         public bool TestArchive(BackupSet backupSet)
         {
-            List<string> resultList = new List<string>();
             bool result = false;
 
             // get list of files in 
@@ -116,15 +124,14 @@ namespace blog.dachs.ServerManager
                 processStartInfo.Arguments += " -p" + backupSet.Source.Password.Decrypt();
             }
 
-            resultList = this.CommandLine.Command(processStartInfo);
-
-            foreach (string line in resultList)
+            ProcessOutput processOutput = this.CommandLine.ExecuteCommand(processStartInfo);
+            string outputLine = this.CommandLine.GetProcessOutput(processOutput, 0, "a.ProcessOutput_Text like '%Everything is Ok%'");
+            if (outputLine != null)
             {
-                if (line.Contains("Everything is Ok"))
-                {
-                    result = true;
-                }
+                result = true;
             }
+
+            this.CommandLine.DeleteProcessOutput(processOutput);
 
             return result;
         }

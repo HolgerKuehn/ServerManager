@@ -1,9 +1,19 @@
-﻿namespace blog.dachs.ServerManager
+﻿/// <summary>
+/// Namespace for ServiceManager
+/// Copyright Holger Kühn, 2023
+/// </summary>
+namespace blog.dachs.ServerManager
 {
     using System.Data;
     
+    /// <summary>
+    /// BaseClass for DynDns client
+    /// </summary>
     public class ThreadDynDns : ThreadWorker
     {
+        /// <summary>
+        /// server running the DynDns client
+        /// </summary>
         private DynDnsServer dynDnsServer;
 
         public ThreadDynDns(Configuration configuration) : base(configuration)
