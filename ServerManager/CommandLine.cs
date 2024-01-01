@@ -63,7 +63,7 @@
                         sqlCommandReplace = sqlCommandReplace.Replace("<ProcessOutputHandle>", processOutput.handle.ToString());
                         sqlCommandReplace = sqlCommandReplace.Replace("<ProcessOutputRandomNumber>", processOutput.randomNumber);
                         sqlCommandReplace = sqlCommandReplace.Replace("<ProcessOutputRow>", processOutputRow.ToString());
-                        sqlCommandReplace = sqlCommandReplace.Replace("<ProcessOutputText>", result);
+                        sqlCommandReplace = sqlCommandReplace.Replace("<ProcessOutputText>", result.Replace("'", "''"));
                         this.Database.ExecuteCommand(sqlCommandReplace);
                     }
                 }
@@ -92,6 +92,15 @@
             sqlCommandProcess = sqlCommandOriginal;
             sqlCommandProcess = sqlCommandProcess.Replace("<ProcessOutputHandle>", processOutput.handle.ToString());
             sqlCommandProcess = sqlCommandProcess.Replace("<ProcessOutputRandomNumber>", processOutput.randomNumber);
+            
+            if (filter != "")
+            {
+                sqlCommandProcess = sqlCommandProcess.Replace("<Filter>", filter);
+            }
+            else
+            {
+                sqlCommandProcess = sqlCommandProcess.Replace("<Filter>", "1 = 1");
+            }
             
             DataRow dataRow = this.Database.GetDataRow(sqlCommandProcess, row, filter);
            

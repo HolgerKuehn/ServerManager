@@ -101,7 +101,6 @@
 
         public override DataRow? GetDataRow(string sqlCommand, int row, string filter = "")
         {
-            sqlCommand = sqlCommand + filter;
             sqlCommand = sqlCommand + " LIMIT 1 OFFSET " + row.ToString();
             
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);

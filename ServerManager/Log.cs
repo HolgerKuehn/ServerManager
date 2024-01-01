@@ -54,7 +54,7 @@
         BackupSourceFile_ReadFromDisc = 31,
         BackupSourceFile_WriteToDisc = 32,
         BackupSource_PrepareOnDisc = 33,
-        BackupSource_ReadFromDisc = 34,
+        BackupSource_ReadFromDiscByPath = 34,
         BackupSource_WriteToDisc = 35,
         BackupSet_PrepareOnDisc = 36,
         BackupSet_ReadFromDisc = 37,
@@ -66,8 +66,19 @@
         KeePassDatabase_WriteToDisc = 43,
         KeePassDatabaseCollection_KeePassDatabaseCollection = 44,
         ServiceWorker_Task = 45,
-        BackupSourceCollection_ReadFileList = 46,
-        BackupSourceFileCollection_ReadFileList = 47
+        BackupSourceCollection_CreateBackup_ReadFileList = 46,
+        BackupSourceFileCollection_ReadFileList = 47,
+        BackupDestinationDevice_BackupDestinationDevice = 48,
+        BackupDestinationDevice_WriteToDisc = 49,
+        BackupSource_CreateBackupSet = 50,
+        BackupSetCollection_BackupSetCollection = 51,
+        BackupSourceFileCollection_CreateBackup = 52,
+        BackupSet_CreateBackup_WriteFileList = 53,
+        BackupSet_CreateBackup_ReadFileList = 54,
+        BackupSet_CreateBackup_ValidateBackup = 55,
+        BackupSet_CreateBackup_LastBackupTimestamp = 56,
+        BackupSet_CreateBackup_ActualSize = 57,
+        BackupSet_CreateBackup_ProjectedSize = 58
     }
 
     public abstract class Log : GlobalExtention

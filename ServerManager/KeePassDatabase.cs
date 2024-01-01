@@ -121,8 +121,8 @@ namespace blog.dachs.ServerManager
 
             ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
             
-            password = this.CommandLine.GetProcessOutput(kPScriptOutput, 1);
-            result = this.CommandLine.GetProcessOutput(kPScriptOutput, 2);
+            password = this.CommandLine.GetProcessOutput(kPScriptOutput, 0);
+            result = this.CommandLine.GetProcessOutput(kPScriptOutput, 1);
             
             this.CommandLine.DeleteProcessOutput(kPScriptOutput);
 
@@ -159,6 +159,8 @@ namespace blog.dachs.ServerManager
                 {
                     break;
                 }
+
+                row++;
             }
 
             this.CommandLine.DeleteProcessOutput(kPScriptOutput);
@@ -195,6 +197,8 @@ namespace blog.dachs.ServerManager
                 {
                     break;
                 }
+
+                row++;
             }
 
             this.CommandLine.DeleteProcessOutput(kPScriptOutput);

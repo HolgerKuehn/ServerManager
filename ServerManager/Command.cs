@@ -51,7 +51,17 @@
         CommandLine_Command_Insert = 47,
         CommandLine_Command_Select = 48,
         CommandLine_Command_Delete = 49,
-        BackupSourceCollection_ReadFileList = 50,
-        BackupSourceFileCollection_ReadFileList = 51
+        BackupSourceCollection_CreateBackup_ReadFileList = 50,
+        BackupSourceFileCollection_ReadFileList = 51,
+        BackupDestinationDevice_BackupDestinationDevice = 53,
+        BackupDestinationDevice_WriteToDisc = 54,
+        BackupSourceFileCollection_CreateBackup = 55,
+        BackupSetCollection_BackupSetCollection = 56,
+        BackupSet_CreateBackup_WriteFileList = 57,
+        BackupSet_CreateBackup_ReadFileList = 58,
+        BackupSet_CreateBackup_ValidateBackup = 59,
+        BackupSet_CreateBackup_LastBackupTimestamp = 60,
+        BackupSet_CreateBackup_ActualSize = 61,
+        BackupSet_CreateBackup_ProjectedSize = 62
     }
 }
