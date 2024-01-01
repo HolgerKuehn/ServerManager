@@ -11,6 +11,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71DB1C76-CD7B-4127-AF7C-DFD09CED88A6}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerManagerService", "ServerManagerService\ServerManagerService.csproj", "{955D8D57-1C3B-45FD-A282-ED1373FE3DEA}"
@@ -18,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerManagerService", "Ser
 		{07A8EB1D-A600-4E2C-A439-B54238EB8FFE} = {07A8EB1D-A600-4E2C-A439-B54238EB8FFE}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerManager", "ServerManager\ServerManager.csproj", "{07A8EB1D-A600-4E2C-A439-B54238EB8FFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerManager", "ServerManager\ServerManager.csproj", "{07A8EB1D-A600-4E2C-A439-B54238EB8FFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
