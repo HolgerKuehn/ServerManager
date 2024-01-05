@@ -1,4 +1,6 @@
-﻿namespace blog.dachs.ServerManager
+﻿using blog.dachs.ServerManager;
+
+namespace blog.dachs.ServerManager.DynDNS
 {
     public class DynDnsFirewallRuleDisplayName : GlobalExtention
     {
@@ -11,8 +13,8 @@
 
         public string DisplayName
         {
-            get { return this.displayName; }
-            set { this.displayName = value; }
+            get { return displayName; }
+            set { displayName = value; }
         }
     }
 }

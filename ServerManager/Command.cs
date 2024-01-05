@@ -62,6 +62,7 @@
         BackupSet_CreateBackup_ValidateBackup = 59,
         BackupSet_CreateBackup_LastBackupTimestamp = 60,
         BackupSet_CreateBackup_ActualSize = 61,
-        BackupSet_CreateBackup_ProjectedSize = 62
+        BackupSet_CreateBackup_ProjectedSize = 62,
+        BackupSet_CreateBackup_CompareSize = 63
     }
 }

@@ -1,7 +1,8 @@
 ﻿
 using System.Data;
+using blog.dachs.ServerManager;
 
-namespace blog.dachs.ServerManager
+namespace blog.dachs.ServerManager.DynDNS
 {
     public class DynDnsServiceRemote : DynDnsService
     {
@@ -20,7 +21,7 @@ namespace blog.dachs.ServerManager
         {
             base.UpdatePublicDnsIpAddress();
 
-            this.UpdatePublicDnsIpAddress(Command.DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp, "set public IPs from " + this.Name + " (RemoteService) as updated");
+            UpdatePublicDnsIpAddress(Command.DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp, "set public IPs from " + Name + " (RemoteService) as updated");
         }
 
     }

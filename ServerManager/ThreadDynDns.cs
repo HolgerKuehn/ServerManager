@@ -4,8 +4,9 @@
 /// </summary>
 namespace blog.dachs.ServerManager
 {
+    using blog.dachs.ServerManager.DynDNS;
     using System.Data;
-    
+
     /// <summary>
     /// BaseClass for DynDns client
     /// </summary>

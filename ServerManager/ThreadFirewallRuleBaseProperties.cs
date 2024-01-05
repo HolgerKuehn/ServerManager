@@ -1,6 +1,6 @@
 ﻿namespace blog.dachs.ServerManager
 {
-    using System.Data;
+    using blog.dachs.ServerManager.DynDNS;
 
     public class ThreadFirewallRuleBaseProperties : ThreadWorker
     {

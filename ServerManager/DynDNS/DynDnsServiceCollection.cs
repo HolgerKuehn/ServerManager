@@ -1,4 +1,6 @@
-﻿namespace blog.dachs.ServerManager
+﻿using blog.dachs.ServerManager;
+
+namespace blog.dachs.ServerManager.DynDNS
 {
     using System;
     using System.Collections;
@@ -9,14 +11,14 @@
 
         public DynDnsServiceCollection(Configuration configuration) : base(configuration)
         {
-            this.serviceCollection = new List<DynDnsService>();
+            serviceCollection = new List<DynDnsService>();
         }
 
 
         public List<DynDnsService> ServiceCollection
         {
-            get { return this.serviceCollection; }
-            set { this.serviceCollection = value; }
+            get { return serviceCollection; }
+            set { serviceCollection = value; }
         }
 
 

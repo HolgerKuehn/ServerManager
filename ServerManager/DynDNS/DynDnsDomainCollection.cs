@@ -1,4 +1,6 @@
-﻿namespace blog.dachs.ServerManager
+﻿using blog.dachs.ServerManager;
+
+namespace blog.dachs.ServerManager.DynDNS
 {
     using System;
     using System.Collections;
@@ -9,19 +11,19 @@
 
         public DynDnsDomainCollection(Configuration configuration) : base(configuration)
         {
-            this.dynDnsDomains = new List<DynDnsDomain>();
+            dynDnsDomains = new List<DynDnsDomain>();
         }
 
         public List<DynDnsDomain> DynDnsDomains
         {
-            get { return this.dynDnsDomains; }
-            set { this.dynDnsDomains = value; }
+            get { return dynDnsDomains; }
+            set { dynDnsDomains = value; }
         }
 
         #region implementing IList
         public object? this[int index] { get => ((IList)DynDnsDomains)[index]; set => ((IList)DynDnsDomains)[index] = value; }
 
- 
+
         public bool IsFixedSize => ((IList)DynDnsDomains).IsFixedSize;
 
         public bool IsReadOnly => ((IList)DynDnsDomains).IsReadOnly;

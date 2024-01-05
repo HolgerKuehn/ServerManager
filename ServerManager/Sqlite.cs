@@ -22,6 +22,7 @@
 
             }
         }
+
         public override string GetCommand(Command command)
         {
             string sqlCommand = string.Empty;

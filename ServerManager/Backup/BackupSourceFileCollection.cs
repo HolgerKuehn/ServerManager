@@ -87,6 +87,8 @@
             int sourceFileId;
             string sourceFilePath;
             string sourceFileName;
+            ulong sourceFileSize;
+
             BackupSourceFile backupSourceFile;
 
             BackupSetCollection backupSetCollection = new BackupSetCollection(this.Configuration, this.BackupSource);
@@ -109,6 +111,7 @@
                         sourceFileId = Convert.ToInt32(dataRow[0].ToString());
                         sourceFilePath = dataRow[1].ToString();
                         sourceFileName = dataRow[2].ToString();
+                        sourceFileSize = Convert.ToUInt64(dataRow[3].ToString());
 
                         if (sourceFilePath != null && sourceFileName != null)
                         {
@@ -116,6 +119,7 @@
                             backupSourceFile.BackupSourceFileId = sourceFileId;
                             backupSourceFile.Path = sourceFilePath;
                             backupSourceFile.Name = sourceFileName;
+                            backupSourceFile.Size = sourceFileSize;
                             backupSetCollection.CreateBackup(backupSourceFile);
                         }
                     }

@@ -1,4 +1,6 @@
-﻿namespace blog.dachs.ServerManager
+﻿using blog.dachs.ServerManager;
+
+namespace blog.dachs.ServerManager.DynDNS
 {
     public class DynDnsServerRemote : DynDnsServer
     {

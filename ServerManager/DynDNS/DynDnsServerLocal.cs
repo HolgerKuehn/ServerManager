@@ -1,14 +1,15 @@
 ﻿using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Net;
+using blog.dachs.ServerManager;
 
-namespace blog.dachs.ServerManager
+namespace blog.dachs.ServerManager.DynDNS
 {
     public class DynDnsServerLocal : DynDnsServer
     {
         public DynDnsServerLocal(Configuration configuration, int dynDnsSerciceID) : base(configuration, dynDnsSerciceID)
         {
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "set private DNS-Server IP Addresses"));
+            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "set private DNS-Server IP Addresses"));
 
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
 
@@ -28,7 +29,7 @@ namespace blog.dachs.ServerManager
 
                     foreach (IPAddress dnsAdress in dnsAddresses)
                     {
-                        DynDnsIpAddress networkIPAddress = new DynDnsIpAddress(this.Configuration, dnsAdress.ToString());
+                        DynDnsIpAddress networkIPAddress = new DynDnsIpAddress(Configuration, dnsAdress.ToString());
                         if (networkIPAddress.IpAddressType != DynDnsIpAddressType.NotValid)
                         {
                             UnicastIPAddressInformationCollection unicastIPAddressInformationCollection = ipProperties.UnicastAddresses;
@@ -55,21 +56,21 @@ namespace blog.dachs.ServerManager
                                 }
                             }
 
-                            this.IpAddressCollection.Add(networkIPAddress);
+                            IpAddressCollection.Add(networkIPAddress);
                         }
                     }
                 }
             }
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "create new ThreadFirewallRuleBaseProperties"));
-            this.Configuration.ThreadCollection.ThreadFirewallRuleBaseProperties(configuration, this);
+            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "create new ThreadFirewallRuleBaseProperties"));
+            Configuration.ThreadCollection.ThreadFirewallRuleBaseProperties(configuration, this);
         }
 
         public override void UpdatePublicDnsIpAddress()
         {
             base.UpdatePublicDnsIpAddress();
 
-            this.UpdatePublicDnsIpAddress(Command.DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp, "set public IPs from " + this.Name + " as updated");
+            UpdatePublicDnsIpAddress(Command.DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp, "set public IPs from " + Name + " as updated");
         }
     }
 }

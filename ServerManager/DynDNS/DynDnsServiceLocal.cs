@@ -1,14 +1,15 @@
 ﻿
 using System.Data;
 using System.Net;
+using blog.dachs.ServerManager;
 
-namespace blog.dachs.ServerManager
+namespace blog.dachs.ServerManager.DynDNS
 {
     public class DynDnsServiceLocal : DynDnsService
     {
         public DynDnsServiceLocal(Configuration configuration, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
         {
-            
+
         }
 
         public override void GetIpAddress()
@@ -30,15 +31,15 @@ namespace blog.dachs.ServerManager
             DataTable dataTable = null;
             DataRow dataRow = null;
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "checking for updateable Public IPs (" + ipAddressVersion.ToString() + ") for " + this.Name));
+            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "checking for updateable Public IPs (" + ipAddressVersion.ToString() + ") for " + Name));
 
-            sqlCommand = this.Database.GetCommand(Command.DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID);
-            sqlCommand = sqlCommand.Replace("<DynDnsServiceID>", this.DynDnsServiceID.ToString());
+            sqlCommand = Database.GetCommand(Command.DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID);
+            sqlCommand = sqlCommand.Replace("<DynDnsServiceID>", DynDnsServiceID.ToString());
             sqlCommand = sqlCommand.Replace("<DynDnsIpAddressVersionID>", Convert.ToByte(ipAddressVersion).ToString());
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, sqlCommand));
+            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, sqlCommand));
 
-            dataTable = this.Database.GetDataTable(sqlCommand);
+            dataTable = Database.GetDataTable(sqlCommand);
             dataRow = null;
 
             for (int row = 0; row < dataTable.Rows.Count; row++)
@@ -54,43 +55,43 @@ namespace blog.dachs.ServerManager
                 url = updateUri;
                 url = url.Replace("<user>", networkCredential.UserName);
                 url = url.Replace("<password>", networkCredential.Password);
-                url = url.Replace("<servicename>", this.Name);
+                url = url.Replace("<servicename>", Name);
 
-                ipAddressCollection = this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressVersion.IPv4);
+                ipAddressCollection = IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressVersion.IPv4);
 
                 if (ipAddressCollection.Count > 0)
                 {
                     url = url.Replace("<ip4addr>", ipAddressCollection.ElementAt(0).IpAddress.ToString());
-                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "updated Public IPv4 IP for " + this.Name + " to " + ipAddressCollection.ElementAt(0).IpAddress.ToString()));
+                    Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "updated Public IPv4 IP for " + Name + " to " + ipAddressCollection.ElementAt(0).IpAddress.ToString()));
                 }
                 else
                 {
                     url = url.Replace("<ip4addr>", "127.0.0.1");
                 }
 
-                ipAddressCollection = this.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressVersion.IPv6);
+                ipAddressCollection = IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressVersion.IPv6);
                 if (ipAddressCollection.Count > 0)
                 {
                     url = url.Replace("<ip6addr>", ipAddressCollection.ElementAt(0).IpAddress.ToString());
-                    this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "updated Public IPV6 IP for " + this.Name + " to " + ipAddressCollection.ElementAt(0).IpAddress.ToString()));
+                    Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "updated Public IPV6 IP for " + Name + " to " + ipAddressCollection.ElementAt(0).IpAddress.ToString()));
                 }
                 else
                 {
                     url = url.Replace("<ip6addr>", "::1");
                 }
 
-                this.WebRequest.Request(url, networkCredential, ipAddressVersion);
+                WebRequest.Request(url, networkCredential, ipAddressVersion);
 
 
-                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "set Public IPs for " + this.Name + " as updated"));
+                Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "set Public IPs for " + Name + " as updated"));
 
                 // IP Address
                 if (dynDnsIpAddressIpAddressID != null)
-                    this.UpdatePublicDnsIpAddress(dynDnsIpAddressIpAddressID);
+                    UpdatePublicDnsIpAddress(dynDnsIpAddressIpAddressID);
 
                 // Network Address
                 if (dynDnsIpAddressNetworkID != null)
-                    this.UpdatePublicDnsIpAddress(dynDnsIpAddressNetworkID);
+                    UpdatePublicDnsIpAddress(dynDnsIpAddressNetworkID);
             }
         }
     }

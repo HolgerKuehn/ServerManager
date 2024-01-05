@@ -2,6 +2,7 @@
 {
     using System.Data;
     using System.Diagnostics;
+    using System.Reflection.Metadata.Ecma335;
     using System.Text;
 
     public enum BackupSetState : byte
@@ -10,13 +11,15 @@
         created = 1,
         creating_FileList = 2,
         FileList_created = 3,
-        FileList_written = 4,
-        creating_Backup = 5,
-        Backup_created = 6,
-        reading_FileList = 7,
-        FileList_read = 8,
-        validating_Backup = 9,
-        Backup_validated = 10
+        BackupSpace_required = 4,
+        BackupSpace_available = 5,
+        FileList_written = 6,
+        creating_Backup = 7,
+        Backup_created = 8,
+        reading_FileList = 9,
+        FileList_read = 10,
+        validating_Backup = 11,
+        Backup_validated = 12
     }
 
     public class BackupSet : GlobalExtention
@@ -172,6 +175,46 @@
         {
             if (this.State == BackupSetState.FileList_created)
             {
+                DataRow dataRow;
+
+                string sqlCommand;
+                ulong sizeBackupSet;
+                ulong sizeDestinationDevice;
+
+
+                // compare space available and space required
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_CreateBackup_CompareSize, "compare size of BackupSet and Destination Device"));
+                sqlCommand = this.Database.GetCommand(Command.BackupSet_CreateBackup_CompareSize);
+                sqlCommand = sqlCommand.Replace("<BackupSetID>", this.SetId.ToString());
+
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.BackupSet_CreateBackup_CompareSize, sqlCommand));
+
+                sizeBackupSet = 0;
+                sizeDestinationDevice = 0;
+
+                dataRow = this.Database.GetDataRow(sqlCommand, 0);
+
+                if (dataRow != null)
+                {
+                    sizeBackupSet = Convert.ToUInt64(dataRow[0].ToString());
+                    sizeDestinationDevice = Convert.ToUInt64(dataRow[1].ToString());
+                }
+
+                if (sizeBackupSet > sizeDestinationDevice)
+                {
+                    this.State = BackupSetState.BackupSpace_required;
+                }
+                else
+                {
+                    this.State = BackupSetState.BackupSpace_available;
+
+                }
+
+                this.WriteToDisc();
+            }
+
+            if (this.State == BackupSetState.BackupSpace_available)
+            {
                 // write FileList
                 DirectoryInfo directoryInfo = new DirectoryInfo(this.FullAbsolutePath);
                 if (!directoryInfo.Exists)
@@ -188,9 +231,7 @@
                 // write FileList
                 FileStream filestream = File.Open(fileListFileInfo.FullName, FileMode.Create);
                 StreamWriter fileListStreamWriter = new StreamWriter(filestream, Encoding.UTF8);
-
-                int i;
-                string fullPath;
+                
                 string sqlCommand;
 
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_CreateBackup_WriteFileList, "read FileList from Set " + this.FullAbsolutePath));
@@ -202,14 +243,14 @@
                 // read FileList from DB
                 using (fileListStreamWriter)
                 {
-                    i = 0;
+                    int i = 0;
                     while (true)
                     {
                         DataRow dataRow = this.Database.GetDataRow(sqlCommand, i);
 
                         if (dataRow != null)
                         {
-                            fullPath = dataRow[0].ToString();
+                            string fullPath = dataRow[0].ToString();
 
                             if (fullPath != null && fullPath != string.Empty)
                             { 
@@ -232,12 +273,15 @@
 
             if (this.State == BackupSetState.FileList_written)
             {
+                ProcessOutput processOutput;
+
                 // create 7z-File
                 this.State = BackupSetState.creating_Backup;
                 this.WriteToDisc();
 
                 this.BackupDate = DateTime.UtcNow;
-                this.SevenZip.Compress(this);
+                processOutput = this.SevenZip.Compress(this);
+                this.CommandLine.DeleteProcessOutput(processOutput);
 
                 this.State = BackupSetState.Backup_created;
                 this.WriteToDisc();
@@ -366,6 +410,7 @@
                 this.PrepareOnDisc();
                 this.ReadFromDisc();
 
+                this.BackupDate = DateTime.UtcNow;
                 this.State = BackupSetState.created;
 
                 this.WriteToDisc();

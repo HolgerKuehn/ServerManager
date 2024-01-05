@@ -1,4 +1,6 @@
-﻿namespace blog.dachs.ServerManager
+﻿using blog.dachs.ServerManager;
+
+namespace blog.dachs.ServerManager.DynDNS
 {
     public class DynDnsFirewallRuleName : GlobalExtention
     {
@@ -6,13 +8,13 @@
 
         public DynDnsFirewallRuleName(Configuration configuration, string Name) : base(configuration)
         {
-            this.name = Name;
+            name = Name;
         }
 
         public string Name
         {
-            get { return this.name; }
-            set { this.name = value; }
+            get { return name; }
+            set { name = value; }
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿namespace blog.dachs.ServerManager
+﻿namespace blog.dachs.ServerManager.DynDNS
 {
     using System;
     using System.Collections;
     using System.Data;
+    using blog.dachs.ServerManager;
 
     public class DynDnsIpAddressCollection : GlobalExtention, IList
     {
@@ -12,65 +13,65 @@
 
         public DynDnsIpAddressCollection(Configuration configuration) : base(configuration)
         {
-            this.IpAddressCollection = new List<DynDnsIpAddress>();
+            IpAddressCollection = new List<DynDnsIpAddress>();
         }
 
         public DynDnsIpAddressReferenceType ReferenceType
         {
-            get { return this.referenceType; }
-            set { this.referenceType = value; }
+            get { return referenceType; }
+            set { referenceType = value; }
         }
 
         public int ReferenceId
         {
-            get { return this.referenceId; }
-            set { this.referenceId = value; }
+            get { return referenceId; }
+            set { referenceId = value; }
         }
 
         private List<DynDnsIpAddress> IpAddressCollection
         {
-            get { return this.ipAddressCollection; }
-            set { this.ipAddressCollection = value; }
+            get { return ipAddressCollection; }
+            set { ipAddressCollection = value; }
         }
 
         public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressType ipAddressType)
         {
-            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
-            ipAddressCollection.ReferenceType = this.ReferenceType;
-            ipAddressCollection.ReferenceId = this.ReferenceId;
+            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(Configuration);
+            ipAddressCollection.ReferenceType = ReferenceType;
+            ipAddressCollection.ReferenceId = ReferenceId;
 
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv4));
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv6));
+            ipAddressCollection.AddRange(GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv4));
+            ipAddressCollection.AddRange(GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv6));
 
             return ipAddressCollection;
         }
 
         public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressVersion ipAddressVersion)
         {
-            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
-            ipAddressCollection.ReferenceType = this.ReferenceType;
-            ipAddressCollection.ReferenceId = this.ReferenceId;
+            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(Configuration);
+            ipAddressCollection.ReferenceType = ReferenceType;
+            ipAddressCollection.ReferenceId = ReferenceId;
 
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.Public, ipAddressVersion));
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.Private, ipAddressVersion));
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.UniqueLocal, ipAddressVersion));
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.LinkLocal, ipAddressVersion));
+            ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.Public, ipAddressVersion));
+            ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.Private, ipAddressVersion));
+            ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.UniqueLocal, ipAddressVersion));
+            ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.LinkLocal, ipAddressVersion));
 
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic, ipAddressVersion));
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate, ipAddressVersion));
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal, ipAddressVersion));
-            ipAddressCollection.AddRange(this.GetIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal, ipAddressVersion));
+            ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic, ipAddressVersion));
+            ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate, ipAddressVersion));
+            ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal, ipAddressVersion));
+            ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal, ipAddressVersion));
 
             return ipAddressCollection;
         }
 
         public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressType ipAddressType, DynDnsIpAddressVersion ipAddressVersion)
         {
-            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
-            ipAddressCollection.ReferenceType = this.ReferenceType;
-            ipAddressCollection.ReferenceId = this.ReferenceId;
+            DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(Configuration);
+            ipAddressCollection.ReferenceType = ReferenceType;
+            ipAddressCollection.ReferenceId = ReferenceId;
 
-            foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
+            foreach (DynDnsIpAddress ipAddress in IpAddressCollection)
             {
                 if (ipAddress.IpAddressType == ipAddressType && ipAddress.IpAddressVersion == ipAddressVersion)
                 {
@@ -85,7 +86,7 @@
         {
             List<DynDnsIpAddressType> ipAddressTypeCollection = new List<DynDnsIpAddressType>();
 
-            foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
+            foreach (DynDnsIpAddress ipAddress in IpAddressCollection)
             {
                 if (!ipAddressTypeCollection.Contains(ipAddress.IpAddressType))
                 {
@@ -98,18 +99,18 @@
 
         public void ReadIpAddressCollectionFromDisc()
         {
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, "read IPs for ReferenceType " + this.ReferenceType + " and ReferenceID " + this.ReferenceId + " from disc"));
+            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, "read IPs for ReferenceType " + ReferenceType + " and ReferenceID " + ReferenceId + " from disc"));
 
-            string sqlCommand = this.Database.GetCommand(Command.DynDnsIpCollection_ReadIpAddressCollectionFromDisc);
+            string sqlCommand = Database.GetCommand(Command.DynDnsIpCollection_ReadIpAddressCollectionFromDisc);
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, sqlCommand));
+            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, sqlCommand));
 
-            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressReferenceTypeID>", Convert.ToString((byte)this.ReferenceType));
-            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressReferenceID>", Convert.ToString(this.ReferenceId));
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressReferenceTypeID>", Convert.ToString((byte)ReferenceType));
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressReferenceID>", Convert.ToString(ReferenceId));
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, sqlCommand));
+            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpCollection_ReadIpAddressCollectionFromDisc, sqlCommand));
 
-            DataTable dataTable = this.Database.GetDataTable(sqlCommand);
+            DataTable dataTable = Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
             string ipAddressName = string.Empty;
             DynDnsIpAddress ipAddress = null;
@@ -129,7 +130,7 @@
 
                 if (ipAddressName != null)
                 {
-                    ipAddress = new DynDnsIpAddress(this.Configuration, ipAddressName);
+                    ipAddress = new DynDnsIpAddress(Configuration, ipAddressName);
                     ipAddress.IpAddressType = ipAddressTypeId;
                     ipAddress.IpAddressIndex = ipAddressIndex;
 
@@ -140,11 +141,11 @@
                         ipAddress.PrefixLength = ipAddressPrefixLength;
                     }
 
-                    this.ipAddressCollection.Add(ipAddress);
+                    ipAddressCollection.Add(ipAddress);
                 }
             }
 
-            this.IpAddressCollection.Sort();
+            IpAddressCollection.Sort();
         }
 
         #region implementing IList
@@ -208,27 +209,27 @@
 
         public void Add(string ipAddress)
         {
-            this.IpAddressCollection.Add(new DynDnsIpAddress(this.Configuration, ipAddress));
+            IpAddressCollection.Add(new DynDnsIpAddress(Configuration, ipAddress));
         }
 
         public void Add(DynDnsIpAddress ipAddress)
         {
-            ipAddress.ReferenceType = this.ReferenceType;
-            ipAddress.ReferenceId = this.ReferenceId;
+            ipAddress.ReferenceType = ReferenceType;
+            ipAddress.ReferenceId = ReferenceId;
 
-            this.IpAddressCollection.Add(ipAddress);
+            IpAddressCollection.Add(ipAddress);
         }
 
         public void Add(DynDnsIpAddressCollection ipAddressCollection)
         {
-            this.AddRange(ipAddressCollection);
+            AddRange(ipAddressCollection);
         }
 
         public void AddRange(DynDnsIpAddressCollection ipAddressCollection)
         {
             foreach (DynDnsIpAddress ipAddress in ipAddressCollection)
             {
-                this.Add(ipAddress);
+                Add(ipAddress);
             }
         }
 
@@ -236,7 +237,7 @@
         {
             List<DynDnsIpAddress> ipAddressCollection = new List<DynDnsIpAddress>();
 
-            foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
+            foreach (DynDnsIpAddress ipAddress in IpAddressCollection)
             {
                 if (ipAddress.IpAddressType != ipAddressType)
                 {
@@ -244,12 +245,12 @@
                 }
             }
 
-            this.IpAddressCollection = ipAddressCollection;
+            IpAddressCollection = ipAddressCollection;
         }
 
         public DynDnsIpAddress ElementAt(int index)
         {
-            return this.IpAddressCollection[index];
+            return IpAddressCollection[index];
         }
     }
 }

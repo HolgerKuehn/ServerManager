@@ -78,7 +78,8 @@
         BackupSet_CreateBackup_ValidateBackup = 55,
         BackupSet_CreateBackup_LastBackupTimestamp = 56,
         BackupSet_CreateBackup_ActualSize = 57,
-        BackupSet_CreateBackup_ProjectedSize = 58
+        BackupSet_CreateBackup_ProjectedSize = 58,
+        BackupSet_CreateBackup_CompareSize = 59
     }
 
     public abstract class Log : GlobalExtention
