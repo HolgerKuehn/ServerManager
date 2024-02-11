@@ -17,9 +17,8 @@
             {
                 dbConnection.Open();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
             }
         }
 

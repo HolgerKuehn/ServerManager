@@ -9,7 +9,7 @@ namespace blog.dachs.ServerManager.DynDNS
     {
         public DynDnsServerLocal(Configuration configuration, int dynDnsSerciceID) : base(configuration, dynDnsSerciceID)
         {
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "set private DNS-Server IP Addresses"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "set private DNS-Server IP Addresses"));
 
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
 
@@ -25,52 +25,63 @@ namespace blog.dachs.ServerManager.DynDNS
                 )
                 {
                     IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
-                    IPAddressCollection dnsAddresses = ipProperties.DnsAddresses;
+                    IPAddressCollection networkAdapterDnsAddresses = ipProperties.DnsAddresses;
+                    
+                    // DNS
+                    DynDnsIpAddressCollection serverDnsAddressCollection = this.GetIpAddressCollection();
+                    DynDnsIpAddress serverDnsAddress;
 
-                    foreach (IPAddress dnsAdress in dnsAddresses)
+                    foreach (IPAddress dnsAdress in networkAdapterDnsAddresses)
                     {
-                        DynDnsIpAddress networkIPAddress = new DynDnsIpAddress(Configuration, dnsAdress.ToString());
-                        if (networkIPAddress.IpAddressType != DynDnsIpAddressType.NotValid)
+                        serverDnsAddress = new DynDnsIpAddress(this.Configuration, dnsAdress.ToString());
+                        serverDnsAddress.IpAddressObject = DynDnsIpAddressObject.DNSServer;
+
+                        if (serverDnsAddress.IpAddressType != DynDnsIpAddressType.NotValid)
                         {
                             UnicastIPAddressInformationCollection unicastIPAddressInformationCollection = ipProperties.UnicastAddresses;
                             foreach (UnicastIPAddressInformation unicastIPAddressInformation in unicastIPAddressInformationCollection)
                             {
-                                if (unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork && networkIPAddress.IpAddressVersion == DynDnsIpAddressVersion.IPv4)
+                                if (unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork && serverDnsAddress.IpAddressVersion == DynDnsIpAddressVersion.IPv4)
                                 {
-                                    networkIPAddress.IpAddressType = DynDnsIpAddressType.DnsServerPrivate;
-                                    networkIPAddress.PrefixLength = (byte)unicastIPAddressInformation.PrefixLength;
+                                    serverDnsAddress.PrefixLength = (byte)unicastIPAddressInformation.PrefixLength;
                                 }
 
-                                if (unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetworkV6 && networkIPAddress.IpAddressVersion == DynDnsIpAddressVersion.IPv6)
+                                if (unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetworkV6 && serverDnsAddress.IpAddressVersion == DynDnsIpAddressVersion.IPv6)
                                 {
-                                    if (networkIPAddress.IpAddressType == DynDnsIpAddressType.LinkLocal)
-                                    {
-                                        networkIPAddress.IpAddressType = DynDnsIpAddressType.DnsServerLinkLocal;
-                                    }
-                                    else if (networkIPAddress.IpAddressType == DynDnsIpAddressType.UniqueLocal)
-                                    {
-                                        networkIPAddress.IpAddressType = DynDnsIpAddressType.DnsServerUniqueLocal;
-                                    }
-
-                                    networkIPAddress.PrefixLength = (byte)unicastIPAddressInformation.PrefixLength;
+                                    serverDnsAddress.PrefixLength = (byte)unicastIPAddressInformation.PrefixLength;
                                 }
                             }
 
-                            IpAddressCollection.Add(networkIPAddress);
+                            serverDnsAddressCollection.Add(serverDnsAddress);
                         }
                     }
+
+                    serverDnsAddressCollection.WriteIpAddressCollection();
+
+                    // Unicast
+                    // NetworkAdapter
                 }
             }
+        }
 
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "create new ThreadFirewallRuleBaseProperties"));
-            Configuration.ThreadCollection.ThreadFirewallRuleBaseProperties(configuration, this);
+        public override void GetIpAddress()
+        {
+            // get public IP 
+            base.GetPublicIpAddress();
+
+            // get private IP 
+            base.GetPrivateIpAddress();
+
+            // invoke depending objects
+            base.GetIpAddress();
         }
 
         public override void UpdatePublicDnsIpAddress()
         {
-            base.UpdatePublicDnsIpAddress();
-
-            UpdatePublicDnsIpAddress(Command.DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp, "set public IPs from " + Name + " as updated");
+            foreach (DynDnsDomain domain in this.DomainCollection)
+            {
+                domain.UpdatePublicDnsIpAddress();
+            }
         }
     }
 }

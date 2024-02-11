@@ -19,44 +19,39 @@ namespace blog.dachs.ServerManager
 
         public ThreadDynDns(Configuration configuration) : base(configuration)
         {
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServiceType"));
+            // reading server type (local or remote)
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading required server type"));
             
             string sqlCommand = this.Database.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
-            
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand)); 
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
 
-            DataTable dataTable = this.Database.GetDataTable(sqlCommand);
-            DataRow dataRow = null;
+            DataRow dataRow = this.Database.GetDataRow(sqlCommand, 0);
             DynDnsServiceType dynDnsServiceType = DynDnsServiceType.Server;
 
-            // get DynDnsServiceType for server 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            if (dataRow != null )
             {
-                dataRow = dataTable.Rows[row];
                 dynDnsServiceType = (DynDnsServiceType)Convert.ToInt32(dataRow[0].ToString());
             }
 
 
+            // create server accordingly
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading DynDnsServer"));
 
             sqlCommand = this.Database.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServer);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
-
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
 
-            dataTable = this.Database.GetDataTable(sqlCommand);
-            dataRow = null;
+            dataRow = this.Database.GetDataRow(sqlCommand, 0);
             int dynDnsServiceID = 0;
 
             // get DynDnsServiceID for server 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            if (dataRow != null)
             {
-                dataRow = dataTable.Rows[row];
                 dynDnsServiceID = Convert.ToInt32(dataRow[0].ToString());
             }
 
-            // create Server accordingly to it
+            // create server
             switch (dynDnsServiceType)
             {
                 case DynDnsServiceType.ServiceLocal:
@@ -78,13 +73,13 @@ namespace blog.dachs.ServerManager
         public override void Work()
         {
             this.DynDnsServer.SetDnsServer();
-
+            
             while (true)
             {
                 this.DynDnsServer.GetIpAddress();
-                this.DynDnsServer.WriteLogForChangedIpAddress();
+            //  this.DynDnsServer.WriteLogForChangedIpAddress();
                 this.DynDnsServer.UpdatePublicDnsIpAddress();
-
+            
                 Thread.Sleep(120000);
             }
         }

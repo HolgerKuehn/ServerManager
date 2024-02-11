@@ -28,7 +28,7 @@
                 sqlInsertValue += ((int)logEntry.LogOrigin).ToString() + " as LogOrigin_ID, ";
 
                 sqlInsertHeader += "Log_Message";
-                sqlInsertValue += "\"" + logEntry.LogMessage.Replace("\"", "'") + "\" as Log_Message";
+                sqlInsertValue += "\'" + logEntry.LogMessage.Replace("\"", "''") + "\' as Log_Message";
 
                 sqlInsertHeader += ") ";
 

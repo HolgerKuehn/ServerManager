@@ -15,6 +15,7 @@ namespace blog.dachs.ServerManager.Backup
             // read current set, not yet validated
             int i;
             string sqlCommand;
+            int deviceId;
             string path;
             string name;
 
@@ -32,24 +33,27 @@ namespace blog.dachs.ServerManager.Backup
                 if (dataRow != null)
                 {
                     this.Set.SetId = Convert.ToInt32(dataRow[0].ToString());
+                    
+                    deviceId = Convert.ToInt32(dataRow[1].ToString());
+                    this.Set.Device = new BackupDestinationDevice(this.Configuration, deviceId);
 
-                    path = dataRow[1].ToString();
+                    path = dataRow[2].ToString();
 
                     if (path != null)
                     {
                         this.Set.Path = path;
                     }
 
-                    name = dataRow[2].ToString();
+                    name = dataRow[3].ToString();
 
                     if (name != null)
                     {
                         this.Set.Name = name;
                     }
 
-                    this.Set.BackupDate = Convert.ToDateTime(dataRow[3].ToString());
-                    this.Set.Size = Convert.ToUInt64(dataRow[4].ToString());
-                    this.Set.State = (BackupSetState)Convert.ToByte(dataRow[5].ToString());
+                    this.Set.BackupDate = Convert.ToDateTime(dataRow[4].ToString());
+                    this.Set.Size = Convert.ToUInt64(dataRow[5].ToString());
+                    this.Set.State = (BackupSetState)Convert.ToByte(dataRow[6].ToString());
                 }
                 else
                 {

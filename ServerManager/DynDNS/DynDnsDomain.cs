@@ -1,62 +1,58 @@
-﻿using blog.dachs.ServerManager;
-
-namespace blog.dachs.ServerManager.DynDNS
+﻿namespace blog.dachs.ServerManager.DynDNS
 {
+    using blog.dachs.ServerManager;
     using System.Data;
     using System.Net;
-    using System.Text;
 
     public class DynDnsDomain : DynDnsService
     {
         private int id;
+        private int serviceId;
         private string name;
+        private KeePassDatabase keePassDatabase;
         private string user;
         private string password;
         private DynDnsServiceCollection serviceCollection;
         private Dictionary<DynDnsIpAddressVersion, string> updateUri;
 
-
-        public DynDnsDomain(Configuration configuration, int dynDnsDomainID, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
+        public DynDnsDomain(Configuration configuration, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
         {
-            ID = dynDnsDomainID;
-
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "creating DynDnsDomain with DynDnsDomain_ID = " + ID.ToString()));
 
             string sqlCommand = Database.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsDomainProperties);
-            sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", ID.ToString());
+            sqlCommand = sqlCommand.Replace("<DynDnsServiceID>", dynDnsServiceID.ToString());
 
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
             DataTable dataTable = Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
             string dynDnsDomainName;
-            string dynDnsDomainUserBase64;
-            string dynDnsDomainPasswordBase64;
+            string keePassDatabase;
 
             // reading values
             for (int row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
-                dynDnsDomainName = dataRow[0].ToString();
-                dynDnsDomainUserBase64 = dataRow[1].ToString();
-                dynDnsDomainPasswordBase64 = dataRow[2].ToString();
+                this.ID = Convert.ToInt32(dataRow[0].ToString());
+                dynDnsDomainName = dataRow[1].ToString();
+                keePassDatabase = dataRow[2].ToString();
 
                 if (dynDnsDomainName != null)
                 {
-                    Name = dynDnsDomainName;
+                    this.Name = dynDnsDomainName;
                     Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "created DynDnsDomain with DynDnsDomain_Name = " + Name));
                 }
 
-                if (dynDnsDomainUserBase64 != null)
+                if (keePassDatabase != null && keePassDatabase != string.Empty)
                 {
-                    User = Encoding.UTF8.GetString(Convert.FromBase64String(dynDnsDomainUserBase64));
-                }
+                    this.KeePassDatabase = this.KeePass.GetKeePassDatabase(keePassDatabase);
 
-                if (dynDnsDomainPasswordBase64 != null)
-                {
-                    Password = Encoding.UTF8.GetString(Convert.FromBase64String(dynDnsDomainPasswordBase64));
+                    KeePassEntry keePassEntry = this.KeePassDatabase.GetEntry(this.Name);
+                    this.User = keePassEntry.UserName;
+                    this.Password = keePassEntry.Password;
                 }
             }
+
 
             // reading updater URI
             UpdateUri = new Dictionary<DynDnsIpAddressVersion, string>();
@@ -64,7 +60,7 @@ namespace blog.dachs.ServerManager.DynDNS
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "reading update URIs for DynDnsDomain with DynDnsDomain_Name = " + Name));
 
             sqlCommand = Database.GetCommand(Command.DynDnsDomain_DynDnsDomain_ReadUpdateUri);
-            sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", ID.ToString());
+            sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", this.ID.ToString());
 
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
@@ -83,15 +79,15 @@ namespace blog.dachs.ServerManager.DynDNS
                     UpdateUri.Add(ipAddressVersion, updateUri);
             }
 
-            // reading servies
-            ServiceCollection = new DynDnsServiceCollection(Configuration);
+            // reading services
+            this.ServiceCollection = new DynDnsServiceCollection(Configuration);
 
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "reading services for DynDnsDomain with DynDnsDomain_Name = " + Name));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "reading services for DynDnsDomain with DynDnsDomain_Name = " + Name));
 
             sqlCommand = Database.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsServices);
             sqlCommand = sqlCommand.Replace("<DynDnsDomainID>", ID.ToString());
 
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
             dataTable = Database.GetDataTable(sqlCommand);
             dataRow = null;
@@ -118,7 +114,11 @@ namespace blog.dachs.ServerManager.DynDNS
                         break;
                 }
 
-                ServiceCollection.Add(dynDnsService);
+                if (dynDnsService != null)
+                {
+                    dynDnsService.Parent = this;
+                    this.ServiceCollection.Add(dynDnsService);
+                }
             }
         }
 
@@ -128,10 +128,22 @@ namespace blog.dachs.ServerManager.DynDNS
             set { id = value; }
         }
 
+        public int ServiceID
+        {
+            get { return serviceId; }
+            set { serviceId = value; }
+        }
+
         public new string Name
         {
             get { return name; }
             set { name = value; }
+        }
+
+        public KeePassDatabase KeePassDatabase
+        {
+            get { return this.keePassDatabase; }
+            set { this.keePassDatabase = value; }
         }
 
         public string User
@@ -160,7 +172,7 @@ namespace blog.dachs.ServerManager.DynDNS
 
         public override void GetIpAddress()
         {
-            foreach (DynDnsService service in ServiceCollection)
+            foreach (DynDnsService service in this.ServiceCollection)
             {
                 service.GetIpAddress();
             }
@@ -168,41 +180,59 @@ namespace blog.dachs.ServerManager.DynDNS
 
         public override void SetDnsServer()
         {
-            foreach (DynDnsService service in ServiceCollection)
+            foreach (DynDnsService service in this.ServiceCollection)
             {
-                DynDnsIpAddressCollection ipAddressCollection = service.IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic);
-                if (ipAddressCollection.Count == 0)
+                DynDnsIpAddressCollection domainPublicDnsServerCollection = this.GetIpAddressCollection();
+                DynDnsIpAddressCollection servicePublicDnsServerCollection = service.GetIpAddressCollection();
+                DynDnsIpAddressCollection privateDnsServerCollection = this.GetIpAddressCollection();
+
+                List<DynDnsIpAddressType> dynDnsIpAddressTypes = [
+                    DynDnsIpAddressType.Private,
+                    DynDnsIpAddressType.LinkLocal,
+                    DynDnsIpAddressType.UniqueLocal,
+                ];
+
+                domainPublicDnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Public);
+                servicePublicDnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Public);
+                privateDnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, dynDnsIpAddressTypes);
+
+                servicePublicDnsServerCollection.Remove(DynDnsIpAddressType.NotValid);
+                privateDnsServerCollection.Remove(DynDnsIpAddressType.NotValid);
+
+
+                if (servicePublicDnsServerCollection.Count == 0)
                 {
-                    service.IpAddressCollection.Add(IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic));
+                    service.IpAddressCollection.Add(domainPublicDnsServerCollection);
                 }
 
-                service.IpAddressCollection.Add(IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate));
-                service.IpAddressCollection.Add(IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal));
-                service.IpAddressCollection.Add(IpAddressCollection.GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal));
+                service.IpAddressCollection.Add(privateDnsServerCollection);
 
                 service.SetDnsServer();
+                service.IpAddressCollection.WriteIpAddressCollection();
             }
         }
 
-        public override void WriteLogForChangedIpAddress()
-        {
-            foreach (DynDnsService service in ServiceCollection)
-            {
-                service.WriteLogForChangedIpAddress();
-            }
-        }
+        //public override void WriteLogForChangedIpAddress()
+        //{
+        //    foreach (DynDnsService service in ServiceCollection)
+        //    {
+        //        service.WriteLogForChangedIpAddress();
+        //    }
+        //}
 
         public override void UpdatePublicDnsIpAddress()
         {
             NetworkCredential networkCredential = new NetworkCredential(User, Password);
 
-            foreach (DynDnsService service in ServiceCollection)
+            foreach (DynDnsService service in this.ServiceCollection)
             {
+                // create IP-Address for Updated IP and Updated IP Response
                 service.UpdatePublicDnsIpAddress();
 
-                for (byte ipAddressVersion = 2; ipAddressVersion < 4; ipAddressVersion++)
+                // update changed IPs
+                for (byte ipAddressVersion = 2; ipAddressVersion <= 3; ipAddressVersion++)
                 {
-                    if (UpdateUri.ContainsKey((DynDnsIpAddressVersion)ipAddressVersion))
+                    if (this.UpdateUri.ContainsKey((DynDnsIpAddressVersion)ipAddressVersion))
                     {
                         service.UpdatePublicDnsIpAddress(UpdateUri[(DynDnsIpAddressVersion)ipAddressVersion], networkCredential, (DynDnsIpAddressVersion)ipAddressVersion);
                     }

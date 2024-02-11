@@ -35,7 +35,7 @@
 
             if (networkCredential.UserName != "")
             {
-                byte[] networkCredentialByteArray = Encoding.ASCII.GetBytes(networkCredential.UserName + ":" + networkCredential.Password);
+                byte[] networkCredentialByteArray = Encoding.ASCII.GetBytes(networkCredential.UserName + ":" + networkCredential.Password.Decrypt());
                 AuthenticationHeaderValue networkCredentialHeader = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(networkCredentialByteArray));
                 httpClient.DefaultRequestHeaders.Authorization = networkCredentialHeader;
             }

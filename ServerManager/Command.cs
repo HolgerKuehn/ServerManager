@@ -13,11 +13,11 @@
         DynDnsServer_GetIpAddress = 14,
         DynDnsService_GetDnsIpAddress = 7,
         DynDnsService_DynDnsService = 8,
-        DynDnsService_PerpareIpAddressCollectionToDisc_IpAddress = 9,
-        DynDnsService_PerpareIpAddressCollectionToDisc_NetworkAddress = 10,
+        DynDnsIpAddress_PerpareIpAddressToDisc_IpAddress = 9,
+      //DynDnsIpAddress_PerpareIpAddressToDisc_NetworkAddress = 10,
         DynDnsService_ReadIpAddressCollectionFromDisc = 21,
-        DynDnsService_WriteIpAddressCollectionToDisc_WriteIpAddress = 11,
-        DynDnsService_WriteIpAddressCollectionToDisc_ReadIpAddressID = 12,
+        DynDnsIpAddress_WriteIpAddress_WriteIpAddress = 11,
+        DynDnsIpAddress_WriteIpAddress_ReadIpAddressID = 12,
         DynDnsService_WriteLogForChangedIpAddress = 20,
         DynDnsService_UpdatePublicDnsIpAddress_UpdateIpAddress = 15,
         DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDNonPublicIp = 16,
@@ -30,7 +30,7 @@
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName = 26,
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled = 27,
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties_RemoteAddress = 28,
-        DynDnsIpCollection_ReadIpAddressCollectionFromDisc = 29,
+        DynDnsIpCollection_ReadIpAddressCollection = 29,
         BackupCollection_BackupCollection = 30,
         Backup_Backup = 31,
         BackupSourceFile_PrepareOnDisc = 32,
@@ -63,6 +63,7 @@
         BackupSet_CreateBackup_LastBackupTimestamp = 60,
         BackupSet_CreateBackup_ActualSize = 61,
         BackupSet_CreateBackup_ProjectedSize = 62,
-        BackupSet_CreateBackup_CompareSize = 63
+        BackupSet_CreateBackup_CompareSize = 63,
+        DynDnsIpAddress_DynDnsIpAddress = 64
     }
 }

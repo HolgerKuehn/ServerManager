@@ -18,11 +18,32 @@
 
         public override void Work()
         {
+            bool doBackup = false;
+            DateTime dateTime;
+            TimeSpan timeOfDay;
+            int backupDay = 0;
+            int lastBackupDay = 0;
+
             while (true)
             {
-                this.BackupCollection.CreateBackup();
+                while (!doBackup)
+                {
+                    dateTime = DateTime.Now;
+                    timeOfDay = dateTime.TimeOfDay;
+                    backupDay = dateTime.DayOfYear;
 
-                Thread.Sleep(1000);
+                    if (timeOfDay.TotalHours > 23 && backupDay != lastBackupDay)
+                    {
+                        doBackup = true;
+                    }
+
+                    Thread.Sleep(60000);
+                }
+
+                doBackup = false;
+                lastBackupDay = backupDay;
+
+                this.BackupCollection.CreateBackup();
             }
         }
     }

@@ -70,9 +70,8 @@
 
                 Process.WaitForExit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
             }
             finally
             {

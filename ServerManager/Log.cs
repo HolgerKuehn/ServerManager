@@ -37,16 +37,16 @@
         DynDnsService_DynDnsService = 11,
         DynDnsService_GetDnsIpAddress = 12,
         DynDnsService_GetPublicIpAddress = 13,
-        DynDnsService_PrepareIpAddressCollectionToDisc = 14,
+        DynDnsIpAddress_PrepareIpAddressToDisc = 14,
         DynDnsService_ReadIpAddressCollectionFromDisc = 22,
         DynDnsService_UpdatePublicDnsIpAddress = 18,
-        DynDnsService_WriteIpAddressCollectionToDisc = 15,
+        DynDnsIpAddress_WriteIpAddress = 15,
         DynDnsService_WriteLogForChangedIpAddress = 20,
         DynDnsServiceLocal_UpdatePublicDnsIpAddress = 19,
         DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell = 23,
         DynDnsFirewallRule_DynDnsFirewallRule = 24,
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties = 25,
-        DynDnsIpCollection_ReadIpAddressCollectionFromDisc = 26,
+        DynDnsIpCollection_ReadIpAddressCollection = 26,
         ThreadBackup_ThreadBackup = 27,
         BackupCollection_BackupCollection = 28,
         Backup_Backup = 29,
@@ -79,7 +79,8 @@
         BackupSet_CreateBackup_LastBackupTimestamp = 56,
         BackupSet_CreateBackup_ActualSize = 57,
         BackupSet_CreateBackup_ProjectedSize = 58,
-        BackupSet_CreateBackup_CompareSize = 59
+        BackupSet_CreateBackup_CompareSize = 59,
+        DynDnsIpAddress_DynDnsIpAddress = 60
     }
 
     public abstract class Log : GlobalExtention

@@ -1,7 +1,9 @@
 ﻿namespace blog.dachs.ServerManager.DynDNS
 {
     using System;
+    using System.Data;
     using System.Net;
+    using System.Net.NetworkInformation;
     using blog.dachs.ServerManager;
 
     public enum DynDnsIpAddressReferenceType : byte
@@ -11,18 +13,23 @@
         DynDnsIpAddress = 3
     }
 
+    public enum DynDnsIpAddressObject : byte
+    {
+        NotValid = 1,
+        DNSServer = 2,
+        ServiceNetworkAdapter = 3,
+        ServiceDNS = 4,
+        UpdatedIP = 5,
+        UpdatedIPResponse = 6
+    }
+
     public enum DynDnsIpAddressType : byte
     {
         NotValid = 1,
         Public = 2,
         Private = 3,
         LinkLocal = 4,
-        UniqueLocal = 5,
-        DnsServerPublic = 6,
-        DnsServerPrivate = 7,
-        DnsServerLinkLocal = 8,
-        DnsServerUniqueLocal = 9,
-        Network = 10
+        UniqueLocal = 5
     }
 
     public enum DynDnsIpAddressVersion : byte
@@ -38,20 +45,70 @@
         private int referenceId;
         private int ipAddressIndex;
 
+        private DynDnsIpAddressObject ipAddressObject;
         private bool isValid;
         private IPAddress ipAddress;
         private byte prefixLength;
         private IPAddress networkAddress;
         private DynDnsIpAddressType ipAddressType;
+        private DynDnsIpAddressVersion ipAddressVersion;
 
         public DynDnsIpAddress(Configuration configuration) : base(configuration)
         {
-            IpAddress = "0";
+            this.ipAddressObject = DynDnsIpAddressObject.ServiceDNS;
+            this.ipAddressVersion = DynDnsIpAddressVersion.NotValid;
+            this.prefixLength = 0;
+
+            this.IpAddress = "0";
         }
 
         public DynDnsIpAddress(Configuration configuration, string ipAddress) : this(configuration)
         {
-            IpAddress = ipAddress;
+            this.IpAddress = ipAddress;
+        }
+
+        public DynDnsIpAddress(Configuration configuration, int ipAddressId) : this(configuration)
+        {
+            DataRow dataRow;
+
+            DynDnsIpAddressObject ipAddressObject;
+            DynDnsIpAddressType ipAddressType;
+            DynDnsIpAddressVersion ipAddressVersion;
+            int ipAddressIndex = 0;
+            string ipAddressName = string.Empty;
+            string ipAddressNetworkName = string.Empty;
+            string ipAddressOrganizationName = string.Empty;
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpAddress_DynDnsIpAddress, "read IPs for ID " + ipAddressId + " from disc"));
+
+            string sqlCommand = Database.GetCommand(Command.DynDnsIpAddress_DynDnsIpAddress);
+
+            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_DynDnsIpAddress, sqlCommand));
+
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressID>", Convert.ToString(ipAddressId));
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_DynDnsIpAddress, sqlCommand));
+
+            dataRow = this.Database.GetDataRow(sqlCommand, 0);
+
+            if (dataRow != null)
+            {
+                ipAddressObject = (DynDnsIpAddressObject)Convert.ToByte(dataRow[0].ToString());
+                ipAddressType = (DynDnsIpAddressType)Convert.ToByte(dataRow[1].ToString());
+                ipAddressVersion = (DynDnsIpAddressVersion)Convert.ToByte(dataRow[2].ToString());
+                ipAddressIndex = Convert.ToInt32(dataRow[3].ToString());
+                ipAddressName = dataRow[4].ToString();
+                ipAddressNetworkName = dataRow[5].ToString();
+                ipAddressOrganizationName = dataRow[6].ToString();
+
+                if (ipAddressName != null && ipAddressNetworkName != null)
+                {
+                    this.IpAddress = ipAddressName;
+                    this.IpAddressObject = ipAddressObject;
+                    this.IpAddressIndex = ipAddressIndex;
+                    this.NetworkAddress = ipAddressNetworkName;
+                }
+            }
         }
 
         public DynDnsIpAddressReferenceType ReferenceType
@@ -72,6 +129,12 @@
             set { ipAddressIndex = value; }
         }
 
+        public DynDnsIpAddressObject IpAddressObject
+        {
+            get { return ipAddressObject; }
+            set { ipAddressObject = value; }
+        }
+
         private bool IsValid
         {
             get { return isValid; }
@@ -85,21 +148,21 @@
             {
                 IPAddress ipAddressTest;
 
-                IsValid = false;
-                ipAddress = new IPAddress(0);
-                networkAddress = new IPAddress(0);
+                this.IsValid = false;
+                this.ipAddress = new IPAddress(0);
+                this.networkAddress = new IPAddress(0);
 
-                IsValid = IPAddress.TryParse(value, out ipAddressTest);
+                this.IsValid = IPAddress.TryParse(value, out ipAddressTest);
 
-                if (IsValid && ipAddressTest != null)
+                if (this.IsValid && ipAddressTest != null)
                 {
-                    ipAddress = ipAddressTest;
+                    this.ipAddress = ipAddressTest;
                 }
 
-                IpAddressType = DynDnsIpAddressType.NotValid;
-                SetNetworkAddress();
+                this.prefixLength = 0;
+                this.SetIpAddressPrefix();
+                this.SetNetworkAddress();
             }
-
         }
 
         public byte PrefixLength
@@ -108,67 +171,75 @@
             set
             {
                 prefixLength = value;
-                SetNetworkAddress();
+                this.SetNetworkAddress();
             }
         }
 
         public string NetworkAddress
         {
-            get { return networkAddress.ToString() + "/" + PrefixLength.ToString(); }
+            get { return this.networkAddress.ToString() + "/" + this.PrefixLength.ToString(); }
+            set
+            {
+                string networkAddressPrefixLength;
+                byte ipAddressPrefixLength;
+
+                if (value != null && value.Contains("/"))
+                {
+                    networkAddressPrefixLength = value.Substring(value.IndexOf("/", StringComparison.Ordinal) + 1);
+                    ipAddressPrefixLength = Convert.ToByte(networkAddressPrefixLength);
+                    this.PrefixLength = ipAddressPrefixLength;
+                }
+                
+                this.SetNetworkAddress();
+            }
         }
 
         public DynDnsIpAddressType IpAddressType
         {
             get
             {
-
-                if (ipAddressType == DynDnsIpAddressType.NotValid)
+                if (!isValid)
                 {
-                    if (!isValid)
-                    {
-                        ipAddressType = DynDnsIpAddressType.NotValid;
-                    }
-                    else if (ipAddress.IsIPv6LinkLocal)
-                    {
-                        ipAddressType = DynDnsIpAddressType.LinkLocal;
-                    }
-                    else if (ipAddress.IsIPv6UniqueLocal)
-                    {
-                        ipAddressType = DynDnsIpAddressType.UniqueLocal;
-                    }
-                    else if (
-                        ipAddress.ToString().StartsWith("10.") ||
-                        ipAddress.ToString().StartsWith("172.16.") ||
-                        ipAddress.ToString().StartsWith("172.17.") ||
-                        ipAddress.ToString().StartsWith("172.18.") ||
-                        ipAddress.ToString().StartsWith("172.19.") ||
-                        ipAddress.ToString().StartsWith("172.20.") ||
-                        ipAddress.ToString().StartsWith("172.21.") ||
-                        ipAddress.ToString().StartsWith("172.22.") ||
-                        ipAddress.ToString().StartsWith("172.23.") ||
-                        ipAddress.ToString().StartsWith("172.24.") ||
-                        ipAddress.ToString().StartsWith("172.25.") ||
-                        ipAddress.ToString().StartsWith("172.26.") ||
-                        ipAddress.ToString().StartsWith("172.27.") ||
-                        ipAddress.ToString().StartsWith("172.28.") ||
-                        ipAddress.ToString().StartsWith("172.29.") ||
-                        ipAddress.ToString().StartsWith("172.30.") ||
-                        ipAddress.ToString().StartsWith("172.31.") ||
-                        ipAddress.ToString().StartsWith("192.168.")
-                    )
-                    {
-                        ipAddressType = DynDnsIpAddressType.Private;
-                    }
-                    else
-                    {
-                        ipAddressType = DynDnsIpAddressType.Public;
-                    }
+                    ipAddressType = DynDnsIpAddressType.NotValid;
+                }
+                else if (ipAddress.IsIPv6LinkLocal)
+                {
+                    ipAddressType = DynDnsIpAddressType.LinkLocal;
+                }
+                else if (ipAddress.IsIPv6UniqueLocal)
+                {
+                    ipAddressType = DynDnsIpAddressType.UniqueLocal;
+                }
+                else if (
+                    ipAddress.ToString().StartsWith("10.") ||
+                    ipAddress.ToString().StartsWith("172.16.") ||
+                    ipAddress.ToString().StartsWith("172.17.") ||
+                    ipAddress.ToString().StartsWith("172.18.") ||
+                    ipAddress.ToString().StartsWith("172.19.") ||
+                    ipAddress.ToString().StartsWith("172.20.") ||
+                    ipAddress.ToString().StartsWith("172.21.") ||
+                    ipAddress.ToString().StartsWith("172.22.") ||
+                    ipAddress.ToString().StartsWith("172.23.") ||
+                    ipAddress.ToString().StartsWith("172.24.") ||
+                    ipAddress.ToString().StartsWith("172.25.") ||
+                    ipAddress.ToString().StartsWith("172.26.") ||
+                    ipAddress.ToString().StartsWith("172.27.") ||
+                    ipAddress.ToString().StartsWith("172.28.") ||
+                    ipAddress.ToString().StartsWith("172.29.") ||
+                    ipAddress.ToString().StartsWith("172.30.") ||
+                    ipAddress.ToString().StartsWith("172.31.") ||
+                    ipAddress.ToString().StartsWith("192.168.")
+                )
+                {
+                    ipAddressType = DynDnsIpAddressType.Private;
+                }
+                else
+                {
+                    ipAddressType = DynDnsIpAddressType.Public;
                 }
 
                 return ipAddressType;
             }
-
-            set { ipAddressType = value; }
         }
 
         public DynDnsIpAddressVersion IpAddressVersion
@@ -177,18 +248,18 @@
             {
                 if (!isValid)
                 {
-                    return DynDnsIpAddressVersion.NotValid;
+                    this.ipAddressVersion = DynDnsIpAddressVersion.NotValid;
                 }
                 else if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                 {
-                    return DynDnsIpAddressVersion.IPv4;
+                    this.ipAddressVersion = DynDnsIpAddressVersion.IPv4;
                 }
                 else if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
                 {
-                    return DynDnsIpAddressVersion.IPv6;
+                    this.ipAddressVersion = DynDnsIpAddressVersion.IPv6;
                 }
 
-                return DynDnsIpAddressVersion.NotValid;
+                return this.ipAddressVersion;
             }
         }
 
@@ -207,14 +278,14 @@
             int numberOfAddressBlocks = 0;
             int numberOfBitsPerAddressBlocks = 0;
 
-            if (IpAddressVersion == DynDnsIpAddressVersion.IPv4)
+            if (this.IpAddressVersion == DynDnsIpAddressVersion.IPv4)
             {
                 // set length according to protocol
                 numberOfAddressBlocks = 4;
                 numberOfBitsPerAddressBlocks = 8;
 
                 // get blocks from string
-                ipAddressListShort = IpAddress.Split('.').ToList();
+                ipAddressListShort = this.IpAddress.Split('.').ToList();
                 ipAddressListFull = ipAddressListShort;
 
                 // convert to bit
@@ -330,6 +401,127 @@
             }
         }
 
+        public void SetIpAddressPrefix()
+        {
+            DynDnsIpAddressCollection dnsServerCollection;
+            dnsServerCollection = new DynDnsIpAddressCollection(this.Configuration);
+            dnsServerCollection.ReferenceType = this.ReferenceType;
+            dnsServerCollection.ReferenceId = this.ReferenceId;
+
+            byte prefixLength = 0;
+            
+            if (this.PrefixLength == 0)
+            {
+                if (prefixLength == 0 && this.IpAddressType == DynDnsIpAddressType.LinkLocal)
+                {
+                    dnsServerCollection.Clear();
+                    dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.LinkLocal);
+                    if (dnsServerCollection.Count > 0) prefixLength = dnsServerCollection.ElementAt(0).PrefixLength;
+                }
+
+                if (prefixLength == 0 && this.IpAddressType == DynDnsIpAddressType.UniqueLocal)
+                {
+                    dnsServerCollection.Clear();
+                    dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.UniqueLocal);
+                    if (dnsServerCollection.Count > 0) prefixLength = dnsServerCollection.ElementAt(0).PrefixLength;
+                }
+
+                if (prefixLength == 0 && this.IpAddressType == DynDnsIpAddressType.Private)
+                {
+                    dnsServerCollection.Clear();
+                    dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Private);
+                    if (dnsServerCollection.Count > 0) prefixLength = dnsServerCollection.ElementAt(0).PrefixLength;
+                }
+
+
+                if (prefixLength == 0 && this.IpAddressVersion == DynDnsIpAddressVersion.IPv4)
+                {
+                    prefixLength = 32;
+                }
+
+                if (prefixLength == 0 && this.IpAddressVersion == DynDnsIpAddressVersion.IPv6)
+                {
+                    prefixLength = 64;
+                }
+
+                this.PrefixLength = prefixLength;
+            }
+        }
+
+        /// <summary>
+        /// prepares a dataset to hold an IPAddress
+        /// </summary>
+        public void PrepareIpAddressToDisc()
+        {
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpAddress_PrepareIpAddressToDisc, "prepare Database for IP (IP Address)"));
+
+            string sqlCommand = this.Database.GetCommand(Command.DynDnsIpAddress_PerpareIpAddressToDisc_IpAddress);
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_PrepareIpAddressToDisc, sqlCommand));
+
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressReferenceTypeID>", Convert.ToString((byte)this.ReferenceType));
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressReferenceID>", Convert.ToString(this.ReferenceId));
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressObjectID>", Convert.ToString((byte)this.IpAddressObject));
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressVersionID>", Convert.ToString((byte)this.IpAddressVersion));
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressTypeID>", Convert.ToString((byte)this.IpAddressType));
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressIndex>", Convert.ToString((byte)this.IpAddressIndex));
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_PrepareIpAddressToDisc, sqlCommand));
+
+            this.Database.ExecuteCommand(sqlCommand);
+        }
+
+        /// <summary>
+        /// Writes IpAddress to disc
+        /// </summary>
+        public void WriteIpAddress()
+        {
+            this.PrepareIpAddressToDisc();
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpAddress_WriteIpAddress, "write IP to disc"));
+
+            string sqlCommandReadIpAddressID = this.Database.GetCommand(Command.DynDnsIpAddress_WriteIpAddress_ReadIpAddressID);
+            string sqlCommandWriteIpAddress = this.Database.GetCommand(Command.DynDnsIpAddress_WriteIpAddress_WriteIpAddress);
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_WriteIpAddress, sqlCommandReadIpAddressID));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_WriteIpAddress, sqlCommandWriteIpAddress));
+
+            // read primary key of IP address
+            sqlCommandReadIpAddressID = sqlCommandReadIpAddressID.Replace("<DynDnsIpAddressReferenceTypeID>", Convert.ToString((byte)this.ReferenceType));
+            sqlCommandReadIpAddressID = sqlCommandReadIpAddressID.Replace("<DynDnsIpAddressReferenceID>", Convert.ToString(this.ReferenceId));
+            sqlCommandReadIpAddressID = sqlCommandReadIpAddressID.Replace("<DynDnsIpAddressObjectID>", Convert.ToString((byte)this.IpAddressObject));
+            sqlCommandReadIpAddressID = sqlCommandReadIpAddressID.Replace("<DynDnsIpAddressVersionID>", Convert.ToString((byte)this.IpAddressVersion));
+            sqlCommandReadIpAddressID = sqlCommandReadIpAddressID.Replace("<DynDnsIpAddressTypeID>", Convert.ToString((byte)this.IpAddressType));
+            sqlCommandReadIpAddressID = sqlCommandReadIpAddressID.Replace("<DynDnsIpAddressIndex>", Convert.ToString(this.IpAddressIndex));
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_WriteIpAddress, sqlCommandReadIpAddressID));
+    
+            DataRow dataRow = this.Database.GetDataRow(sqlCommandReadIpAddressID, 0);
+            int ipAddressAddressID = 0;
+    
+            if (dataRow != null)
+            {
+                ipAddressAddressID = Convert.ToInt32(dataRow[0].ToString());
+            }
+    
+            if (ipAddressAddressID != 0)
+            {
+                // set IP-Address
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressID>", ipAddressAddressID.ToString());
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressReferenceTypeID>", Convert.ToString((byte)this.ReferenceType));
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressReferenceID>", Convert.ToString(this.ReferenceId));
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressObjectID>", Convert.ToString((byte)this.IpAddressObject));
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressVersionID>", Convert.ToString((byte)this.IpAddressVersion));
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressTypeID>", Convert.ToString((byte)this.IpAddressType));
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressIndex>", Convert.ToString(this.IpAddressIndex));
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressAddress>", this.IpAddress);
+                sqlCommandWriteIpAddress = sqlCommandWriteIpAddress.Replace("<DynDnsIpAddressNetwork>", this.NetworkAddress);
+    
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_WriteIpAddress, sqlCommandWriteIpAddress));
+                this.Database.ExecuteCommand(sqlCommandWriteIpAddress);
+            }
+        }
+        
         #region IComparable
 
         public int CompareTo(object? obj)
@@ -338,7 +530,9 @@
 
             if (ipAddress == null) return 0;
 
-            if ((byte)IpAddressType < (byte)ipAddress.IpAddressType) return -1;
+            if ((byte)IpAddressObject < (byte)ipAddress.IpAddressObject) return -1;
+            else if ((byte)IpAddressObject > (byte)ipAddress.IpAddressObject) return +1;
+            else if ((byte)IpAddressType < (byte)ipAddress.IpAddressType) return -1;
             else if ((byte)IpAddressType > (byte)ipAddress.IpAddressType) return +1;
             else if ((byte)IpAddressVersion < (byte)ipAddress.IpAddressVersion) return -1;
             else if ((byte)IpAddressVersion > (byte)ipAddress.IpAddressVersion) return +1;

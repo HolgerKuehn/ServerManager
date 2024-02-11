@@ -21,7 +21,6 @@ namespace blog.dachs.ServerManager.DynDNS
             set { serviceCollection = value; }
         }
 
-
         #region implementing IList
         public object? this[int index] { get => ((IList)ServiceCollection)[index]; set => ((IList)ServiceCollection)[index] = value; }
 

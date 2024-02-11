@@ -26,6 +26,7 @@
     {
         private int setId;
         private BackupSource source;
+        private BackupDestinationDevice device;
         private string path;
         private string name;
         private DateTime backupDate;
@@ -40,6 +41,7 @@
             this.Source = backupSource;
 
             DateTime date = DateTime.UtcNow;
+            this.Device = this.Source.Backup.DestinationDevice;
             this.Path = this.Source.Path;
             this.Name = date.Year.ToString().PadLeft(4, '0') + date.Month.ToString().PadLeft(2, '0') + date.Day.ToString().PadLeft(2, '0') + date.Hour.ToString().PadLeft(2, '0') + date.Minute.ToString().PadLeft(2, '0');
             this.Size = 0;
@@ -63,6 +65,20 @@
                 }
 
                 this.source = value;
+            }
+        }
+
+        public BackupDestinationDevice Device
+        {
+            get { return this.device; }
+            set
+            {
+                if (this.Device != null && !this.Device.Equals(value))
+                {
+                    this.Changed = true;
+                }
+
+                this.device = value;
             }
         }
 
@@ -98,7 +114,12 @@
         {
             get
             {
-                string fullAbsolutePath = this.Source.Backup.DestinationDevicePath + "\\" + this.Source.Backup.DestinationBasePath + "\\" + this.Path;
+                string fullAbsolutePath = this.Source.Backup.DestinationDevicePath + "\\" + this.Source.Backup.DestinationBasePath; 
+                    
+                if (this.Path != string.Empty)
+                {
+                    fullAbsolutePath = fullAbsolutePath + "\\" + this.Path;
+                }
   
                 if (this.Name != string.Empty)
                 {
@@ -293,7 +314,7 @@
                 this.WriteToDisc();
 
                 string sqlCommandOriginal;
-                string sqlCommandReplace;
+                string sqlCommandPath;
 
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_CreateBackup_ReadFileList, "change State for BackupSetSourceFile " + this.FullAbsolutePath));
                 sqlCommandOriginal = this.Database.GetCommand(Command.BackupSet_CreateBackup_ReadFileList);
@@ -310,7 +331,7 @@
                 while (true)
                 {
                     fileNameWithoutDevice = string.Empty;
-                    string outputLine = this.CommandLine.GetProcessOutput(processOutput, i, "(a.ProcessOutput_Text like 'Path = %' or a.ProcessOutput_Text like 'Packed Size = %')");
+                    string outputLine = this.CommandLine.GetProcessOutput(processOutput, i, "(a.ProcessOutput_Text like 'Path = %' or a.ProcessOutput_Text like 'Packed Size = %') and a.ProcessOutput_Text != 'Packed Size = '");
 
                     if (outputLine != null)
                     {
@@ -318,12 +339,12 @@
                         {
                             fileNameWithoutDevice = outputLine.Substring(7);
 
-                            sqlCommandReplace = sqlCommandOriginal;
-                            sqlCommandReplace = sqlCommandReplace.Replace("<BackupSetID>", this.SetId.ToString());
-                            sqlCommandReplace = sqlCommandReplace.Replace("<BackupSourceFilePath>", fileNameWithoutDevice.Replace("'", "''"));
+                            sqlCommandPath = sqlCommandOriginal;
+                            sqlCommandPath = sqlCommandPath.Replace("<BackupSetID>", this.SetId.ToString());
+                            sqlCommandPath = sqlCommandPath.Replace("<BackupSourceFilePath>", fileNameWithoutDevice.Replace("'", "''"));
 
-                            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.BackupSet_CreateBackup_ReadFileList, sqlCommandReplace));
-                            this.Database.ExecuteCommand(sqlCommandReplace);
+                            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.BackupSet_CreateBackup_ReadFileList, sqlCommandPath));
+                            this.Database.ExecuteCommand(sqlCommandPath);
                         }
 
                         if (outputLine.Contains("Packed Size = "))
@@ -482,6 +503,7 @@
             sqlCommand = this.Database.GetCommand(Command.BackupSet_WriteToDisc);
 
             sqlCommand = sqlCommand.Replace("<BackupSetID>", this.SetId.ToString());
+            sqlCommand = sqlCommand.Replace("<BackupDestinationDeviceID>", this.Source.Backup.DestinationDevice.Id.ToString());
             sqlCommand = sqlCommand.Replace("<BackupSetTimestamp>", ((DateTimeOffset)this.BackupDate.ToLocalTime()).ToUnixTimeSeconds().ToString());
             sqlCommand = sqlCommand.Replace("<BackupSetSize>", this.Size.ToString());
             sqlCommand = sqlCommand.Replace("<BackupSetStateID>", ((byte)this.State).ToString());

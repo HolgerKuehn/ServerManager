@@ -183,9 +183,13 @@ namespace blog.dachs.ServerManager
             int row = 0;
             while (true)
             {
-                outputLine = this.CommandLine.GetProcessOutput(kPScriptOutput, row, "(a.ProcessOutput_Text like 'S: Password = %' or a.ProcessOutput_Text like 'S: Title = %')");
-                
-                if (outputLine != null && outputLine.StartsWith("S: Password = "))
+                outputLine = this.CommandLine.GetProcessOutput(kPScriptOutput, row, "(a.ProcessOutput_Text like 'S: UserName = %' or a.ProcessOutput_Text like 'S: Password = %' or a.ProcessOutput_Text like 'S: Title = %')");
+
+                if (outputLine != null && outputLine.StartsWith("S: UserName = "))
+                {
+                    keePassEntry.UserName = outputLine.Substring(14).Encrypt();
+                }
+                else if (outputLine != null && outputLine.StartsWith("S: Password = "))
                 {
                     keePassEntry.Password = outputLine.Substring(14).Encrypt();
                 }

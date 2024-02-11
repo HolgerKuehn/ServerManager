@@ -48,7 +48,17 @@
 
         public string Path
         {
-            get { return this.path; }
+            get
+            {
+                string path = this.path;
+
+                if (path == string.Empty || path is null)
+                {
+                    path = string.Empty;
+                }
+
+                return path;
+            }
             set
             {
                 if (this.Path != null && !this.Path.Equals(value))
@@ -114,13 +124,29 @@
 
         public void CreateBackup()
         {
+            List<string> entryNameArray;
+            string entryName;
+            string entryPath;
+
             this.PrepareOnDisc();
             this.ReadFromDisc();
 
             this.LastSeenDate = DateTime.UtcNow;
 
             // read Password for Source
-            KeePassEntry keePassEntry = this.Backup.KeePassDatabase.GetEntry(this.Path);
+            entryNameArray = this.Path.Split("\\").ToList<string>();
+            
+            entryName = entryNameArray.ElementAt(entryNameArray.Count - 1);
+            entryNameArray.RemoveAt(entryNameArray.Count - 1);
+            entryPath = string.Empty;
+            entryPath = string.Join("\\", entryNameArray.ToArray());
+
+            if (entryName == string.Empty)
+            {
+                entryName = this.Backup.Name;
+            }
+
+            KeePassEntry keePassEntry = this.Backup.KeePassDatabase.GetEntry(entryName, entryPath);
             this.Password = keePassEntry.Password;
             this.WriteToDisc();
 

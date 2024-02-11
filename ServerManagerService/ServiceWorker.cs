@@ -46,9 +46,9 @@ namespace blog.dachs.ServerManager
                 configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ServiceWorker_Task, "create new ThreadDynDns"));
                 configuration.ThreadCollection.ThreadDynDns(configuration);
 
-                //// create new Thread for BackupClient
-                //configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ServiceWorker_Task, "create new ThreadBackup"));
-                //configuration.ThreadCollection.ThreadBackup(configuration);
+                // create new Thread for BackupClient
+                configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ServiceWorker_Task, "create new ThreadBackup"));
+                configuration.ThreadCollection.ThreadBackup(configuration);
             }
             catch (Exception ex)
             {
