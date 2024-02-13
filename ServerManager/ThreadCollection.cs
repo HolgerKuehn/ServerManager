@@ -58,14 +58,14 @@ namespace blog.dachs.ServerManager
             ThreadWorkers.Add(threadDynDns);
         }
 
-        public void ThreadFirewallRuleBaseProperties(Configuration configuration, DynDnsServerLocal server)
+        public void ThreadFirewallRules(Configuration configuration)
         {
-            ThreadFirewallRuleBaseProperties threadFirewallRuleBaseProperties = new ThreadFirewallRuleBaseProperties(configuration, server);
-            Thread threadFirewallRuleBasePropertiesThread = new Thread(threadFirewallRuleBaseProperties.Work);
-            threadFirewallRuleBasePropertiesThread.Name = "ThreadFirewallRuleBaseProperties";
-            threadFirewallRuleBasePropertiesThread.Start();
+            ThreadFirewallRules threadFirewallRules = new ThreadFirewallRules(configuration);
+            Thread threadFirewallRulesThread = new Thread(threadFirewallRules.Work);
+            threadFirewallRulesThread.Name = "ThreadFirewallRules";
+            threadFirewallRulesThread.Start();
 
-            ThreadWorkers.Add(threadFirewallRuleBaseProperties);
+            ThreadWorkers.Add(threadFirewallRules);
         }
 
         public void TerminateThreads()

@@ -80,7 +80,10 @@
         BackupSet_CreateBackup_ActualSize = 57,
         BackupSet_CreateBackup_ProjectedSize = 58,
         BackupSet_CreateBackup_CompareSize = 59,
-        DynDnsIpAddress_DynDnsIpAddress = 60
+        DynDnsIpAddress_DynDnsIpAddress = 60,
+        DynDnsFirewallRule_PrepareFirewallRuleToDisc = 61,
+        DynDnsFirewallRule_WriteFirewallRuleToDisc = 62,
+        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc = 63
     }
 
     public abstract class Log : GlobalExtention

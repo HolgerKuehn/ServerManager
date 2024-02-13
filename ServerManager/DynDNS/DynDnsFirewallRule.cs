@@ -12,55 +12,78 @@ namespace blog.dachs.ServerManager.DynDNS
         private DynDnsIpAddressCollection remoteAddresses;
 
         /* properties for settings */
-        private DynDnsServiceCollection services;
         private bool active;
+
+        public DynDnsFirewallRule(Configuration configuration) : base(configuration)
+        {
+            this.FirewallRuleID = 0;
+            this.Name = string.Empty;
+            this.DisplayName = string.Empty;
+            this.Enabled = false;
+            this.RemoteAddresses = new DynDnsIpAddressCollection(Configuration);
+            this.RemoteAddresses.ReferenceType = DynDnsIpAddressReferenceType.DynDnsFirewallRule;
+            this.RemoteAddresses.ReferenceId = 0;
+            this.Active = false;
+        }
 
         public DynDnsFirewallRule(Configuration configuration, int firewallRuleID) : base(configuration)
         {
+            DataRow dataRow;
             string sqlCommandReadFirewallRule;
+            string firewallRuleName;
+            string firewallRuleDisplayName;
+            string firewallRuleEnabled;
+            string firewallRuleActive;
 
-            FirewallRuleID = firewallRuleID;
+            this.FirewallRuleID = firewallRuleID;
 
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_DynDnsFirewallRule, "read firewall rule properties"));
-            sqlCommandReadFirewallRule = Database.GetCommand(Command.DynDnsFirewallRule_DynDnsFirewallRule);
-            sqlCommandReadFirewallRule = sqlCommandReadFirewallRule.Replace("<DynDnsFirewallRuleID>", FirewallRuleID.ToString());
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_DynDnsFirewallRule, sqlCommandReadFirewallRule));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_DynDnsFirewallRule, "read firewall rule properties"));
+            sqlCommandReadFirewallRule = this.Database.GetCommand(Command.DynDnsFirewallRule_DynDnsFirewallRule);
+            sqlCommandReadFirewallRule = sqlCommandReadFirewallRule.Replace("<DynDnsFirewallRuleID>", this.FirewallRuleID.ToString());
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_DynDnsFirewallRule, sqlCommandReadFirewallRule));
 
-            DataTable dataTable = Database.GetDataTable(sqlCommandReadFirewallRule);
-            DataRow dataRow = null;
-            string firewallRuleName = string.Empty;
-            string firewallRuleDisplayName = string.Empty;
-            string firewallRuleEnabled = string.Empty;
+            dataRow = this.Database.GetDataRow(sqlCommandReadFirewallRule, 0);
+            firewallRuleName = string.Empty;
+            firewallRuleDisplayName = string.Empty;
+            firewallRuleEnabled = string.Empty;
+            firewallRuleActive = string.Empty;
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            if (dataRow != null)
             {
-                dataRow = dataTable.Rows[row];
-
                 firewallRuleName = dataRow[0].ToString();
                 firewallRuleDisplayName = dataRow[1].ToString();
                 firewallRuleEnabled = dataRow[2].ToString();
+                firewallRuleActive = dataRow[2].ToString();
 
                 if (firewallRuleName != null)
-                    Name = firewallRuleName;
+                    this.Name = firewallRuleName;
 
                 if (firewallRuleDisplayName != null)
-                    DisplayName = firewallRuleDisplayName;
+                    this.DisplayName = firewallRuleDisplayName;
 
                 if (firewallRuleEnabled != null && firewallRuleEnabled == "0")
                 {
-                    Enabled = false;
+                    this.Enabled = false;
                 }
                 else
                 {
-                    Enabled = true;
+                    this.Enabled = true;
                 }
 
-                RemoteAddresses = new DynDnsIpAddressCollection(Configuration);
-                RemoteAddresses.ReferenceType = DynDnsIpAddressReferenceType.DynDnsFirewallRule;
-                RemoteAddresses.ReferenceId = FirewallRuleID;
+                if (firewallRuleActive != null && firewallRuleActive == "0")
+                {
+                    this.Active = false;
+                }
+                else
+                {
+                    this.Active = true;
+                }
 
-                Services = new DynDnsServiceCollection(Configuration);
-                Active = false;
+                this.Active = false;
+
+                this.RemoteAddresses = new DynDnsIpAddressCollection(Configuration);
+                this.RemoteAddresses.ReferenceType = DynDnsIpAddressReferenceType.DynDnsFirewallRule;
+                this.RemoteAddresses.ReferenceId = this.FirewallRuleID;
             }
         }
 
@@ -94,12 +117,6 @@ namespace blog.dachs.ServerManager.DynDNS
             set { remoteAddresses = value; }
         }
 
-        public DynDnsServiceCollection Services
-        {
-            get { return services; }
-            set { services = value; }
-        }
-
         public bool Active
         {
             get { return active; }
@@ -111,35 +128,89 @@ namespace blog.dachs.ServerManager.DynDNS
             string pshCommand;
             ProcessOutput processOutput;
 
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, "read base properties from firewall rule \"" + Name + "\""));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, "read base properties from firewall rule \"" + Name + "\""));
 
             // read DisplayName
-            pshCommand = Database.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName);
-            pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", Name);
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
-            processOutput = PowerShell.ExecuteCommand(pshCommand);
-            string? firewallRuleDisplayName = CommandLine.GetProcessOutput(processOutput, 4);
+            pshCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName);
+            pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", Name.Replace("...", "*"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
+            processOutput = this.PowerShell.ExecuteCommand(pshCommand);
+            string? firewallRuleDisplayName = this.CommandLine.GetProcessOutput(processOutput, 3);
 
             if (firewallRuleDisplayName != null)
-                DisplayName = firewallRuleDisplayName;
+                this.DisplayName = firewallRuleDisplayName;
 
             // read Enabled
-            pshCommand = Database.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled);
-            pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", Name);
-            Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
-            processOutput = PowerShell.ExecuteCommand(pshCommand);
-            string? firewallRuleEnabled = PowerShell.CommandLine.GetProcessOutput(processOutput, 4);
+            pshCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled);
+            pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", Name.Replace("...", "*"));
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
+            processOutput = this.PowerShell.ExecuteCommand(pshCommand);
+            string? firewallRuleEnabled = this.PowerShell.CommandLine.GetProcessOutput(processOutput, 3);
 
             if (firewallRuleEnabled != null && firewallRuleEnabled.Trim().ToLower() == "false")
             {
-                Enabled = false;
+                this.Enabled = false;
             }
             else
             {
-                Enabled = true;
+                this.Enabled = true;
             }
 
-            PowerShell.CommandLine.DeleteProcessOutput(processOutput);
+            this.PowerShell.CommandLine.DeleteProcessOutput(processOutput);
+        }
+
+        public void PrepareFirewallRuleToDisc()
+        {
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_PrepareFirewallRuleToDisc, "prepare Database for FirewallRule"));
+
+            string sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_PrepareFirewallRuleToDisc);
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_PrepareFirewallRuleToDisc, sqlCommand));
+
+            sqlCommand = sqlCommand.Replace("<DynDnsFirewallRuleName>", this.Name);
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_PrepareIpAddressToDisc, sqlCommand));
+
+            this.Database.ExecuteCommand(sqlCommand);
+        }
+
+        public void WriteFirewallRuleToDisc()
+        {
+            this.PrepareFirewallRuleToDisc();
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_WriteFirewallRuleToDisc, "write FirewallRule " + this.Name + " to disc"));
+
+            string sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_WriteFirewallRuleToDisc);
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_WriteFirewallRuleToDisc, sqlCommand));
+
+            sqlCommand = sqlCommand.Replace("<DynDnsFirewallRuleName>", this.Name);
+            sqlCommand = sqlCommand.Replace("<DynDnsFirewallRuleDisplayName>", this.DisplayName);
+            
+            if (this.Enabled)
+            {
+                sqlCommand = sqlCommand.Replace("<DynDnsFirewallRuleEnabled>", "1");
+            }
+            else
+            {
+                sqlCommand = sqlCommand.Replace("<DynDnsFirewallRuleEnabled>", "0");
+            }
+            
+            sqlCommand = sqlCommand.Replace("<DynDnsFirewallRuleTimestamp>", ((DateTimeOffset)DateTime.UtcNow.ToLocalTime()).ToUnixTimeSeconds().ToString());
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_WriteFirewallRuleToDisc, sqlCommand));
+
+            this.Database.ExecuteCommand(sqlCommand);
+        }
+
+        public void EnableFirewallRule()
+        {
+            this.PowerShell.ExecuteCommand("Get-NetFirewallRule -Name \'" + this.Name.Replace("...", "*") + "\' | Enable-NetFirewallRule");
+        }
+
+        public void DisableFirewallRule()
+        {
+            this.PowerShell.ExecuteCommand("Get-NetFirewallRule -Name \'" + this.Name.Replace("...", "*") + "\' | Disable-NetFirewallRule");
         }
     }
 }

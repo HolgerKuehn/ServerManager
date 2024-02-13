@@ -101,46 +101,64 @@
         {
         }
 
-        public virtual void GetDnsIpAddress(string dnsServer, DynDnsIpAddressObject ipAddressObject = DynDnsIpAddressObject.ServiceDNS)
+        public virtual void GetDnsIpAddress(DynDnsIpAddressCollection dnsServerCollection, DynDnsIpAddressObject ipAddressObject = DynDnsIpAddressObject.ServiceDNS)
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_GetDnsIpAddress, "request DNS IP for " + this.Name));
 
-            string powerShellCommand;
+            string powerShellCommandOriginal;
+            string powerShellCommandReplace;
             DynDnsIpAddressCollection dnsIpAddressCollection;
             DynDnsIpAddress ipAddress;
             ProcessOutput ipAddressList;
+            string ipAddressAddress;
+            string dnsErrorMessage;
 
-            powerShellCommand = this.Database.GetCommand(Command.DynDnsService_GetDnsIpAddress);
-            powerShellCommand = powerShellCommand.Replace("<DomainName>", this.Name);
-            powerShellCommand = powerShellCommand.Replace("<DnsServer>", dnsServer);
+            powerShellCommandOriginal = this.Database.GetCommand(Command.DynDnsService_GetDnsIpAddress);
 
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_GetDnsIpAddress, powerShellCommand));
-
-            dnsIpAddressCollection = this.GetIpAddressCollection();
-            ipAddressList = this.PowerShell.ExecuteCommand(powerShellCommand);
-
-            int i = 3;
-            while (true)
+            for (int dnsServerNumber = 0; dnsServerNumber < dnsServerCollection.Count; dnsServerNumber++)
             {
-                string ipAddressAddress = this.CommandLine.GetProcessOutput(ipAddressList, i);
+                powerShellCommandReplace = powerShellCommandOriginal;
+                powerShellCommandReplace = powerShellCommandReplace.Replace("<DomainName>", this.Name);
+                powerShellCommandReplace = powerShellCommandReplace.Replace("<DnsServer>", dnsServerCollection.ElementAt(dnsServerNumber).IpAddress);
 
-                if (ipAddressAddress != null)
+                dnsIpAddressCollection = this.GetIpAddressCollection();
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_GetDnsIpAddress, powerShellCommandReplace));
+            
+                ipAddressList = this.PowerShell.ExecuteCommand(powerShellCommandReplace);
+                dnsErrorMessage = this.CommandLine.GetProcessOutput(ipAddressList, 0, "ProcessOutput_Text like '%Dieser Vorgang wurde wegen Zeitüberschreitung zurückgegeben%'");
+
+                // on error try next DNS-Server
+                if (dnsErrorMessage != null)
                 {
-                    ipAddress = new DynDnsIpAddress(this.Configuration, ipAddressAddress.Trim());
-                    ipAddress.IpAddressObject = ipAddressObject;
-
-                    dnsIpAddressCollection.Add(ipAddress);
+                    this.CommandLine.DeleteProcessOutput(ipAddressList);
+                    continue;
                 }
-                else
+
+                int i = 3;
+                while (true)
                 {
-                    break;
+                    ipAddressAddress = this.CommandLine.GetProcessOutput(ipAddressList, i);
+
+                    if (ipAddressAddress != null)
+                    {
+                        ipAddress = new DynDnsIpAddress(this.Configuration, ipAddressAddress.Trim());
+                        ipAddress.IpAddressObject = ipAddressObject;
+
+                        dnsIpAddressCollection.Add(ipAddress);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    i++;
                 }
 
-                i++;
+                this.CommandLine.DeleteProcessOutput(ipAddressList);
+                dnsIpAddressCollection.WriteIpAddressCollection();
+
+                break;
             }
-
-            this.CommandLine.DeleteProcessOutput(ipAddressList);
-            dnsIpAddressCollection.WriteIpAddressCollection();
         }
 
         public virtual void GetPublicIpAddress(DynDnsIpAddressObject ipAddressObject = DynDnsIpAddressObject.ServiceDNS)
@@ -150,19 +168,9 @@
             DynDnsIpAddressCollection dnsServerCollection;
             dnsServerCollection = this.GetIpAddressCollection();
 
-            if (Socket.OSSupportsIPv6)
-            {
-                dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Public, DynDnsIpAddressVersion.IPv6);
-            }
-            else
-            {
-                dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Public, DynDnsIpAddressVersion.IPv4);
-            }
-
-            if (dnsServerCollection.Count != 0)
-            {
-                this.GetDnsIpAddress(dnsServerCollection.ElementAt(0).IpAddress, ipAddressObject);
-            }
+            dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Public);
+            
+            this.GetDnsIpAddress(dnsServerCollection, ipAddressObject);
         }
 
         public virtual void GetPrivateIpAddress()
@@ -172,23 +180,15 @@
             DynDnsIpAddressCollection dnsServerCollection;
             dnsServerCollection = this.GetIpAddressCollection();
 
-            if (Socket.OSSupportsIPv6)
-            {
-                dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.UniqueLocal, DynDnsIpAddressVersion.IPv6);
-                dnsServerCollection.Remove(DynDnsIpAddressType.NotValid);
+            List<DynDnsIpAddressType> dnsIpAddressTypes = [
+                    DynDnsIpAddressType.UniqueLocal,
+                DynDnsIpAddressType.LinkLocal,
+                DynDnsIpAddressType.Private
+                ];
 
-                if (dnsServerCollection.Count == 0)
-                {
-                    dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.LinkLocal, DynDnsIpAddressVersion.IPv6);
-                    dnsServerCollection.Remove(DynDnsIpAddressType.NotValid);
-                }
-            }
-            else
-            {
-                dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Private, DynDnsIpAddressVersion.IPv4);
-            }
-
-            this.GetDnsIpAddress(dnsServerCollection.ElementAt(0).IpAddress);
+            dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, dnsIpAddressTypes);
+            
+            this.GetDnsIpAddress(dnsServerCollection);
         }
 
         public virtual void UpdatePublicDnsIpAddress()

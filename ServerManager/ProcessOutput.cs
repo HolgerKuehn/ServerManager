@@ -10,7 +10,7 @@
             this.handle = handle;
             this.randomNumber = string.Empty;
 
-            byte[] randomNumberBytes = GlobalEncryptionAes.Generate256BitsOfRandomEntropy();
+            byte[] randomNumberBytes = GlobalEncryptionAes.GenerateBitsOfRandomEntropy(32);
             
             foreach (byte randomNumberByte in randomNumberBytes.ToList<byte>())
             {

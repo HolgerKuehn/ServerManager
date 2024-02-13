@@ -48,3 +48,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~M:blog.dachs.ServerManager.DynDNS.DynDnsService.UpdatePublicDnsIpAddress")]
 [assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~M:blog.dachs.ServerManager.DynDNS.DynDnsService.UpdatePublicDnsIpAddress(System.String,System.Net.NetworkCredential,blog.dachs.ServerManager.DynDNS.DynDnsIpAddressVersion)")]
 [assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~M:blog.dachs.ServerManager.DynDNS.DynDnsDomain.UpdatePublicDnsIpAddress")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "type", Target = "~T:blog.dachs.ServerManager.DynDNS.DynDnsFirewallRuleCollection")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~M:blog.dachs.ServerManager.DynDNS.DynDnsFirewallRule.#ctor(blog.dachs.ServerManager.Configuration,System.Int32)")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~M:blog.dachs.ServerManager.DynDNS.DynDnsFirewallRule.#ctor(blog.dachs.ServerManager.Configuration)")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "type", Target = "~T:blog.dachs.ServerManager.GlobalEncryptionAes")]

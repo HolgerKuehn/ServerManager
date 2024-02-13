@@ -77,6 +77,8 @@
             int ipAddressIndex = 0;
             string ipAddressName = string.Empty;
             string ipAddressNetworkName = string.Empty;
+            string networkAddressPrefixLengthText = string.Empty;
+            byte networkAddressPrefixLengthByte = 0;
             string ipAddressOrganizationName = string.Empty;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpAddress_DynDnsIpAddress, "read IPs for ID " + ipAddressId + " from disc"));
@@ -101,12 +103,37 @@
                 ipAddressNetworkName = dataRow[5].ToString();
                 ipAddressOrganizationName = dataRow[6].ToString();
 
+                if (ipAddressNetworkName != null && ipAddressNetworkName.Contains("/"))
+                {
+                    networkAddressPrefixLengthText = ipAddressNetworkName.Substring(ipAddressNetworkName.IndexOf("/", StringComparison.Ordinal) + 1);
+                    ipAddressNetworkName = ipAddressNetworkName.Substring(0, ipAddressNetworkName.IndexOf("/", StringComparison.Ordinal));
+                    networkAddressPrefixLengthByte = Convert.ToByte(networkAddressPrefixLengthText);
+                    this.prefixLength = networkAddressPrefixLengthByte;
+                }
+
                 if (ipAddressName != null && ipAddressNetworkName != null)
                 {
-                    this.IpAddress = ipAddressName;
-                    this.IpAddressObject = ipAddressObject;
-                    this.IpAddressIndex = ipAddressIndex;
-                    this.NetworkAddress = ipAddressNetworkName;
+                    IPAddress ipAddressTest;
+                    IPAddress networkAddressTest;
+
+                    this.IsValid = false;
+                    this.ipAddress = new IPAddress(0);
+                    this.networkAddress = new IPAddress(0);
+
+                    this.IsValid = IPAddress.TryParse(ipAddressName, out ipAddressTest);
+                    this.IsValid = IPAddress.TryParse(ipAddressNetworkName, out networkAddressTest);
+
+                    if (ipAddressTest != null && networkAddressTest != null)
+                    {
+                        this.ipAddress = ipAddressTest;
+                        this.ipAddressObject = ipAddressObject;
+                        this.ipAddressType = ipAddressType;
+                        this.ipAddressVersion = ipAddressVersion;
+                        this.ipAddressIndex = ipAddressIndex;
+                        this.networkAddress = networkAddressTest;
+                      //this.or ipAddressOrganizationName
+                      // Reference
+                    }
                 }
             }
         }
@@ -410,7 +437,7 @@
 
             byte prefixLength = 0;
             
-            if (this.PrefixLength == 0)
+            if (this.PrefixLength == 0 && this.IpAddressType != DynDnsIpAddressType.NotValid)
             {
                 if (prefixLength == 0 && this.IpAddressType == DynDnsIpAddressType.LinkLocal)
                 {

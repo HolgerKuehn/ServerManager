@@ -7,6 +7,7 @@
     /// <summary>
     /// Extension class for encryption based on an algorithm described in https://stackoverflow.com/questions/10168240/encrypting-decrypting-a-string-in-c-sharp
     /// Changed the fixed derivationIterations to a random short-number and algorithm to AesCng.
+    /// Changed HashAlgorithm to SHA512, as SHA1 became deprecated
     /// </summary>
     public static class GlobalEncryptionAes
     {
@@ -18,14 +19,14 @@
         public static string Encrypt(this string plainText, string passPhrase)
         {
             // DerivationIterations, Salt and IV are randomly generated each time, but is prepended to encrypted cipher text, so they can be used for decryption
-            byte[] derivationIterationsBytes = Generate16BitDerivationIterations();
+            byte[] derivationIterationsBytes = GenerateBitsOfRandomEntropy(2);
             int derivationIterations = (int)BitConverter.ToUInt16(derivationIterationsBytes);
             if (derivationIterations == 0) derivationIterations++;
 
-            byte[] saltStringBytes = Generate256BitsOfRandomEntropy();
-            byte[] ivStringBytes = Generate128BitsOfRandomEntropy();
+            byte[] saltStringBytes = GenerateBitsOfRandomEntropy(32);
+            byte[] ivStringBytes = GenerateBitsOfRandomEntropy(16);
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            using (Rfc2898DeriveBytes password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, derivationIterations))
+            using (Rfc2898DeriveBytes password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, derivationIterations, HashAlgorithmName.SHA512))
             {
                 var keyBytes = password.GetBytes(32);
                 using (AesCng symmetricKey = new AesCng())
@@ -82,6 +83,11 @@
             // [2 byte of Derivation Iteration], [32 bytes of Salt] + [16 bytes of IV] + [n bytes of CipherText]
             byte[] cipherTextBytesWithDerivationIterationSaltIv = Convert.FromBase64String(cipherText);
 
+            if (cipherTextBytesWithDerivationIterationSaltIv.Length <= 50)
+            {
+                throw new ArgumentException("cipherText is not valid");
+            }
+
             // Get the DerivationIterationBytes by extracting the first 2 bytes from the supplied cipherText bytes.
             byte[] derivationIterationsBytes = cipherTextBytesWithDerivationIterationSaltIv.Take(2).ToArray();
             int derivationIterations = (int)BitConverter.ToUInt16(derivationIterationsBytes);
@@ -89,13 +95,13 @@
             // Get the saltStringBytes by extracting the next 32 bytes from the supplied cipherText bytes.
             byte[] saltStringBytes = cipherTextBytesWithDerivationIterationSaltIv.Skip(2).Take(32).ToArray();
 
-            // Get the ivStringBytes by extracting the next 16 bytes from the supplied cipherText bytes.
+            // Get the ivStringBytes by extracting the next 24 bytes from the supplied cipherText bytes.
             byte[] ivStringBytes = cipherTextBytesWithDerivationIterationSaltIv.Skip(34).Take(16).ToArray();
 
-            // Get the actual cipher text bytes by removing the first 50 bytes (2 + 32 + 16) from the cipherText string.
+            // Get the actual cipher text bytes by removing the first 58 bytes (2 + 32 + 16) from the cipherText string.
             byte[] cipherTextBytes = cipherTextBytesWithDerivationIterationSaltIv.Skip(50).Take(cipherTextBytesWithDerivationIterationSaltIv.Length - 50).ToArray();
 
-            using (Rfc2898DeriveBytes password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, derivationIterations))
+            using (Rfc2898DeriveBytes password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, derivationIterations, HashAlgorithmName.SHA512))
             {
                 var keyBytes = password.GetBytes(32);
                 using (AesCng symmetricKey = new AesCng())
@@ -155,38 +161,12 @@
         }
 
         /// <summary>
-        /// generates int for DerivationIteration
+        /// generates entropy
         /// </summary>
-        /// <returns>short random number</returns>
-        private static byte[] Generate16BitDerivationIterations()
+        /// <returns>random entropy of length</returns>
+        public static byte[] GenerateBitsOfRandomEntropy(byte numberOfBytes)
         {
-            byte[] randomBytes = new byte[2];
-
-            RandomNumberGenerator.Fill(randomBytes);
-
-            return randomBytes;
-        }
-
-        /// <summary>
-        /// generates 16 bytes or 128 bit entropy
-        /// </summary>
-        /// <returns>random 16 bytes or 128 bit entropy</returns>
-        private static byte[] Generate128BitsOfRandomEntropy()
-        {
-            byte[] randomBytes = new byte[16];
-
-            RandomNumberGenerator.Fill(randomBytes);
-
-            return randomBytes;
-        }
-
-        /// <summary>
-        /// generates 32 bytes or 256 bit entropy
-        /// </summary>
-        /// <returns>random 32 bytes or 256 bit entropy</returns>
-        public static byte[] Generate256BitsOfRandomEntropy()
-        {
-            byte[] randomBytes = new byte[32];
+            byte[] randomBytes = new byte[numberOfBytes];
 
             RandomNumberGenerator.Fill(randomBytes);
 

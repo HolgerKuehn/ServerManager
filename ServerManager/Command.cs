@@ -24,8 +24,8 @@
         DynDnsService_UpdatePublicDnsIpAddress_ReadIpAddressIDPublicIp = 17,
         DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID = 18,
         DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromPowerShell = 22,
-        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_WriteFirewallRuleCollection = 23,
-        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromDisc = 24,
+        DynDnsFirewallRule_PrepareFirewallRuleToDisc = 23,
+        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc = 24,
         DynDnsFirewallRule_DynDnsFirewallRule = 25,
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties_DisplayName = 26,
         DynDnsFirewallRule_ReadFirewallRuleBaseProperties_Enabled = 27,
@@ -64,6 +64,7 @@
         BackupSet_CreateBackup_ActualSize = 61,
         BackupSet_CreateBackup_ProjectedSize = 62,
         BackupSet_CreateBackup_CompareSize = 63,
-        DynDnsIpAddress_DynDnsIpAddress = 64
+        DynDnsIpAddress_DynDnsIpAddress = 64,
+        DynDnsFirewallRule_WriteFirewallRuleToDisc = 65
     }
 }

@@ -44,7 +44,7 @@
             {
                 response = httpClient.GetStringAsync(url).Result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 

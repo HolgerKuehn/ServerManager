@@ -54,7 +54,7 @@ namespace blog.dachs.ServerManager
                     }
                     catch (ArgumentException ex)
                     {
-                        if (ex.Source == "System.Security.Cryptography.Cng")
+                        if (ex.Message == "cipherText is not valid" || ex.Source == "System.Security.Cryptography.Cng")
                         {
                             this.Password = password.Encrypt();
                             this.WriteToDisc();
