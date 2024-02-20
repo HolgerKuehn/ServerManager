@@ -28,7 +28,7 @@ namespace blog.dachs.ServerManager.DynDNS
                     IPAddressCollection networkAdapterDnsAddresses = ipProperties.DnsAddresses;
                     
                     // DNS
-                    DynDnsIpAddressCollection serverDnsAddressCollection = this.GetIpAddressCollection();
+                    DynDnsIpAddressCollection serverDnsAddressCollection = this.NewIpAddressCollection();
                     DynDnsIpAddress serverDnsAddress;
 
                     foreach (IPAddress dnsAdress in networkAdapterDnsAddresses)

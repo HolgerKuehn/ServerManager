@@ -2,9 +2,8 @@
 /// Namespace for ServiceManager
 /// Copyright Holger Kühn, 2023
 /// </summary>
-namespace blog.dachs.ServerManager
+namespace blog.dachs.ServerManager.DynDNS
 {
-    using blog.dachs.ServerManager.DynDNS;
     using System.Data;
 
     /// <summary>

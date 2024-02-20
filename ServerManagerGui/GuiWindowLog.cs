@@ -1,5 +1,3 @@
-using System.Data;
-
 namespace blog.dachs.ServerManager
 {
     public partial class GuiWindowLog : GuiExtention

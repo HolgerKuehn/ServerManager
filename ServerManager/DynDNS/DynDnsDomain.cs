@@ -182,9 +182,9 @@
         {
             foreach (DynDnsService service in this.ServiceCollection)
             {
-                DynDnsIpAddressCollection domainPublicDnsServerCollection = this.GetIpAddressCollection();
-                DynDnsIpAddressCollection servicePublicDnsServerCollection = service.GetIpAddressCollection();
-                DynDnsIpAddressCollection privateDnsServerCollection = this.GetIpAddressCollection();
+                DynDnsIpAddressCollection domainPublicDnsServerCollection = this.NewIpAddressCollection();
+                DynDnsIpAddressCollection servicePublicDnsServerCollection = service.NewIpAddressCollection();
+                DynDnsIpAddressCollection privateDnsServerCollection = this.NewIpAddressCollection();
 
                 List<DynDnsIpAddressType> dynDnsIpAddressTypes = [
                     DynDnsIpAddressType.Private,

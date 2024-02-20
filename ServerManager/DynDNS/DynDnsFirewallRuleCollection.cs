@@ -8,6 +8,7 @@
     public class DynDnsFirewallRuleCollection : GlobalExtention, IList
     {
         private List<DynDnsFirewallRule> firewallRules;
+        private DateTime lastSeenDate;
 
         public DynDnsFirewallRuleCollection(Configuration configuration) : base(configuration)
         {
@@ -20,53 +21,86 @@
             set { firewallRules = value; }
         }
 
-        public void ReadFirewallRuleCollectionFromPowerShell()
+        public DateTime LastSeenDate
         {
-            string firewallRuleName;
-            DynDnsFirewallRule firewallRule;
-
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, "read firewall rules from PowerShell"));
-
-            string pshCommand = Database.GetCommand(Command.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromPowerShell);
-            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, pshCommand));
-
-            // read powerShellOutput from PowerShell and add them to disc
-            ProcessOutput powerShellOutput = this.PowerShell.ExecuteCommand(pshCommand);
-
-            // add new firewall rules
-            int i = 3;
-            while (true)
-            {
-                firewallRuleName = this.PowerShell.CommandLine.GetProcessOutput(powerShellOutput, i);
-
-                if (firewallRuleName == null)
-                {
-                    break;
-                }
-                else if (firewallRuleName.Trim() != string.Empty)
-                {
-                    firewallRuleName = firewallRuleName.Trim();
-                    firewallRule = new DynDnsFirewallRule(this.Configuration);
-                    firewallRule.Name = firewallRuleName;
-                    
-                    firewallRule.ReadFirewallRuleBaseProperties();
-                    firewallRule.WriteFirewallRuleToDisc();
-                }
-
-                i++;
-            }
-
-            this.PowerShell.CommandLine.DeleteProcessOutput(powerShellOutput);
+            get { return lastSeenDate; }
+            set { lastSeenDate = value; }
         }
 
-        public void ReadFirewallRuleCollectionFromDisc(bool enabled, bool active)
+        public void ReadFirewallRuleBaseProperties()
+        {
+            string sqlCommand;
+            DataRow dataRow;
+            long latestLastSeenTimestamp = 0;
+
+            // get latest LastSeenDate
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadFirewallRules_Work, "read latest LastSeenDate"));
+            sqlCommand = this.Database.GetCommand(Command.ThreadFirewallRules_Work_LatestLastSeenDate);
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadFirewallRules_Work, sqlCommand));
+
+            dataRow = this.Database.GetDataRow(sqlCommand, 0);
+
+            if (dataRow != null)
+            {
+                latestLastSeenTimestamp = Convert.ToInt64(dataRow[0].ToString());
+                this.LastSeenDate = DateTimeOffset.FromUnixTimeSeconds(latestLastSeenTimestamp).UtcDateTime.ToLocalTime();
+            }
+
+            if (((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - latestLastSeenTimestamp > 6 /* h */ * 60 /* min */ * 60 /* sec */)
+            {
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ThreadFirewallRules_Work, "refreshing firewall rule base properties"));
+
+                ProcessOutput powerShellOutput;
+                string firewallRuleName;
+                DynDnsFirewallRule firewallRule;
+                DateTime lastSeenDate;
+
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, "read firewall rules from PowerShell"));
+
+                string pshCommand = Database.GetCommand(Command.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell_ReadFirewallRuleCollectionFromPowerShell);
+                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromPowerShell, pshCommand));
+
+                // read powerShellOutput from PowerShell and add them to disc
+                powerShellOutput = this.PowerShell.ExecuteCommand(pshCommand);
+                lastSeenDate = DateTime.Now;
+                this.LastSeenDate = lastSeenDate;
+
+                // add new firewall rules
+                int i = 3;
+                while (true)
+                {
+                    firewallRuleName = this.PowerShell.CommandLine.GetProcessOutput(powerShellOutput, i);
+
+                    if (firewallRuleName == null)
+                    {
+                        break;
+                    }
+                    else if (firewallRuleName.Trim() != string.Empty)
+                    {
+                        firewallRuleName = firewallRuleName.Trim();
+                        firewallRule = new DynDnsFirewallRule(this.Configuration);
+                        firewallRule.Name = firewallRuleName;
+                        firewallRule.LastSeenDate = lastSeenDate;
+
+                        firewallRule.ReadFirewallRuleBaseProperties();
+                        firewallRule.WriteFirewallRuleToDisc();
+                    }
+
+                    i++;
+                }
+
+                this.PowerShell.CommandLine.DeleteProcessOutput(powerShellOutput);
+            }
+        }
+
+        public void ReadActiveFirewallRules(bool enabled, bool active)
         {
             DataRow dataRow;
             string sqlCommand;
             int firewallRuleID;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc, "read firewall rule collection"));
-            sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc);
+            sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRuleCollection_ReadFirewallRuleCollection_ActiveRules);
             
             if (enabled)
             {
@@ -109,10 +143,50 @@
             }
         }
 
+        public void ReadServiceFirewallRules()
+        {
+            DataRow dataRow;
+            string sqlCommand;
+            int firewallRuleID;
+
+            this.Clear();
+
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc, "read firewall rules connected to services"));
+            sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRuleCollection_ReadFirewallRuleCollection_ServiceRules);
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc, sqlCommand));
+            sqlCommand = sqlCommand.Replace("<DynDnsFirewallRuleLastSeenTimestamp>", ((DateTimeOffset)this.LastSeenDate.ToUniversalTime()).ToUnixTimeSeconds().ToString());
+            this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc, sqlCommand));
+
+            int i = 0;
+            while (true)
+            {
+                dataRow = this.Database.GetDataRow(sqlCommand, i);
+
+                if (dataRow != null)
+                {
+                    firewallRuleID = Convert.ToInt32(dataRow[0].ToString());
+
+                    this.Add(new DynDnsFirewallRule(this.Configuration, firewallRuleID));
+                }
+                else
+                {
+                    break;
+                }
+
+                i++;
+            }
+
+            foreach (DynDnsFirewallRule rule in this.FirewallRules)
+            {
+                rule.WriteRemoteAddress();
+                rule.WriteFirewallRuleToDisc();
+            }
+        }
+
         public void EnableRequiredRules()
         {
             this.Clear();
-            this.ReadFirewallRuleCollectionFromDisc(false, true);
+            this.ReadActiveFirewallRules(false, true);
 
             foreach (DynDnsFirewallRule rule in this.FirewallRules)
             {
@@ -125,7 +199,7 @@
         public void DisableObsoleteRules()
         {
             this.Clear();
-            this.ReadFirewallRuleCollectionFromDisc(true, false);
+            this.ReadActiveFirewallRules(true, false);
 
             foreach (DynDnsFirewallRule rule in this.FirewallRules)
             {
@@ -134,7 +208,7 @@
                 rule.WriteFirewallRuleToDisc();
             }
         }
- 
+
         #region implement IList
 
         public object? this[int index] { get => ((IList)FirewallRules)[index]; set => ((IList)FirewallRules)[index] = value; }

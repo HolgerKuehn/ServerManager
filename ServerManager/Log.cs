@@ -83,7 +83,9 @@
         DynDnsIpAddress_DynDnsIpAddress = 60,
         DynDnsFirewallRule_PrepareFirewallRuleToDisc = 61,
         DynDnsFirewallRule_WriteFirewallRuleToDisc = 62,
-        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc = 63
+        DynDnsFirewallRuleCollection_ReadFirewallRuleCollectionFromDisc = 63,
+        ThreadFirewallRules_Work = 64,
+        DynDnsFirewallRule_WriteRemoteAddress = 65
     }
 
     public abstract class Log : GlobalExtention

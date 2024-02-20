@@ -18,7 +18,7 @@
 
         public override void Work()
         {
-            bool doBackup = true;
+            bool doBackup = false;
             DateTime dateTime;
             TimeSpan timeOfDay;
             int backupDay = 0;

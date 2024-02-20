@@ -1,6 +1,5 @@
-﻿namespace blog.dachs.ServerManager
+﻿namespace blog.dachs.ServerManager.DynDNS
 {
-    using blog.dachs.ServerManager.DynDNS;
 
     public class ThreadFirewallRules : ThreadWorker
     {
@@ -15,11 +14,9 @@
 
             while (true)
             {
-                this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.ThreadDynDns_ThreadDynDns, "refreshing firewall rule base properties"));
-
                 // read current state
                 firewallRuleCollection.Clear();
-                firewallRuleCollection.ReadFirewallRuleCollectionFromPowerShell();
+                firewallRuleCollection.ReadFirewallRuleBaseProperties();
 
                 // activate required rules
                 firewallRuleCollection.Clear();
@@ -29,7 +26,11 @@
                 firewallRuleCollection.Clear();
                 firewallRuleCollection.DisableObsoleteRules();
 
-                Thread.Sleep(21600000);
+                // read and write RemoteAdresses
+                firewallRuleCollection.Clear();
+                firewallRuleCollection.ReadServiceFirewallRules();
+
+                Thread.Sleep(120000);
             }
         }
     }

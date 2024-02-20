@@ -44,7 +44,7 @@
 
         public override void GetPublicIpAddress(DynDnsIpAddressObject ipAddressObject = DynDnsIpAddressObject.ServiceDNS)
         {
-            DynDnsIpAddressCollection publicIpAddressCollection = this.GetIpAddressCollection();
+            DynDnsIpAddressCollection publicIpAddressCollection = this.NewIpAddressCollection();
             string publicIP = string.Empty;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServer_GetPublicIpAddress, "request Public IP for " + Name));
@@ -79,8 +79,8 @@
 
             foreach (DynDnsDomain domain in DomainCollection)
             {
-                DynDnsIpAddressCollection publicDnsServerCollection = this.GetIpAddressCollection();
-                DynDnsIpAddressCollection privateDnsServerCollection = this.GetIpAddressCollection();
+                DynDnsIpAddressCollection publicDnsServerCollection = this.NewIpAddressCollection();
+                DynDnsIpAddressCollection privateDnsServerCollection = this.NewIpAddressCollection();
 
                 List<DynDnsIpAddressType> dynDnsIpAddressTypes = [
                     DynDnsIpAddressType.Private,

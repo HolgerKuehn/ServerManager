@@ -82,7 +82,7 @@
             set { this.parent = value; }
         }
 
-        public DynDnsIpAddressCollection GetIpAddressCollection()
+        public DynDnsIpAddressCollection NewIpAddressCollection()
         {
             DynDnsIpAddressCollection ipAddressCollection;
             ipAddressCollection = new DynDnsIpAddressCollection(this.Configuration);
@@ -90,6 +90,16 @@
             ipAddressCollection.ReferenceId = this.DynDnsServiceID;
 
             return ipAddressCollection;
+        }
+
+        public DynDnsIpAddress NewIpAddress()
+        {
+            DynDnsIpAddress ipAddress;
+            ipAddress = new DynDnsIpAddress(this.Configuration);
+            ipAddress.ReferenceType = DynDnsIpAddressReferenceType.DynDnsService;
+            ipAddress.ReferenceId = this.DynDnsServiceID;
+
+            return ipAddress;
         }
 
         public virtual void GetIpAddress()
@@ -121,7 +131,7 @@
                 powerShellCommandReplace = powerShellCommandReplace.Replace("<DomainName>", this.Name);
                 powerShellCommandReplace = powerShellCommandReplace.Replace("<DnsServer>", dnsServerCollection.ElementAt(dnsServerNumber).IpAddress);
 
-                dnsIpAddressCollection = this.GetIpAddressCollection();
+                dnsIpAddressCollection = this.NewIpAddressCollection();
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsService_GetDnsIpAddress, powerShellCommandReplace));
             
                 ipAddressList = this.PowerShell.ExecuteCommand(powerShellCommandReplace);
@@ -141,8 +151,11 @@
 
                     if (ipAddressAddress != null)
                     {
-                        ipAddress = new DynDnsIpAddress(this.Configuration, ipAddressAddress.Trim());
+                        ipAddress = new DynDnsIpAddress(this.Configuration);
                         ipAddress.IpAddressObject = ipAddressObject;
+                        ipAddress.ReferenceType = dnsIpAddressCollection.ReferenceType;
+                        ipAddress.ReferenceId = dnsIpAddressCollection.ReferenceId;
+                        ipAddress.IpAddress = ipAddressAddress.Trim();
 
                         dnsIpAddressCollection.Add(ipAddress);
                     }
@@ -166,7 +179,7 @@
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_GetPublicIpAddress, "request Public IP from DNS for " + this.Name));
 
             DynDnsIpAddressCollection dnsServerCollection;
-            dnsServerCollection = this.GetIpAddressCollection();
+            dnsServerCollection = this.NewIpAddressCollection();
 
             dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Public);
             
@@ -178,12 +191,12 @@
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsService_GetPublicIpAddress, "request Private IP from DNS for " + Name));
 
             DynDnsIpAddressCollection dnsServerCollection;
-            dnsServerCollection = this.GetIpAddressCollection();
+            dnsServerCollection = this.NewIpAddressCollection();
 
             List<DynDnsIpAddressType> dnsIpAddressTypes = [
                     DynDnsIpAddressType.UniqueLocal,
-                DynDnsIpAddressType.LinkLocal,
-                DynDnsIpAddressType.Private
+                    DynDnsIpAddressType.LinkLocal,
+                    DynDnsIpAddressType.Private
                 ];
 
             dnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, dnsIpAddressTypes);

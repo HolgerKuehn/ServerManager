@@ -12,8 +12,8 @@
         public override void GetIpAddress()
         {
             // get public IP from parent
-            DynDnsIpAddressCollection serverPublicIpAddressCollection = this.Parent.Parent.GetIpAddressCollection();
-            DynDnsIpAddressCollection servicePublicIpAddressCollection = this.GetIpAddressCollection();
+            DynDnsIpAddressCollection serverPublicIpAddressCollection = this.Parent.Parent.NewIpAddressCollection();
+            DynDnsIpAddressCollection servicePublicIpAddressCollection = this.NewIpAddressCollection();
 
             serverPublicIpAddressCollection.ReadIpAddressCollection(DynDnsIpAddressObject.ServiceDNS, DynDnsIpAddressType.Public);
             servicePublicIpAddressCollection.Add(serverPublicIpAddressCollection);
@@ -27,7 +27,7 @@
         {
             DynDnsIpAddressCollection servicePublicIpAddressCollection;
 
-            servicePublicIpAddressCollection = this.GetIpAddressCollection();
+            servicePublicIpAddressCollection = this.NewIpAddressCollection();
             servicePublicIpAddressCollection.ReadIpAddressCollection(DynDnsIpAddressObject.ServiceDNS, DynDnsIpAddressType.Public);
 
             foreach (DynDnsIpAddress ipAddress in servicePublicIpAddressCollection)

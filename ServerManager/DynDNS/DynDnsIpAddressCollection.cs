@@ -51,38 +51,86 @@
             set { ipAddressCollection = value; }
         }
 
-        //public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressType ipAddressType)
+        public string IpAddresses
+        {
+            get
+            {
+                string ipAddresses = string.Empty;
+
+                foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
+                {
+                    if (!ipAddresses.Contains(ipAddress.IpAddress))
+                    {
+                        if (ipAddresses != string.Empty)
+                        {
+                            ipAddresses = ipAddresses + ", ";
+                        }
+
+                        ipAddresses = ipAddresses + ipAddress.IpAddress;
+                    }
+                }
+
+                return ipAddresses;
+            }
+            set { }
+        }
+
+        public string NetworkAddresses
+        {
+            get
+            {
+                string ipAddresses = string.Empty;
+
+                foreach (DynDnsIpAddress ipAddress in this.IpAddressCollection)
+                {
+                    if (!ipAddresses.Contains(ipAddress.NetworkAddress))
+                    {
+                        if (ipAddresses != string.Empty)
+                        {
+                            ipAddresses = ipAddresses + ", ";
+                        }
+
+                        ipAddresses = ipAddresses + ipAddress.NetworkAddress;
+                    }
+                }
+
+                return ipAddresses;
+            }
+            set { }
+        }
+
+        //public DynDnsIpAddressCollection NewIpAddressCollection(DynDnsIpAddressType ipAddressType)
         //{
         //    DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(Configuration);
         //    ipAddressCollection.ReferenceType = ReferenceType;
         //    ipAddressCollection.ReferenceId = ReferenceId;
 
-        //    ipAddressCollection.AddRange(GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv4));
-        //    ipAddressCollection.AddRange(GetIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv6));
+        //    ipAddressCollection.AddRange(NewIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv4));
+        //    ipAddressCollection.AddRange(NewIpAddressCollection(ipAddressType, DynDnsIpAddressVersion.IPv6));
 
         //    return ipAddressCollection;
         //}
 
-        //public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressVersion ipAddressVersion)
+        //public DynDnsIpAddressCollection NewIpAddressCollection(DynDnsIpAddressVersion ipAddressVersion)
         //{
         //    DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(Configuration);
         //    ipAddressCollection.ReferenceType = ReferenceType;
         //    ipAddressCollection.ReferenceId = ReferenceId;
 
-        //    ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.Public, ipAddressVersion));
-        //    ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.Private, ipAddressVersion));
-        //    ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.UniqueLocal, ipAddressVersion));
-        //    ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.LinkLocal, ipAddressVersion));
+        //    ipAddressCollection.AddRange(NewIpAddressCollection(DynDnsIpAddressType.Public, ipAddressVersion));
+        //    ipAddressCollection.AddRange(NewIpAddressCollection(DynDnsIpAddressType.Private, ipAddressVersion));
+        //    ipAddressCollection.AddRange(NewIpAddressCollection(DynDnsIpAddressType.UniqueLocal, ipAddressVersion));
+        //    ipAddressCollection.AddRange(NewIpAddressCollection(DynDnsIpAddressType.LinkLocal, ipAddressVersion));
 
-        //    //ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.DnsServerPublic, ipAddressVersion));
-        //    //ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate, ipAddressVersion));
-        //    //ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal, ipAddressVersion));
-        //    //ipAddressCollection.AddRange(GetIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal, ipAddressVersion));
+        //    //ipAddressCollection.AddRange(NewIpAddressCollection(DynDnsIpAddressType.DnsServerPublic, ipAddressVersion));
+        //    //ipAddressCollection.AddRange(NewIpAddressCollection(DynDnsIpAddressType.DnsServerPrivate, ipAddressVersion));
+        //    //ipAddressCollection.AddRange(NewIpAddressCollection(DynDnsIpAddressType.DnsServerUniqueLocal, ipAddressVersion));
+        //    //ipAddressCollection.AddRange(NewIpAddressCollection(DynDnsIpAddressType.DnsServerLinkLocal, ipAddressVersion));
 
         //    return ipAddressCollection;
         //}
 
-        //public DynDnsIpAddressCollection GetIpAddressCollection(DynDnsIpAddressType ipAddressType, DynDnsIpAddressVersion ipAddressVersion)
+        //public DynDnsIpAddressCollection NewIpAddressCollection(DynDnsIpAddressType ipAddressType, DynDnsIpAddressVersion ipAddressVersion)
         //{
         //    DynDnsIpAddressCollection ipAddressCollection = new DynDnsIpAddressCollection(Configuration);
         //    ipAddressCollection.ReferenceType = ReferenceType;
@@ -99,19 +147,14 @@
         //    return ipAddressCollection;
         //}
 
-        public List<DynDnsIpAddressType> GetAvailableIpTypes()
+        public DynDnsIpAddress NewIpAddress()
         {
-            List<DynDnsIpAddressType> ipAddressTypeCollection = new List<DynDnsIpAddressType>();
+            DynDnsIpAddress ipAddress;
+            ipAddress = new DynDnsIpAddress(this.Configuration);
+            ipAddress.ReferenceType = this.ReferenceType;
+            ipAddress.ReferenceId = this.ReferenceId;
 
-            foreach (DynDnsIpAddress ipAddress in IpAddressCollection)
-            {
-                if (!ipAddressTypeCollection.Contains(ipAddress.IpAddressType))
-                {
-                    ipAddressTypeCollection.Add(ipAddress.IpAddressType);
-                }
-            }
-
-            return ipAddressTypeCollection;
+            return ipAddress;
         }
 
         /// <summary>
@@ -150,6 +193,22 @@
             ];
 
             this.ReadIpAddressCollection(ipAddressObjects, ipAddressTypes);
+        }
+
+        /// <summary>
+        /// reads all IP Addresses fitting the parameters for the reference-object
+        /// </summary>
+        /// <param name="ipAddressObject">List of Objects to include</param>
+        /// <remarks>includes both Versions, Types, IPv4 and IPv6</remarks>
+        public void ReadIpAddressCollection(DynDnsIpAddressObject ipAddressObject)
+        {
+            List<DynDnsIpAddressObject> ipAddressObjects;
+
+            ipAddressObjects = [
+                ipAddressObject
+            ];
+
+            this.ReadIpAddressCollection(ipAddressObjects);
         }
 
         /// <summary>
@@ -346,7 +405,6 @@
         {
             // determine Index of IP-Address
             this.Remove(DynDnsIpAddressType.NotValid);
-            this.SetIpAddressPrefix();
             this.IpAddressCollection.Sort();
 
             DynDnsIpAddress ipAddress;
@@ -464,6 +522,27 @@
             {
                 this.Add(ipAddress);
             }
+        }
+
+        public bool Contains(DynDnsIpAddress ipAddress)
+        {
+            bool containsIpAddress = false;
+
+            foreach (DynDnsIpAddress ipAddressTest in this.IpAddressCollection)
+            {
+                if (ipAddressTest.IpAddress == ipAddress.IpAddress)
+                {
+                    containsIpAddress = true;
+                    break;
+                }
+            }
+
+            return containsIpAddress;
+        }
+
+        public void Sort()
+        {
+            this.IpAddressCollection.Sort();
         }
 
         public void Remove(DynDnsIpAddressType ipAddressType)
