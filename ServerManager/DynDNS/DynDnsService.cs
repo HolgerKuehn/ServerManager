@@ -151,10 +151,8 @@
 
                     if (ipAddressAddress != null)
                     {
-                        ipAddress = new DynDnsIpAddress(this.Configuration);
+                        ipAddress = dnsIpAddressCollection.NewIpAddress();
                         ipAddress.IpAddressObject = ipAddressObject;
-                        ipAddress.ReferenceType = dnsIpAddressCollection.ReferenceType;
-                        ipAddress.ReferenceId = dnsIpAddressCollection.ReferenceId;
                         ipAddress.IpAddress = ipAddressAddress.Trim();
 
                         dnsIpAddressCollection.Add(ipAddress);
@@ -210,6 +208,48 @@
 
         public virtual void UpdatePublicDnsIpAddress(string updateUri, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion)
         {
+        }
+
+        public virtual void WriteIpAddressHistory()
+        {
+            DynDnsIpAddressCollection currentIpAddressCollection;
+            DynDnsIpAddressCollection historyIpAddressCollection;
+            DynDnsIpAddress historyIpAddress;
+
+            currentIpAddressCollection = this.NewIpAddressCollection();
+            currentIpAddressCollection.ReadIpAddressCollection(DynDnsIpAddressObject.ServiceDNS);
+            historyIpAddressCollection = this.NewIpAddressCollection();
+
+            foreach (DynDnsIpAddress currentIpAddress in currentIpAddressCollection)
+            {
+                historyIpAddressCollection.Clear();
+                historyIpAddressCollection.ReadIpAddressCollection(DynDnsIpAddressObject.UpdateHistory, currentIpAddress.IpAddressType, currentIpAddress.IpAddressVersion);
+
+                currentIpAddress.Sorting = DynDnsIpAddressSorting.byChangeDateDesc;
+                foreach (DynDnsIpAddress historyIpAddressSorting in historyIpAddressCollection)
+                {
+                    historyIpAddressSorting.Sorting = DynDnsIpAddressSorting.byChangeDateDesc;
+                }
+
+                historyIpAddressCollection.Sort();
+
+                if (historyIpAddressCollection.Count > 0)
+                {
+                    historyIpAddress = historyIpAddressCollection.ElementAt(0);
+                }
+                else
+                {
+                    historyIpAddress = this.NewIpAddress();
+                    historyIpAddress.IpAddress = "0";
+                }
+
+                if (currentIpAddress.IpAddress != historyIpAddress.IpAddress)
+                {
+                    currentIpAddress.IpAddressObject = DynDnsIpAddressObject.UpdateHistory;
+                    historyIpAddressCollection.Insert(0, currentIpAddress);
+                    historyIpAddressCollection.WriteIpAddressCollection();
+                }
+            }
         }
     }
 }

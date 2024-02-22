@@ -44,21 +44,34 @@
 
         public override void GetPublicIpAddress(DynDnsIpAddressObject ipAddressObject = DynDnsIpAddressObject.ServiceDNS)
         {
-            DynDnsIpAddressCollection publicIpAddressCollection = this.NewIpAddressCollection();
-            string publicIP = string.Empty;
+            DynDnsIpAddressCollection publicIpAddressCollection;
+            DynDnsIpAddress publicIpAddress;
+            string publicIP;
+
+            publicIpAddressCollection = this.NewIpAddressCollection();
+
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServer_GetPublicIpAddress, "request Public IP for " + Name));
 
             if (Socket.OSSupportsIPv4)
             {
                 publicIP = WebRequest.Request("https://ident.me", DynDnsIpAddressVersion.IPv4);
-                publicIpAddressCollection.Add(publicIP.Trim());
+                publicIpAddress = publicIpAddressCollection.NewIpAddress();
+                publicIpAddress.IpAddressObject = ipAddressObject;
+                publicIpAddress.IpAddress = publicIP.Trim();
+
+                publicIpAddressCollection.Add(publicIpAddress);
             }
 
             if (Socket.OSSupportsIPv6)
             {
                 publicIP = WebRequest.Request("https://ident.me", DynDnsIpAddressVersion.IPv6);
-                publicIpAddressCollection.Add(publicIP.Trim());
+
+                publicIpAddress = publicIpAddressCollection.NewIpAddress();
+                publicIpAddress.IpAddressObject = ipAddressObject;
+                publicIpAddress.IpAddress = publicIP.Trim();
+
+                publicIpAddressCollection.Add(publicIpAddress);
             }
 
             publicIpAddressCollection.WriteIpAddressCollection();
@@ -90,7 +103,7 @@
 
                 publicDnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, DynDnsIpAddressType.Public);
                 privateDnsServerCollection.ReadIpAddressCollection(DynDnsIpAddressObject.DNSServer, dynDnsIpAddressTypes);
-                
+
                 publicDnsServerCollection.Remove(DynDnsIpAddressType.NotValid);
                 privateDnsServerCollection.Remove(DynDnsIpAddressType.NotValid);
 
@@ -106,24 +119,15 @@
             }
         }
 
-        //public override void WriteLogForChangedIpAddress()
-        //{
-        //    base.WriteLogForChangedIpAddress();
+        public override void WriteIpAddressHistory()
+        {
+            base.WriteIpAddressHistory();
 
-        //    foreach (DynDnsDomain domain in DomainCollection)
-        //    {
-        //        domain.WriteLogForChangedIpAddress();
-        //    }
-        //}
-
-        //public override void UpdatePublicDnsIpAddress()
-        //{
-        //    base.UpdatePublicDnsIpAddress();
-
-        //    foreach (DynDnsDomain domain in DomainCollection)
-        //    {
-        //        domain.UpdatePublicDnsIpAddress();
-        //    }
-        //}
+            // invoke depending objects
+            foreach (DynDnsDomain domain in this.DomainCollection)
+            {
+                domain.WriteIpAddressHistory();
+            }
+        }
     }
 }

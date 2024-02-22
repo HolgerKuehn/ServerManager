@@ -212,17 +212,9 @@
             }
         }
 
-        //public override void WriteLogForChangedIpAddress()
-        //{
-        //    foreach (DynDnsService service in ServiceCollection)
-        //    {
-        //        service.WriteLogForChangedIpAddress();
-        //    }
-        //}
-
         public override void UpdatePublicDnsIpAddress()
         {
-            NetworkCredential networkCredential = new NetworkCredential(User, Password);
+            NetworkCredential networkCredential = new NetworkCredential(this.User, this.Password);
 
             foreach (DynDnsService service in this.ServiceCollection)
             {
@@ -237,6 +229,14 @@
                         service.UpdatePublicDnsIpAddress(UpdateUri[(DynDnsIpAddressVersion)ipAddressVersion], networkCredential, (DynDnsIpAddressVersion)ipAddressVersion);
                     }
                 }
+            }
+        }
+
+        public override void WriteIpAddressHistory()
+        {
+            foreach (DynDnsService service in this.ServiceCollection)
+            {
+                service.WriteIpAddressHistory();
             }
         }
     }

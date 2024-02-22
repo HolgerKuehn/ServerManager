@@ -75,10 +75,15 @@ namespace blog.dachs.ServerManager.DynDNS
             
             while (true)
             {
+                // get public and DNS IP-Addresses
                 this.DynDnsServer.GetIpAddress();
-            //  this.DynDnsServer.WriteLogForChangedIpAddress();
+
+                // update public IPs if necessary
                 this.DynDnsServer.UpdatePublicDnsIpAddress();
-            
+
+                // write History of IP Addresses
+                this.DynDnsServer.WriteIpAddressHistory();
+
                 Thread.Sleep(120000);
             }
         }

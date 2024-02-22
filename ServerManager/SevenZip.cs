@@ -22,7 +22,7 @@
             
             if (backupSet.Source.Password != string.Empty)
             {
-                processStartInfo.Arguments += " -mhe -p" + backupSet.Source.Password.Decrypt();
+                processStartInfo.Arguments += " -mhe -p" + backupSet.Source.Password /*.Decrypt()*/;
             }
             
             processStartInfo.Arguments += " " + backupSet.Name + ".7z @FileList.txt";
@@ -48,7 +48,7 @@
 
             if (backupSet.Source.Password != string.Empty)
             {
-                processStartInfo.Arguments += " -p" + backupSet.Source.Password.Decrypt();
+                processStartInfo.Arguments += " -p" + backupSet.Source.Password /*.Decrypt()*/;
             }
 
             processStartInfo.Arguments += " -sccUTF-8 -slt";
@@ -68,7 +68,7 @@
 
             if (backupSet.Source.Password != string.Empty)
             {
-                processStartInfo.Arguments += " -p" + backupSet.Source.Password.Decrypt();
+                processStartInfo.Arguments += " -p" + backupSet.Source.Password /*.Decrypt()*/;
             }
 
             ProcessOutput processOutput = this.CommandLine.ExecuteCommand(processStartInfo);

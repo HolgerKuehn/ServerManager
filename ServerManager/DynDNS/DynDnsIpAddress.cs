@@ -19,7 +19,8 @@
         ServiceNetworkAdapter = 3,
         ServiceDNS = 4,
         UpdatedIP = 5,
-        UpdatedIPResponse = 6
+        ValidatedIP = 6,
+        UpdateHistory = 7
     }
 
     public enum DynDnsIpAddressType : byte
@@ -38,6 +39,13 @@
         IPv6 = 3
     }
 
+    public enum DynDnsIpAddressSorting : byte
+    {
+        byType = 1,
+        byChangeDateAsc = 2,
+        byChangeDateDesc = 3
+    }
+
     public class DynDnsIpAddress : GlobalExtention, IComparable
     {
         private DynDnsIpAddressReferenceType referenceType;
@@ -52,20 +60,17 @@
         private DynDnsIpAddressType ipAddressType;
         private DynDnsIpAddressVersion ipAddressVersion;
         private DateTime changeDate;
+        private DynDnsIpAddressSorting sorting;
 
         public DynDnsIpAddress(Configuration configuration) : base(configuration)
         {
-            this.ipAddressObject = DynDnsIpAddressObject.ServiceDNS;
+            this.ipAddressObject = DynDnsIpAddressObject.NotValid;
             this.ipAddressVersion = DynDnsIpAddressVersion.NotValid;
             this.prefixLength = 0;
 
             this.IpAddress = "0";
             this.changeDate = DateTime.Now;
-        }
-
-        public DynDnsIpAddress(Configuration configuration, string ipAddress) : this(configuration)
-        {
-            this.IpAddress = ipAddress;
+            this.Sorting = DynDnsIpAddressSorting.byType;
         }
 
         public DynDnsIpAddress(Configuration configuration, int ipAddressId) : this(configuration)
@@ -315,6 +320,12 @@
             set { this.changeDate = value; }
         }        
 
+        public DynDnsIpAddressSorting Sorting
+        {
+            get { return this.sorting; }
+            set { this.sorting = value; }
+        }
+
         private void SetNetworkAddress()
         {
             List<string> networkAddressListFull = new List<string>();
@@ -485,12 +496,7 @@
                     if (dnsServerCollection.Count > 0) prefixLength = dnsServerCollection.ElementAt(0).PrefixLength;
                 }
 
-                if (prefixLength == 0 && this.IpAddressType == DynDnsIpAddressType.Private)
-                {
-                    prefixLength = 24;
-                }
-
-
+                // default for public addresses
                 if (prefixLength == 0 && this.IpAddressVersion == DynDnsIpAddressVersion.IPv4)
                 {
                     prefixLength = 32;
@@ -604,13 +610,27 @@
 
             if (ipAddress == null) return 0;
 
-            if ((byte)IpAddressObject < (byte)ipAddress.IpAddressObject) return -1;
-            else if ((byte)IpAddressObject > (byte)ipAddress.IpAddressObject) return +1;
-            else if ((byte)IpAddressType < (byte)ipAddress.IpAddressType) return -1;
-            else if ((byte)IpAddressType > (byte)ipAddress.IpAddressType) return +1;
-            else if ((byte)IpAddressVersion < (byte)ipAddress.IpAddressVersion) return -1;
-            else if ((byte)IpAddressVersion > (byte)ipAddress.IpAddressVersion) return +1;
-            else return string.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
+            if (this.Sorting == DynDnsIpAddressSorting.byType)
+            {
+                if ((byte)IpAddressObject < (byte)ipAddress.IpAddressObject) return -1;
+                else if ((byte)IpAddressObject > (byte)ipAddress.IpAddressObject) return +1;
+                else if ((byte)IpAddressType < (byte)ipAddress.IpAddressType) return -1;
+                else if ((byte)IpAddressType > (byte)ipAddress.IpAddressType) return +1;
+                else if ((byte)IpAddressVersion < (byte)ipAddress.IpAddressVersion) return -1;
+                else if ((byte)IpAddressVersion > (byte)ipAddress.IpAddressVersion) return +1;
+                else return string.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
+            }
+            else if (this.Sorting == DynDnsIpAddressSorting.byChangeDateAsc)
+            {
+                if (this.ChangeDate < ipAddress.ChangeDate) return -1;
+                else if (this.ChangeDate > ipAddress.ChangeDate) return +1;
+                else return string.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
+            } else
+            {
+                if (this.ChangeDate < ipAddress.ChangeDate) return +1;
+                else if (this.ChangeDate > ipAddress.ChangeDate) return -1;
+                else return string.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         #endregion

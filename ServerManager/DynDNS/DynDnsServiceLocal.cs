@@ -35,11 +35,11 @@
                 ipAddress.IpAddressObject = DynDnsIpAddressObject.UpdatedIP;
                 ipAddress.PrepareIpAddressToDisc();
 
-                ipAddress.IpAddressObject = DynDnsIpAddressObject.UpdatedIPResponse;
+                ipAddress.IpAddressObject = DynDnsIpAddressObject.ValidatedIP;
                 ipAddress.PrepareIpAddressToDisc();
             }
 
-            base.GetPublicIpAddress(DynDnsIpAddressObject.UpdatedIPResponse);
+            base.GetPublicIpAddress(DynDnsIpAddressObject.ValidatedIP);
         }
 
         public override void UpdatePublicDnsIpAddress(string updateUri, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion)
@@ -57,7 +57,7 @@
             sqlCommand = Database.GetCommand(Command.DynDnsServiceLocal_UpdatePublicDnsIpAddress_ReadIpAddressID);
             sqlCommand = sqlCommand.Replace("<DynDnsIpAddressReferenceID>", DynDnsServiceID.ToString());
             sqlCommand = sqlCommand.Replace("<DynDnsIpAddressObjectID_1>", Convert.ToString((byte)DynDnsIpAddressObject.ServiceDNS));
-            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressObjectID_2>", Convert.ToString((byte)DynDnsIpAddressObject.UpdatedIP));
+            sqlCommand = sqlCommand.Replace("<DynDnsIpAddressObjectID_2>", Convert.ToString((byte)DynDnsIpAddressObject.ValidatedIP));
             sqlCommand = sqlCommand.Replace("<DynDnsIpAddressVersionID>", Convert.ToByte(ipAddressVersion).ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, sqlCommand));
@@ -78,8 +78,8 @@
                 url = string.Empty;
 
                 url = updateUri;
-                url = url.Replace("<user>", networkCredential.UserName);
-                url = url.Replace("<password>", networkCredential.Password);
+                url = url.Replace("<user>", networkCredential.UserName /*.Decrypt()*/);
+                url = url.Replace("<password>", networkCredential.Password /*.Decrypt()*/);
                 url = url.Replace("<servicename>", Name);
 
 
@@ -90,6 +90,7 @@
                     this.WebRequest.Request(url, networkCredential, ipAddressVersion);
 
                     ipAddress.IpAddressObject = DynDnsIpAddressObject.UpdatedIP;
+                    ipAddress.ChangeDate = DateTime.Now;
                     ipAddress.WriteIpAddress();
                 }
 
@@ -100,6 +101,7 @@
                     this.WebRequest.Request(url, networkCredential, ipAddressVersion);
 
                     ipAddress.IpAddressObject = DynDnsIpAddressObject.UpdatedIP;
+                    ipAddress.ChangeDate = DateTime.Now;
                     ipAddress.WriteIpAddress();
                 }
             }

@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using blog.dachs.ServerManager;
 
 namespace blog.dachs.ServerManager.DynDNS
 {
@@ -37,9 +36,7 @@ namespace blog.dachs.ServerManager.DynDNS
             string firewallRuleEnabled;
             string firewallRuleActive;
             long lastSeenTimestamp;
-            DateTime lastSeenDate;
             long lastWriteTimestamp;
-            DateTime lastWriteDate;
 
             this.FirewallRuleID = firewallRuleID;
 
@@ -297,9 +294,10 @@ namespace blog.dachs.ServerManager.DynDNS
 
                     foreach (DynDnsIpAddress serviceIpAddress in serviceIpAddresseCollection)
                     {
-                        networkIpAddress = new DynDnsIpAddress(this.Configuration, serviceIpAddress.NetworkAddress);
+                        networkIpAddress = serviceIpAddresseCollection.NewIpAddress();
                         networkIpAddress.IpAddressObject = DynDnsIpAddressObject.UpdatedIP;
                         networkIpAddress.ChangeDate = changeDate;
+                        networkIpAddress.IpAddress = serviceIpAddress.NetworkAddress;
 
                         if (!firewallRuleNetworkAddressCollection.Contains(networkIpAddress))
                         {

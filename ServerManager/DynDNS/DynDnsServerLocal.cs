@@ -1,7 +1,6 @@
 ﻿using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Net;
-using blog.dachs.ServerManager;
 
 namespace blog.dachs.ServerManager.DynDNS
 {
@@ -33,8 +32,9 @@ namespace blog.dachs.ServerManager.DynDNS
 
                     foreach (IPAddress dnsAdress in networkAdapterDnsAddresses)
                     {
-                        serverDnsAddress = new DynDnsIpAddress(this.Configuration, dnsAdress.ToString());
+                        serverDnsAddress = serverDnsAddressCollection.NewIpAddress();
                         serverDnsAddress.IpAddressObject = DynDnsIpAddressObject.DNSServer;
+                        serverDnsAddress.IpAddress = dnsAdress.ToString();
 
                         if (serverDnsAddress.IpAddressType != DynDnsIpAddressType.NotValid)
                         {

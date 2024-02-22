@@ -1,6 +1,4 @@
-﻿using blog.dachs.ServerManager;
-
-namespace blog.dachs.ServerManager.DynDNS
+﻿namespace blog.dachs.ServerManager.DynDNS
 {
     using System;
     using System.Collections;
@@ -79,6 +77,5 @@ namespace blog.dachs.ServerManager.DynDNS
             ((IList)DynDnsDomains).RemoveAt(index);
         }
         #endregion
-
     }
 }
