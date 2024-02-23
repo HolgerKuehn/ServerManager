@@ -48,18 +48,18 @@ namespace blog.dachs.ServerManager
                 {
                     this.Password = password;
 
-                    //try
-                    //{
-                    //    password.Decrypt();
-                    //}
-                    //catch (ArgumentException ex)
-                    //{
-                    //    if (ex.Message == "cipherText is not valid" || ex.Source == "System.Security.Cryptography.Cng")
-                    //    {
-                    //        this.Password = password.Encrypt();
-                    //        this.WriteToDisc();
-                    //    }
-                    //}
+                    try
+                    {
+                        password.Decrypt();
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        if (ex.Message == "cipherText is not valid" || ex.Source == "System.Security.Cryptography.Cng")
+                        {
+                            this.Password = password.Encrypt();
+                            this.WriteToDisc();
+                        }
+                    }
                 }
             }
         }
@@ -141,7 +141,7 @@ namespace blog.dachs.ServerManager
             
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath; ;
-            processStartInfo.Arguments = "-c:ListEntries \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password /*.Decrypt()*/ + "  -ref-Title:\"" + title + "\" -refx-GroupPath:\"" + path + "\"";
+            processStartInfo.Arguments = "-c:ListEntries \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password.Decrypt() + "  -ref-Title:\"" + title + "\" -refx-GroupPath:\"" + path + "\"";
 
             ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
 
@@ -175,7 +175,7 @@ namespace blog.dachs.ServerManager
 
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath;
-            processStartInfo.Arguments = "-c:ListEntries \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password /*.Decrypt()*/ + "  -ref-Title:\"" + title + "\" -refx-GroupPath:\"" + path + "\"";
+            processStartInfo.Arguments = "-c:ListEntries \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password.Decrypt() + "  -ref-Title:\"" + title + "\" -refx-GroupPath:\"" + path + "\"";
 
             ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
 
@@ -187,11 +187,11 @@ namespace blog.dachs.ServerManager
 
                 if (outputLine != null && outputLine.StartsWith("S: UserName = "))
                 {
-                    keePassEntry.UserName = outputLine.Substring(14) /*.Encrypt()*/;
+                    keePassEntry.UserName = outputLine.Substring(14).Encrypt();
                 }
                 else if (outputLine != null && outputLine.StartsWith("S: Password = "))
                 {
-                    keePassEntry.Password = outputLine.Substring(14) /*.Encrypt()*/;
+                    keePassEntry.Password = outputLine.Substring(14).Encrypt();
                 }
                 else if (outputLine != null && outputLine.StartsWith("S: Title = "))
                 {
@@ -212,7 +212,7 @@ namespace blog.dachs.ServerManager
             if (keePassEntry.Title == string.Empty)
             {
                 keePassEntry.Title = title;
-                keePassEntry.Password = this.GeneratePassword() /*.Encrypt()*/;
+                keePassEntry.Password = this.GeneratePassword().Encrypt();
 
                 this.CreateEntry(keePassEntry);
                 Thread.Sleep(2000);
@@ -225,7 +225,7 @@ namespace blog.dachs.ServerManager
         {
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath; ;
-            processStartInfo.Arguments = "-c:AddEntry \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password /*.Decrypt()*/ + "  -Title:\"" + keePassEntry.Title + "\" -UserName:\"\" -Password:\"" + keePassEntry.Password /*.Decrypt()*/ + "\"";
+            processStartInfo.Arguments = "-c:AddEntry \"" + this.FullAbsoluteDatabasePath + "\" -pw:" + this.Password.Decrypt() + "  -Title:\"" + keePassEntry.Title + "\" -UserName:\"\" -Password:\"" + keePassEntry.Password.Decrypt() + "\"";
             
             ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
             this.CommandLine.DeleteProcessOutput(kPScriptOutput);

@@ -78,8 +78,8 @@
                 url = string.Empty;
 
                 url = updateUri;
-                url = url.Replace("<user>", networkCredential.UserName /*.Decrypt()*/);
-                url = url.Replace("<password>", networkCredential.Password /*.Decrypt()*/);
+                url = url.Replace("<user>", networkCredential.UserName.Decrypt());
+                url = url.Replace("<password>", networkCredential.Password.Decrypt());
                 url = url.Replace("<servicename>", Name);
 
 
