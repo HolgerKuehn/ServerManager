@@ -79,6 +79,8 @@
         /// <returns></returns>
         public static string Decrypt(this string cipherText, string passPhrase)
         {
+            string plainText = string.Empty;
+
             // Get the complete stream of bytes that represent:
             // [2 byte of Derivation Iteration], [32 bytes of Salt] + [16 bytes of IV] + [n bytes of CipherText]
             byte[] cipherTextBytesWithDerivationIterationSaltIv = Convert.FromBase64String(cipherText);
@@ -110,18 +112,22 @@
                     symmetricKey.BlockSize = 128;
                     symmetricKey.Mode = CipherMode.CBC;
                     symmetricKey.Padding = PaddingMode.PKCS7;
-                    using (var decryptor = symmetricKey.CreateDecryptor(keyBytes, ivStringBytes))
+
+                    using (ICryptoTransform decryptor = symmetricKey.CreateDecryptor(keyBytes, ivStringBytes))
                     {
                         using (MemoryStream memoryStream = new MemoryStream(cipherTextBytes))
                         {
                             using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
                             {
-                                byte[] plainTextBytes = new byte[cipherTextBytes.Length];
-                                var decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
-                                memoryStream.Close();
-                                cryptoStream.Close();
+                                using (StreamReader plainTextReader = new StreamReader(cryptoStream))
+                                {
+                                    plainText = plainTextReader.ReadToEnd();
 
-                                return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
+                                    memoryStream.Close();
+                                    cryptoStream.Close();
+                                }
+
+                                return plainText;
                             }
                         }
                     }

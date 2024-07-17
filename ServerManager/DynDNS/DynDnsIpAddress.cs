@@ -190,6 +190,10 @@
                 this.ipAddress = new IPAddress(0);
                 this.networkAddress = new IPAddress(0);
 
+                if (value.Contains("%"))
+                {
+                    value = value.Substring(0, value.IndexOf("%", StringComparison.Ordinal));
+                }
 
                 if (value.Contains("/"))
                 {
