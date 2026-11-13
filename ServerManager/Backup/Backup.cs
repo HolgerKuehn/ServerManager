@@ -4,39 +4,39 @@
 
     public class Backup : GlobalExtention
 	{ 
-		private int backupId;
-		private string name;
-        private string sourceDevicePath;
-        private string sourceBasePath;
-        private int sourceNameDepth;
+		private Int32 backupId;
+		private String name;
+        private String sourceDevicePath;
+        private String sourceBasePath;
+        private Int32 sourceNameDepth;
         private BackupDestinationDevice destinationDevice;
-		private string destinationBasePath;
+		private String destinationBasePath;
         private KeePassDatabase keePassDatabase;
 
-        public Backup(Configuration configuration, int backupId) : base(configuration)
+        public Backup(Configuration configuration, Int32 backupId) : base(configuration)
         {
 			this.backupId = backupId;
 
             // read set properties from disk
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.Backup_Backup, "reading Backup properties"));
 
-            string sqlCommand = this.Database.GetCommand(Command.Backup_Backup);
+            String sqlCommand = this.Database.GetCommand(Command.Backup_Backup);
             sqlCommand = sqlCommand.Replace("<BackupID>", this.backupId.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.Backup_Backup, sqlCommand));
 
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
 			DataRow dataRow = null;
-            string name;
-            string sourceDevicePath;
-            string sourceBasePath;
-            int sourceNameDepth;
-            int destinationDeviceId;
-            string destinationBasePath;
-            string keePassDatabase;
+            String name;
+            String sourceDevicePath;
+            String sourceBasePath;
+            Int32 sourceNameDepth;
+            Int32 destinationDeviceId;
+            String destinationBasePath;
+            String keePassDatabase;
 
             // get Backup properties 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 name = dataRow[0].ToString();
@@ -68,37 +68,37 @@
             }
         }
 
-        public int BackupId
+        public Int32 BackupId
 		{
 			get { return this.backupId; }
 			set { this.backupId = value; }
 		}
 
-        public string Name
+        public String Name
 		{
 			get { return this.name; }
 			set { this.name = value; }
 		}
 
-        public string SourceDevicePath
+        public String SourceDevicePath
         {
             get { return this.sourceDevicePath; }
             set { this.sourceDevicePath = value; }
         }
 
-        public string SourceBasePathWithDevice
+        public String SourceBasePathWithDevice
 		{
 			get { return Path.Combine(this.SourceDevicePath, this.sourceBasePath); }
 			set { this.sourceBasePath = value; }
 		}
 
-        public string SourceBasePathWithoutDevice
+        public String SourceBasePathWithoutDevice
         {
             get { return this.sourceBasePath; }
             set { this.sourceBasePath = value; }
         }
 
-        public int SourceNameDepth
+        public Int32 SourceNameDepth
         {
             get { return sourceNameDepth; }
             set { this.sourceNameDepth = value; }
@@ -110,19 +110,19 @@
             set { this.destinationDevice = value; }
         }
 
-        public string DestinationDevicePath
+        public String DestinationDevicePath
 		{
 			get { return this.DestinationDevice.Path; }
 			set { this.DestinationDevice.Path = value; }
 		}
 
-        public string DestinationBasePath
+        public String DestinationBasePath
 		{
 			get { return this.destinationBasePath; }
 			set { this.destinationBasePath = value; }
 		}
 
-        public string FullAbsolutePath
+        public String FullAbsolutePath
         {
             get { return Path.Combine(this.SourceDevicePath, this.SourceBasePathWithDevice); }
             set { }

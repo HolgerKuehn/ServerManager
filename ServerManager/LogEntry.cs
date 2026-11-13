@@ -4,9 +4,9 @@
     {
         private LogSeverity logSeverity = LogSeverity.Informational;
         private LogOrigin logOrigin     = LogOrigin.ProgramMain_Main;
-        private string logMessage       = string.Empty;
+        private String logMessage       = String.Empty;
 
-        public LogEntry(LogSeverity logSeverity, LogOrigin logOrigin, string logMessage)
+        public LogEntry(LogSeverity logSeverity, LogOrigin logOrigin, String logMessage)
         {
             LogSeverity = logSeverity;
             LogOrigin   = logOrigin;
@@ -25,7 +25,7 @@
             set { this.logOrigin = value; }
         }
 
-        public string LogMessage
+        public String LogMessage
         {
             get { return this.logMessage; }
             set { this.logMessage = value; }

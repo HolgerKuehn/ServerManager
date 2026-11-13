@@ -13,11 +13,11 @@ namespace blog.dachs.ServerManager.Backup
             this.Set = new BackupSet(configuration, backupSource);
 
             // read current set, not yet validated
-            int i;
-            string sqlCommand;
-            int deviceId;
-            string path;
-            string name;
+            Int32 i;
+            String sqlCommand;
+            Int32 deviceId;
+            String path;
+            String name;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSetCollection_BackupSetCollection, "read Id for last BackupSet not yet validated for Source " + this.Source.FullAbsolutePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSetCollection_BackupSetCollection);

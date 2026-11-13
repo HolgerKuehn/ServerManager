@@ -3,12 +3,12 @@
     public class ProcessOutput
     {
         public long handle;
-        public string randomNumber;
+        public String randomNumber;
 
         public ProcessOutput(long handle)
         {
             this.handle = handle;
-            this.randomNumber = string.Empty;
+            this.randomNumber = String.Empty;
 
             byte[] randomNumberBytes = GlobalEncryptionAes.GenerateBitsOfRandomEntropy(32);
             

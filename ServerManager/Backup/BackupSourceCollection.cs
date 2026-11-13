@@ -19,12 +19,12 @@ namespace blog.dachs.ServerManager.Backup
 
         public void CreateBackup()
         {
-            int i;
-            int j;
+            Int32 i;
+            Int32 j;
             BackupSource backupSource;
 
-            List<string> baseDirectoryCollection = new List<string>();
-            List<string> sourceDirectoryCollection = new List<string>();
+            List<String> baseDirectoryCollection = new List<String>();
+            List<String> sourceDirectoryCollection = new List<String>();
 
             // read all directories for required depth; start on baseDirectory
             sourceDirectoryCollection.Add(this.Backup.SourceBasePathWithDevice);
@@ -32,7 +32,7 @@ namespace blog.dachs.ServerManager.Backup
             // read directories in BaseDirectory
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceCollection_CreateBackup_ReadFileList, "reading subdirectories from " + this.Backup.SourceBasePathWithDevice));
 
-            string cmdCommandOriginal = this.Database.GetCommand(Command.BackupSourceCollection_CreateBackup_ReadFileList);
+            String cmdCommandOriginal = this.Database.GetCommand(Command.BackupSourceCollection_CreateBackup_ReadFileList);
 
             for (i = 0; i < this.Backup.SourceNameDepth; i++)
             {
@@ -40,11 +40,11 @@ namespace blog.dachs.ServerManager.Backup
                 baseDirectoryCollection.AddRange(sourceDirectoryCollection);
                 sourceDirectoryCollection.Clear();
 
-                foreach (string baseDirectory in baseDirectoryCollection)
+                foreach (String baseDirectory in baseDirectoryCollection)
                 {
                     this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceCollection_CreateBackup_ReadFileList, "reading subdirectories in depth " + this.Backup.SourceNameDepth.ToString() + " from " + baseDirectory));
 
-                    string cmdCommandReplace = cmdCommandOriginal;
+                    String cmdCommandReplace = cmdCommandOriginal;
                     cmdCommandReplace = cmdCommandReplace.Replace("<SourceDirectory>", baseDirectory);
 
                     ProcessOutput cmdOutput = this.PowerShell.ExecuteCommand(cmdCommandReplace);
@@ -52,7 +52,7 @@ namespace blog.dachs.ServerManager.Backup
                     j = 0;
                     while (true)
                     {
-                        string sourceDirectory = this.CommandLine.GetProcessOutput(cmdOutput, j);
+                        String sourceDirectory = this.CommandLine.GetProcessOutput(cmdOutput, j);
 
                         if (sourceDirectory != null)
                         {
@@ -79,7 +79,7 @@ namespace blog.dachs.ServerManager.Backup
 
             baseDirectoryCollection.Clear();
 
-            foreach (string directoryPath in sourceDirectoryCollection)
+            foreach (String directoryPath in sourceDirectoryCollection)
             {
                 DirectoryInfo directoryInfo = new DirectoryInfo(directoryPath);
 
@@ -88,11 +88,11 @@ namespace blog.dachs.ServerManager.Backup
 
                 if (directoryInfo.FullName == backup.SourceBasePathWithDevice)
                 {
-                    backupSource.Path = string.Empty;
+                    backupSource.Path = String.Empty;
                 }
                 else
                 {
-                    backupSource.Path = directoryInfo.FullName.Replace(backup.SourceBasePathWithDevice + "\\", string.Empty);
+                    backupSource.Path = directoryInfo.FullName.Replace(backup.SourceBasePathWithDevice + "\\", String.Empty);
                 }
 
                 backupSource.CreateBackup();

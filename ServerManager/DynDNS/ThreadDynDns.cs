@@ -21,7 +21,7 @@ namespace blog.dachs.ServerManager.DynDNS
             // reading server type (local or remote)
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.ThreadDynDns_ThreadDynDns, "reading required server type"));
             
-            string sqlCommand = this.Database.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
+            String sqlCommand = this.Database.GetCommand(Command.ThreadDynDns_ThreadDynDns_DynDnsServiceType);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
 
@@ -42,7 +42,7 @@ namespace blog.dachs.ServerManager.DynDNS
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.ThreadDynDns_ThreadDynDns, sqlCommand));
 
             dataRow = this.Database.GetDataRow(sqlCommand, 0);
-            int dynDnsServiceID = 0;
+            Int32 dynDnsServiceID = 0;
 
             // get DynDnsServiceID for server 
             if (dataRow != null)

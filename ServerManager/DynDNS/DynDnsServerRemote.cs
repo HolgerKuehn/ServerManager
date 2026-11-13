@@ -5,7 +5,7 @@ namespace blog.dachs.ServerManager.DynDNS
 
     public class DynDnsServerRemote : DynDnsServer
     {
-        public DynDnsServerRemote(Configuration configuration, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
+        public DynDnsServerRemote(Configuration configuration, Int32 dynDnsServiceID) : base(configuration, dynDnsServiceID)
         {
         }
 

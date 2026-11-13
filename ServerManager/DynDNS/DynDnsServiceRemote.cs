@@ -2,14 +2,14 @@
 {
     public class DynDnsServiceRemote : DynDnsService
     {
-        public DynDnsServiceRemote(Configuration configuration, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
+        public DynDnsServiceRemote(Configuration configuration, Int32 dynDnsServiceID) : base(configuration, dynDnsServiceID)
         {
         }
 
         public override void GetIpAddress()
         {
-            // get only DNS IP 
-            base.GetPublicIpAddress();
+            // get only DNS IP and Update IP in Domain
+            this.UpdateLocalDomainAddress(base.GetPublicIpAddress());
         }
     }
 }

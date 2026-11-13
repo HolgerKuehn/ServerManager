@@ -3,39 +3,40 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Security;
+using System.Security.Cryptography;
 
 namespace blog.dachs.ServerManager
 {
     public class KeePassDatabase : GlobalExtention
     {
-        private int id;
-        private string name;
-        private string password;
+        private Int32 id;
+        private String name;
+        private String password;
 
         public KeePassDatabase(Configuration configuration) : base(configuration)
         {
             this.Id = 0;
         }
 
-        public KeePassDatabase(Configuration configuration, int id) : base(configuration)
+        public KeePassDatabase(Configuration configuration, Int32 id) : base(configuration)
         {
             this.Id = id;
 
             // read set properties from disk
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.KeePassDatabase_KeePassDatabase, "reading KeePass database with id " + this.Id.ToString()));
 
-            string sqlCommand = this.Database.GetCommand(Command.KeePassDatabase_KeePassDatabase);
+            String sqlCommand = this.Database.GetCommand(Command.KeePassDatabase_KeePassDatabase);
             sqlCommand = sqlCommand.Replace("<KeePassDatabaseID>", id.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.KeePassDatabase_KeePassDatabase, sqlCommand));
 
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
-            string name;
-            string password;
+            String name;
+            String password;
 
             // get ID and Password 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 name = dataRow[0].ToString();
@@ -44,51 +45,72 @@ namespace blog.dachs.ServerManager
                 if (name != null)
                     this.Name = name;
 
-                if (password != null && password != string.Empty)
+                if (password != null && password != String.Empty)
                 {
                     this.Password = password;
 
+                    if(!this.Password.Contains("b64-"))
+                    {
+                        this.Password = password.Encrypt ();
+                        this.WriteToDisc ();
+                    }
+
                     try
                     {
-                        password.Decrypt();
+                        this.Password.Decrypt();
                     }
-                    catch (ArgumentException ex)
+                    catch (CryptographicException ex)
                     {
-                        if (ex.Message == "cipherText is not valid" || ex.Source == "System.Security.Cryptography.Cng")
-                        {
-                            this.Password = password.Encrypt();
-                            this.WriteToDisc();
-                        }
+                    //    if(ex.Message == "The input data is not a complete block.") {
+                    //        this.Password = password.Encrypt();
+                    //        this.WriteToDisc();
+                    //    }
                     }
+                    //catch (ArgumentException ex)
+                    //{
+                    //    if (ex.Message == "cipherText is not valid" || ex.Source == "System.Security.Cryptography.Cng")
+                    //    {
+                    //    }
+                    //}
                 }
             }
         }
 
-        public int Id
+        public Int32 Id
         {
             get { return this.id; }
             set { this.id = value; }
         }
 
-        public string Name
+        public String Name
         {
             get { return this.name; }
             set { this.name = value; }
         }
 
-        public string FullAbsoluteDatabasePath
+        public String FullAbsoluteDatabasePath
         {
-            get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "blog.dachs", "ServerManager", this.Name); }
+            get
+            {
+                String path = String.Empty;
+
+                if(this.Name != null)
+                {
+                    path = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.CommonApplicationData), "blog", "dachs", "ServerManager", this.Name);
+                }
+                
+                return path;
+            }
             set { }
         }
 
-        public string FullAbsoluteKPScriptPath
+        public String FullAbsoluteKPScriptPath
         {
             get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "KeePass", "KPScript.exe"); }
             set { }
         }
 
-        public string Password
+        public String Password
         {
             get { return this.password; }
             set { this.password = value; }
@@ -96,7 +118,7 @@ namespace blog.dachs.ServerManager
 
         private void WriteToDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.KeePassDatabase_WriteToDisc, "write properties for KeePassDatabase with ID " + this.Id + " to disc"));
             sqlCommand = this.Database.GetCommand(Command.KeePassDatabase_WriteToDisc);
@@ -108,12 +130,12 @@ namespace blog.dachs.ServerManager
             this.Database.ExecuteCommand(sqlCommand);
         }
 
-        public string GeneratePassword()
+        public String GeneratePassword()
         {
-            string sqlCommandOriginal = string.Empty;
-            string sqlCommandProcess = string.Empty;
-            string? password;
-            string? result;
+            String sqlCommandOriginal = String.Empty;
+            String sqlCommandProcess = String.Empty;
+            String? password;
+            String? result;
 
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath; ;
@@ -134,10 +156,10 @@ namespace blog.dachs.ServerManager
             throw new Exception("GeneratePassword failed");
         }
 
-        public List<string> GetListOfEntries(string title, string path = "")
+        public List<String> GetListOfEntries(String title, String path = "")
         {
-            string outputLine;
-            List<string> listOfEntries = new List<string>();
+            String outputLine;
+            List<String> listOfEntries = new List<String>();
             
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = this.FullAbsoluteKPScriptPath; ;
@@ -146,7 +168,7 @@ namespace blog.dachs.ServerManager
             ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
 
             // search for existing entry
-            int row = 0;
+            Int32 row = 0;
             while (true)
             {
                 outputLine = this.CommandLine.GetProcessOutput(kPScriptOutput, row, "a.ProcessOutput_Text like 'S: Title = %'");
@@ -168,9 +190,9 @@ namespace blog.dachs.ServerManager
             return listOfEntries;
         }
 
-        public KeePassEntry GetEntry(string title, string path = "")
+        public KeePassEntry GetEntry(String title, String path = "")
         {
-            string? outputLine;
+            String? outputLine;
             KeePassEntry keePassEntry = new KeePassEntry("", path);
 
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
@@ -180,7 +202,7 @@ namespace blog.dachs.ServerManager
             ProcessOutput kPScriptOutput = this.CommandLine.ExecuteCommand(processStartInfo);
 
             // search for existing entry
-            int row = 0;
+            Int32 row = 0;
             while (true)
             {
                 outputLine = this.CommandLine.GetProcessOutput(kPScriptOutput, row, "(a.ProcessOutput_Text like 'S: UserName = %' or a.ProcessOutput_Text like 'S: Password = %' or a.ProcessOutput_Text like 'S: Title = %')");
@@ -209,7 +231,7 @@ namespace blog.dachs.ServerManager
 
 
             // if empty, create new one
-            if (keePassEntry.Title == string.Empty)
+            if (keePassEntry.Title == String.Empty)
             {
                 keePassEntry.Title = title;
                 keePassEntry.Password = this.GeneratePassword().Encrypt();

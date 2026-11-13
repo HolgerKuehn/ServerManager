@@ -21,9 +21,9 @@
 
         public ProcessOutput ExecuteCommand(ProcessStartInfo processStartInfo)
         {
-            string sqlCommandOriginal = string.Empty;
-            string sqlCommandReplace = string.Empty;
-            int processOutputRow = 0;
+            String sqlCommandOriginal = String.Empty;
+            String sqlCommandReplace = String.Empty;
+            Int32 processOutputRow = 0;
 
             Process serverManager = Process.GetCurrentProcess();
             ProcessPriorityClass processPriorityClass = serverManager.PriorityClass;
@@ -31,7 +31,7 @@
 
             sqlCommandOriginal = this.Database.GetCommand(Command.CommandLine_Command_Insert);
 
-            string result = string.Empty;
+            String result = String.Empty;
 
             // set default values for list-output
             this.Process.StartInfo.FileName = processStartInfo.FileName;
@@ -81,11 +81,11 @@
             return processOutput;
         }
 
-        public string? GetProcessOutput(ProcessOutput processOutput, int row = 0, string filter = "")
+        public String? GetProcessOutput(ProcessOutput processOutput, Int32 row = 0, String filter = "")
         {
-            string sqlCommandOriginal;
-            string sqlCommandProcess;
-            string? processOutputLine = null;
+            String sqlCommandOriginal;
+            String sqlCommandProcess;
+            String? processOutputLine = null;
 
             sqlCommandOriginal = this.Database.GetCommand(Command.CommandLine_Command_Select);
             sqlCommandProcess = sqlCommandOriginal;
@@ -111,7 +111,7 @@
 
         public void DeleteProcessOutput(ProcessOutput processOutput)
         {
-            string sqlCommand;
+            String sqlCommand;
             
             sqlCommand = this.Database.GetCommand(Command.CommandLine_Command_Delete);
             sqlCommand = sqlCommand.Replace("<ProcessOutputHandle>", processOutput.handle.ToString());

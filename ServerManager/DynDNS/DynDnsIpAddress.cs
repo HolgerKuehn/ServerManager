@@ -49,8 +49,8 @@
     public class DynDnsIpAddress : GlobalExtention, IComparable
     {
         private DynDnsIpAddressReferenceType referenceType;
-        private int referenceId;
-        private int ipAddressIndex;
+        private Int32 referenceId;
+        private Int32 ipAddressIndex;
 
         private DynDnsIpAddressObject ipAddressObject;
         private bool isValid;
@@ -73,19 +73,19 @@
             this.Sorting = DynDnsIpAddressSorting.byType;
         }
 
-        public DynDnsIpAddress(Configuration configuration, int ipAddressId) : this(configuration)
+        public DynDnsIpAddress(Configuration configuration, Int32 ipAddressId) : this(configuration)
         {
             DataRow dataRow;
-            string ipAddressName = string.Empty;
-            string ipAddressNetworkName = string.Empty;
-            string networkAddressPrefixLengthText = string.Empty;
+            String ipAddressName = String.Empty;
+            String ipAddressNetworkName = String.Empty;
+            String networkAddressPrefixLengthText = String.Empty;
             byte networkAddressPrefixLengthByte = 0;
-            string ipAddressOrganizationName = string.Empty;
+            String ipAddressOrganizationName = String.Empty;
             long ipAddressChangeDate;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpAddress_DynDnsIpAddress, "read IPs for ID " + ipAddressId + " from disc"));
 
-            string sqlCommand = Database.GetCommand(Command.DynDnsIpAddress_DynDnsIpAddress);
+            String sqlCommand = Database.GetCommand(Command.DynDnsIpAddress_DynDnsIpAddress);
 
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_DynDnsIpAddress, sqlCommand));
 
@@ -153,13 +153,13 @@
             set { referenceType = value; }
         }
 
-        public int ReferenceId
+        public Int32 ReferenceId
         {
             get { return referenceId; }
             set { referenceId = value; }
         }
 
-        public int IpAddressIndex
+        public Int32 IpAddressIndex
         {
             get { return ipAddressIndex; }
             set { ipAddressIndex = value; }
@@ -177,13 +177,13 @@
             set { isValid = value; }
         }
 
-        public string IpAddress
+        public String IpAddress
         {
             get { return ipAddress.ToString(); }
             set
             {
                 IPAddress ipAddressTest;
-                string networkAddressPrefixLengthText;
+                String networkAddressPrefixLengthText;
                 byte networkAddressPrefixLengthByte = 0;
 
                 this.IsValid = false;
@@ -220,6 +220,15 @@
             }
         }
 
+        public byte[] IpAddressBytes
+        {
+            get { return ipAddress.GetAddressBytes(); }
+            set
+            {
+                this.ipAddress = new IPAddress(value);
+            }
+        }
+
         public byte PrefixLength
         {
             get { return this.prefixLength; }
@@ -230,12 +239,12 @@
             }
         }
 
-        public string NetworkAddress
+        public String NetworkAddress
         {
             get { return this.networkAddress.ToString() + "/" + this.PrefixLength.ToString(); }
             set
             {
-                string networkAddressPrefixLength;
+                String networkAddressPrefixLength;
                 byte ipAddressPrefixLength;
 
                 if (value != null && value.Contains("/"))
@@ -332,18 +341,18 @@
 
         private void SetNetworkAddress()
         {
-            List<string> networkAddressListFull = new List<string>();
-            List<string> networkAddressListBit = new List<string>();
-            string networkAddressPart = string.Empty;
+            List<String> networkAddressListFull = new List<String>();
+            List<String> networkAddressListBit = new List<String>();
+            String networkAddressPart = String.Empty;
 
-            List<string> ipAddressListShort = new List<string>();
-            List<string> ipAddressListFull = new List<string>();
-            List<string> ipAddressListBit = new List<string>();
-            string ipAddressPartOriginal = string.Empty;
-            string ipAddressPartBit = string.Empty;
+            List<String> ipAddressListShort = new List<String>();
+            List<String> ipAddressListFull = new List<String>();
+            List<String> ipAddressListBit = new List<String>();
+            String ipAddressPartOriginal = String.Empty;
+            String ipAddressPartBit = String.Empty;
 
-            int numberOfAddressBlocks = 0;
-            int numberOfBitsPerAddressBlocks = 0;
+            Int32 numberOfAddressBlocks = 0;
+            Int32 numberOfBitsPerAddressBlocks = 0;
 
             if (this.IpAddressVersion == DynDnsIpAddressVersion.IPv4)
             {
@@ -351,12 +360,12 @@
                 numberOfAddressBlocks = 4;
                 numberOfBitsPerAddressBlocks = 8;
 
-                // get blocks from string
+                // get blocks from String
                 ipAddressListShort = this.IpAddress.Split('.').ToList();
                 ipAddressListFull = ipAddressListShort;
 
                 // convert to bit
-                for (int i = 0; i < numberOfAddressBlocks; i++)
+                for (Int32 i = 0; i < numberOfAddressBlocks; i++)
                 {
                     ipAddressPartOriginal = ipAddressListFull.ElementAt(i);
                     ipAddressPartBit = Convert.ToString(Convert.ToByte(ipAddressPartOriginal), 2);
@@ -371,14 +380,14 @@
                 numberOfAddressBlocks = 8;
                 numberOfBitsPerAddressBlocks = 16;
 
-                // get blocks from string
+                // get blocks from String
                 ipAddressListShort = IpAddress.Split(':').ToList();
 
                 // add padding for short notation
-                for (int addressBlock = 0; addressBlock < ipAddressListShort.Count; addressBlock++)
+                for (Int32 addressBlock = 0; addressBlock < ipAddressListShort.Count; addressBlock++)
                 {
-                    int addressBlockOffset = 0;
-                    int numberOfEmptyBlocks = 8 - ipAddressListShort.Count;
+                    Int32 addressBlockOffset = 0;
+                    Int32 numberOfEmptyBlocks = 8 - ipAddressListShort.Count;
 
                     ipAddressPartOriginal = ipAddressListShort.ElementAt(addressBlock);
 
@@ -399,7 +408,7 @@
                 }
 
                 // convert to bit
-                for (int i = 0; i < numberOfAddressBlocks; i++)
+                for (Int32 i = 0; i < numberOfAddressBlocks; i++)
                 {
                     ipAddressPartOriginal = ipAddressListFull.ElementAt(i);
                     ipAddressPartBit = Convert.ToString(Convert.ToInt16(ipAddressPartOriginal, 16), 2);
@@ -410,12 +419,12 @@
 
 
             // apply networkAddress
-            for (int addressBlock = 0; addressBlock < numberOfAddressBlocks; addressBlock++)
+            for (Int32 addressBlock = 0; addressBlock < numberOfAddressBlocks; addressBlock++)
             {
-                networkAddressPart = string.Empty;
+                networkAddressPart = String.Empty;
                 ipAddressPartBit = ipAddressListBit.ElementAt(addressBlock);
 
-                for (int bit = 0; bit < numberOfBitsPerAddressBlocks; bit++)
+                for (Int32 bit = 0; bit < numberOfBitsPerAddressBlocks; bit++)
                 {
                     if (ipAddressPartBit.ElementAt(bit) == '1' && addressBlock * numberOfBitsPerAddressBlocks + bit < PrefixLength)
                     {
@@ -432,9 +441,9 @@
 
 
             // convert to byte or hex notation
-            string networkAddress = string.Empty;
+            String networkAddress = String.Empty;
 
-            for (int addressBlock = 0; addressBlock < numberOfAddressBlocks; addressBlock++)
+            for (Int32 addressBlock = 0; addressBlock < numberOfAddressBlocks; addressBlock++)
             {
                 networkAddressPart = networkAddressListBit.ElementAt(addressBlock);
 
@@ -522,7 +531,7 @@
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpAddress_PrepareIpAddressToDisc, "prepare Database for IP (IP Address)"));
 
-            string sqlCommandIpAddress = this.Database.GetCommand(Command.DynDnsIpAddress_PerpareIpAddressToDisc_IpAddress);
+            String sqlCommandIpAddress = this.Database.GetCommand(Command.DynDnsIpAddress_PerpareIpAddressToDisc_IpAddress);
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_PrepareIpAddressToDisc, sqlCommandIpAddress));
 
@@ -538,7 +547,7 @@
             this.Database.ExecuteCommand(sqlCommandIpAddress);
 
             // set Index Used
-            string sqlCommandIndex = this.Database.GetCommand(Command.DynDnsIpAddress_PerpareIpAddressToDisc_Index);
+            String sqlCommandIndex = this.Database.GetCommand(Command.DynDnsIpAddress_PerpareIpAddressToDisc_Index);
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_PrepareIpAddressToDisc, sqlCommandIndex));
 
@@ -563,8 +572,8 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsIpAddress_WriteIpAddress, "write IP to disc"));
 
-            string sqlCommandReadIpAddressID = this.Database.GetCommand(Command.DynDnsIpAddress_WriteIpAddress_ReadIpAddressID);
-            string sqlCommandWriteIpAddress = this.Database.GetCommand(Command.DynDnsIpAddress_WriteIpAddress_WriteIpAddress);
+            String sqlCommandReadIpAddressID = this.Database.GetCommand(Command.DynDnsIpAddress_WriteIpAddress_ReadIpAddressID);
+            String sqlCommandWriteIpAddress = this.Database.GetCommand(Command.DynDnsIpAddress_WriteIpAddress_WriteIpAddress);
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_WriteIpAddress, sqlCommandReadIpAddressID));
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_WriteIpAddress, sqlCommandWriteIpAddress));
@@ -580,7 +589,7 @@
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsIpAddress_WriteIpAddress, sqlCommandReadIpAddressID));
     
             DataRow dataRow = this.Database.GetDataRow(sqlCommandReadIpAddressID, 0);
-            int ipAddressAddressID = 0;
+            Int32 ipAddressAddressID = 0;
     
             if (dataRow != null)
             {
@@ -608,7 +617,7 @@
         
         #region IComparable
 
-        public int CompareTo(object? obj)
+        public Int32 CompareTo(object? obj)
         {
             DynDnsIpAddress ipAddress = (DynDnsIpAddress)obj;
 
@@ -622,18 +631,18 @@
                 else if ((byte)IpAddressType > (byte)ipAddress.IpAddressType) return +1;
                 else if ((byte)IpAddressVersion < (byte)ipAddress.IpAddressVersion) return -1;
                 else if ((byte)IpAddressVersion > (byte)ipAddress.IpAddressVersion) return +1;
-                else return string.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
+                else return String.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
             }
             else if (this.Sorting == DynDnsIpAddressSorting.byChangeDateAsc)
             {
                 if (this.ChangeDate < ipAddress.ChangeDate) return -1;
                 else if (this.ChangeDate > ipAddress.ChangeDate) return +1;
-                else return string.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
+                else return String.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
             } else
             {
                 if (this.ChangeDate < ipAddress.ChangeDate) return +1;
                 else if (this.ChangeDate > ipAddress.ChangeDate) return -1;
-                else return string.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
+                else return String.Compare(IpAddress, ipAddress.IpAddress, StringComparison.OrdinalIgnoreCase);
             }
         }
 

@@ -4,9 +4,9 @@ namespace blog.dachs.ServerManager.DynDNS
 {
     public class DynDnsFirewallRule : GlobalExtention
     {
-        private int firewallRuleID;
-        private string name;
-        private string displayName;
+        private Int32 firewallRuleID;
+        private String name;
+        private String displayName;
         private bool enabled;
         private DateTime lastSeenDate;
         private DateTime lastWriteDate;
@@ -18,8 +18,8 @@ namespace blog.dachs.ServerManager.DynDNS
         public DynDnsFirewallRule(Configuration configuration) : base(configuration)
         {
             this.FirewallRuleID = 0;
-            this.Name = string.Empty;
-            this.DisplayName = string.Empty;
+            this.Name = String.Empty;
+            this.DisplayName = String.Empty;
             this.Enabled = false;
             this.RemoteAddresses = new DynDnsIpAddressCollection(Configuration);
             this.RemoteAddresses.ReferenceType = DynDnsIpAddressReferenceType.DynDnsFirewallRule;
@@ -27,14 +27,14 @@ namespace blog.dachs.ServerManager.DynDNS
             this.Active = false;
         }
 
-        public DynDnsFirewallRule(Configuration configuration, int firewallRuleID) : base(configuration)
+        public DynDnsFirewallRule(Configuration configuration, Int32 firewallRuleID) : base(configuration)
         {
             DataRow dataRow;
-            string sqlCommandReadFirewallRule;
-            string firewallRuleName;
-            string firewallRuleDisplayName;
-            string firewallRuleEnabled;
-            string firewallRuleActive;
+            String sqlCommandReadFirewallRule;
+            String firewallRuleName;
+            String firewallRuleDisplayName;
+            String firewallRuleEnabled;
+            String firewallRuleActive;
             long lastSeenTimestamp;
             long lastWriteTimestamp;
 
@@ -46,10 +46,10 @@ namespace blog.dachs.ServerManager.DynDNS
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_DynDnsFirewallRule, sqlCommandReadFirewallRule));
 
             dataRow = this.Database.GetDataRow(sqlCommandReadFirewallRule, 0);
-            firewallRuleName = string.Empty;
-            firewallRuleDisplayName = string.Empty;
-            firewallRuleEnabled = string.Empty;
-            firewallRuleActive = string.Empty;
+            firewallRuleName = String.Empty;
+            firewallRuleDisplayName = String.Empty;
+            firewallRuleEnabled = String.Empty;
+            firewallRuleActive = String.Empty;
 
             if (dataRow != null)
             {
@@ -95,19 +95,19 @@ namespace blog.dachs.ServerManager.DynDNS
             }
         }
 
-        public int FirewallRuleID
+        public Int32 FirewallRuleID
         {
             get { return firewallRuleID; }
             set { firewallRuleID = value; }
         }
 
-        public string Name
+        public String Name
         {
             get { return name; }
             set { name = value; }
         }
 
-        public string DisplayName
+        public String DisplayName
         {
             get { return displayName; }
             set { displayName = value; }
@@ -161,7 +161,7 @@ namespace blog.dachs.ServerManager.DynDNS
 
         public void ReadFirewallRuleBaseProperties()
         {
-            string pshCommand;
+            String pshCommand;
             ProcessOutput processOutput;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, "read base properties from firewall rule \"" + Name + "\""));
@@ -171,8 +171,8 @@ namespace blog.dachs.ServerManager.DynDNS
             pshCommand = pshCommand.Replace("<DynDnsFirewallRuleName>", Name.Replace("...", "*"));
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
             processOutput = this.PowerShell.ExecuteCommand(pshCommand);
-            string columnNameDisplayName = this.CommandLine.GetProcessOutput(processOutput, 1);
-            string firewallRuleDisplayName = this.CommandLine.GetProcessOutput(processOutput, 3);
+            String columnNameDisplayName = this.CommandLine.GetProcessOutput(processOutput, 1);
+            String firewallRuleDisplayName = this.CommandLine.GetProcessOutput(processOutput, 3);
 
             if (
                 columnNameDisplayName != null && columnNameDisplayName.Trim() == "DisplayName" && 
@@ -190,8 +190,8 @@ namespace blog.dachs.ServerManager.DynDNS
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_ReadFirewallRuleBaseProperties, pshCommand));
             processOutput = this.PowerShell.ExecuteCommand(pshCommand);
             
-            string columnNameEnabled = this.PowerShell.CommandLine.GetProcessOutput(processOutput, 1);
-            string firewallRuleEnabled = this.PowerShell.CommandLine.GetProcessOutput(processOutput, 3);
+            String columnNameEnabled = this.PowerShell.CommandLine.GetProcessOutput(processOutput, 1);
+            String firewallRuleEnabled = this.PowerShell.CommandLine.GetProcessOutput(processOutput, 3);
 
             if (columnNameEnabled != null && columnNameEnabled.Trim() == "Enabled") { 
             
@@ -212,7 +212,7 @@ namespace blog.dachs.ServerManager.DynDNS
         public void ReadRemoteAddress()
         {
             //powerShellResult = PowerShellHandler.Command("Get-NetFirewallRule -Name \'" + firewallRule.Name + "\' | Get-NetFirewallAddressFilter | Select-Object RemoteAddress");
-            //List<string> powerShellResultList = powerShellResult.Split("\r\n").ToList();
+            //List<String> powerShellResultList = powerShellResult.Split("\r\n").ToList();
             //if (powerShellResultList.Count < 3) return; 
             //powerShellResultList.RemoveRange(0, 3);
             //
@@ -241,9 +241,9 @@ namespace blog.dachs.ServerManager.DynDNS
             //    }
             //    else
             //    {
-            //        List<string> powerShellResultIpList = powerShellResultList.ElementAt(0).ToLower().Replace("{", "").Replace("}", "").Split(",").ToList();
+            //        List<String> powerShellResultIpList = powerShellResultList.ElementAt(0).ToLower().Replace("{", "").Replace("}", "").Split(",").ToList();
             //
-            //        foreach (string powerShellResultIp in powerShellResultIpList)
+            //        foreach (String powerShellResultIp in powerShellResultIpList)
             //        {
             //            IP ip = new IP(powerShellResultIp.Trim());
             //
@@ -259,7 +259,7 @@ namespace blog.dachs.ServerManager.DynDNS
         public void WriteRemoteAddress()
         {
             DataRow dataRow;
-            string sqlCommand;
+            String sqlCommand;
             DynDnsIpAddressCollection firewallRuleNetworkAddressCollection;
             DynDnsIpAddressCollection serviceIpAddresseCollection;
             DynDnsIpAddress networkIpAddress;
@@ -280,7 +280,7 @@ namespace blog.dachs.ServerManager.DynDNS
             sqlCommand = sqlCommand.Replace("<DynDnsFirewallRuleID>", this.FirewallRuleID.ToString());
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_WriteRemoteAddress, sqlCommand));
 
-            int i = 0;
+            Int32 i = 0;
             while (true)
             {
                 dataRow = this.Database.GetDataRow(sqlCommand, i);
@@ -323,7 +323,7 @@ namespace blog.dachs.ServerManager.DynDNS
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_PrepareFirewallRuleToDisc, "prepare Database for FirewallRule"));
 
-            string sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_PrepareFirewallRuleToDisc);
+            String sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_PrepareFirewallRuleToDisc);
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_PrepareFirewallRuleToDisc, sqlCommand));
 
@@ -340,7 +340,7 @@ namespace blog.dachs.ServerManager.DynDNS
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsFirewallRule_WriteFirewallRuleToDisc, "write FirewallRule " + this.Name + " to disc"));
 
-            string sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_WriteFirewallRuleToDisc);
+            String sqlCommand = this.Database.GetCommand(Command.DynDnsFirewallRule_WriteFirewallRuleToDisc);
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsFirewallRule_WriteFirewallRuleToDisc, sqlCommand));
 

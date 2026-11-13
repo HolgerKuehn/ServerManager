@@ -4,7 +4,7 @@
 
     public class Configuration
     {
-        private int configurationID;
+        private Int32 configurationID;
         private Dictionary<LogType, Log> logs;
         private LogSeverity minimumLogSeverity;
         ThreadCollection threadCollection;
@@ -21,7 +21,7 @@
 
             this.HandlerDatabase = Database.GetHandlerDatabase(this);
 
-            string sqlCommand = this.HandlerDatabase.GetCommand(Command.Configuration_Configuration);
+            String sqlCommand = this.HandlerDatabase.GetCommand(Command.Configuration_Configuration);
             sqlCommand = sqlCommand.Replace("<MachineName>", Environment.MachineName);
 
             DataTable dataTable = this.HandlerDatabase.GetDataTable(sqlCommand);
@@ -29,7 +29,7 @@
 
             if (dataTable.Rows.Count != 0)
             {
-                for (int row = 0; row < dataTable.Rows.Count; row++)
+                for (Int32 row = 0; row < dataTable.Rows.Count; row++)
                 {
                     dataRow = dataTable.Rows[row];
                     this.ConfigurationID = Convert.ToInt32(dataRow[0]);
@@ -55,7 +55,7 @@
             set { this.handlerDatabase = value; }
         }
 
-        public int ConfigurationID
+        public Int32 ConfigurationID
         {
             get { return this.configurationID; }
             set { this.configurationID = value; }

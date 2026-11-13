@@ -11,8 +11,8 @@
         {
             if (this.Configuration.MinimumLogSeverity <= logEntry.LogSeverity)
             {
-                string sqlInsertHeader = string.Empty;
-                string sqlInsertValue = string.Empty;
+                String sqlInsertHeader = String.Empty;
+                String sqlInsertValue = String.Empty;
 
                 sqlInsertHeader += "insert into Log ";
                 sqlInsertHeader += "   (";
@@ -22,10 +22,10 @@
                 sqlInsertValue += "unixepoch() as Log_Timestamp, ";
 
                 sqlInsertHeader += "LogSeverity_ID, ";
-                sqlInsertValue += ((int)logEntry.LogSeverity).ToString() + " as LogSeverity_ID, ";
+                sqlInsertValue += ((Int32)logEntry.LogSeverity).ToString() + " as LogSeverity_ID, ";
 
                 sqlInsertHeader += "LogOrigin_ID, ";
-                sqlInsertValue += ((int)logEntry.LogOrigin).ToString() + " as LogOrigin_ID, ";
+                sqlInsertValue += ((Int32)logEntry.LogOrigin).ToString() + " as LogOrigin_ID, ";
 
                 sqlInsertHeader += "Log_Message";
                 sqlInsertValue += "\'" + logEntry.LogMessage.Replace("\"", "''") + "\' as Log_Message";

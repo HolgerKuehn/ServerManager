@@ -18,11 +18,11 @@
 
         public override void Work()
         {
-            bool doBackup = false;
+            bool doBackup = true;
             DateTime dateTime;
             TimeSpan timeOfDay;
-            int backupDay = 0;
-            int lastBackupDay = 0;
+            Int32 backupDay = 0;
+            Int32 lastBackupDay = 0;
 
             while (true)
             {
@@ -32,7 +32,7 @@
                     timeOfDay = dateTime.TimeOfDay;
                     backupDay = dateTime.DayOfYear;
 
-                    if (timeOfDay.TotalHours > 23 && backupDay != lastBackupDay)
+                    if(timeOfDay.TotalHours > 20 && backupDay != lastBackupDay)
                     {
                         doBackup = true;
                     }

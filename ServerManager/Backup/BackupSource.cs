@@ -4,29 +4,29 @@
     
     public class BackupSource : GlobalExtention
     {
-        private int sourceId;
+        private Int32 sourceId;
         private Backup backup;
-        private string path;
-        private string password;
+        private String path;
+        private String password;
         private DateTime lastSeenDate;
 
         public BackupSource(Configuration configuration, Backup backup) : base(configuration)
         {
             this.SourceId = 0;
             this.Backup = backup;
-            this.Path = string.Empty;
-            this.Password= string.Empty;
+            this.Path = String.Empty;
+            this.Password= String.Empty;
         }
 
-        //public BackupSource(Configuration configuration, int sourceId) : base(configuration)
+        //public BackupSource(Configuration configuration, Int32 sourceId) : base(configuration)
         //{
         //    this.SourceId = sourceId;
         //    this.Backup = backup;
-        //    this.Path = string.Empty;
-        //    this.Password = string.Empty;
+        //    this.Path = String.Empty;
+        //    this.Password = String.Empty;
         //}
 
-        public int SourceId
+        public Int32 SourceId
         {
             get { return this.sourceId; }
             set { this.sourceId = value; }
@@ -46,15 +46,15 @@
             }
         }
 
-        public string Path
+        public String Path
         {
             get
             {
-                string path = this.path;
+                String path = this.path;
 
-                if (path == string.Empty || path is null)
+                if (path == String.Empty || path is null)
                 {
-                    path = string.Empty;
+                    path = String.Empty;
                 }
 
                 return path;
@@ -70,15 +70,15 @@
             }
         }
 
-        public string FullAbsolutePath
+        public String FullAbsolutePath
         {
             get 
             {
-                string path;
+                String path;
                 
                 path = this.Backup.SourceBasePathWithDevice;
                 
-                if (this.Path != string.Empty)
+                if (this.Path != String.Empty)
                 {
                     path += "\\" + this.Path;
                 }
@@ -88,13 +88,13 @@
             set { }
         }
 
-        public string FullRelativePath
+        public String FullRelativePath
         {
             get { return this.Path; }
             set { }
         }
 
-        public string Password
+        public String Password
         {
             get { return this.password; }
             set
@@ -124,9 +124,9 @@
 
         public void CreateBackup()
         {
-            List<string> entryNameArray;
-            string entryName;
-            string entryPath;
+            List<String> entryNameArray;
+            String entryName;
+            String entryPath;
 
             this.PrepareOnDisc();
             this.ReadFromDisc();
@@ -134,14 +134,14 @@
             this.LastSeenDate = DateTime.UtcNow;
 
             // read Password for Source
-            entryNameArray = this.Path.Split("\\").ToList<string>();
+            entryNameArray = this.Path.Split("\\").ToList<String>();
             
             entryName = entryNameArray.ElementAt(entryNameArray.Count - 1);
             entryNameArray.RemoveAt(entryNameArray.Count - 1);
-            entryPath = string.Empty;
-            entryPath = string.Join("\\", entryNameArray.ToArray());
+            entryPath = String.Empty;
+            entryPath = String.Join("\\", entryNameArray.ToArray());
 
-            if (entryName == string.Empty)
+            if (entryName == String.Empty)
             {
                 entryName = this.Backup.Name;
             }
@@ -164,7 +164,7 @@
 
         private void PrepareOnDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSource_PrepareOnDisc, "create SourceId for " + this.FullRelativePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSource_PrepareOnDisc);
@@ -177,7 +177,7 @@
 
         public void ReadFromDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSource_ReadFromDiscByPath, "read Id for Source " + this.FullRelativePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSource_ReadFromDisc);
@@ -189,7 +189,7 @@
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
 
@@ -200,7 +200,7 @@
 
         public void WriteToDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSource_WriteToDisc, "write properties for Source " + this.FullRelativePath + " to disc"));
             sqlCommand = this.Database.GetCommand(Command.BackupSource_WriteToDisc);

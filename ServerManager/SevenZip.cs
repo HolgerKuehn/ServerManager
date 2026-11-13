@@ -20,7 +20,7 @@
             processStartInfo.WorkingDirectory = backupSet.FullAbsolutePath;
             processStartInfo.Arguments  = " a -t7z -mx9 -mmt=8 -spf2 -scsUTF-8 -v1g";
             
-            if (backupSet.Source.Password != string.Empty)
+            if (backupSet.Source.Password != String.Empty)
             {
                 processStartInfo.Arguments += " -mhe -p" + backupSet.Source.Password.Decrypt();
             }
@@ -37,7 +37,7 @@
 
         public ProcessOutput FilesInArchive(BackupSet backupSet)
         {
-            List<string> filesInArchive = new List<string>();
+            List<String> filesInArchive = new List<String>();
             BackupSetSourceFileCollection setSourceFileCollection = new BackupSetSourceFileCollection(this.Configuration, backupSet);
 
             // get list of files in 
@@ -46,7 +46,7 @@
             processStartInfo.WorkingDirectory = backupSet.FullAbsolutePath;
             processStartInfo.Arguments = " l \"" + backupSet.FullAbsolutePath + "\\" + backupSet.Name + ".7z.001\"";
 
-            if (backupSet.Source.Password != string.Empty)
+            if (backupSet.Source.Password != String.Empty)
             {
                 processStartInfo.Arguments += " -p" + backupSet.Source.Password.Decrypt();
             }
@@ -66,13 +66,13 @@
             processStartInfo.WorkingDirectory = backupSet.FullAbsolutePath;
             processStartInfo.Arguments = " t \"" + backupSet.FullAbsolutePath + "\\" + backupSet.Name + ".7z.001\"";
 
-            if (backupSet.Source.Password != string.Empty)
+            if (backupSet.Source.Password != String.Empty)
             {
                 processStartInfo.Arguments += " -p" + backupSet.Source.Password.Decrypt();
             }
 
             ProcessOutput processOutput = this.CommandLine.ExecuteCommand(processStartInfo);
-            string outputLine = this.CommandLine.GetProcessOutput(processOutput, 0, "a.ProcessOutput_Text like '%Everything is Ok%'");
+            String outputLine = this.CommandLine.GetProcessOutput(processOutput, 0, "a.ProcessOutput_Text like '%Everything is Ok%'");
             if (outputLine != null)
             {
                 result = true;

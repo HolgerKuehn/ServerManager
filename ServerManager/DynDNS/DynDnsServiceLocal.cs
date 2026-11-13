@@ -1,26 +1,45 @@
 ﻿namespace blog.dachs.ServerManager.DynDNS
 {
     using System.Data;
+    using System.Diagnostics;
     using System.Net;
 
     public class DynDnsServiceLocal : DynDnsService
     {
-        public DynDnsServiceLocal(Configuration configuration, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
+        public DynDnsServiceLocal(Configuration configuration, Int32 dynDnsServiceID) : base(configuration, dynDnsServiceID)
         {
         }
 
         public override void GetIpAddress()
         {
-            // get public IP from parent
+            // get public and private IP from parent
             DynDnsIpAddressCollection serverPublicIpAddressCollection = this.Parent.Parent.NewIpAddressCollection();
             DynDnsIpAddressCollection servicePublicIpAddressCollection = this.NewIpAddressCollection();
 
-            serverPublicIpAddressCollection.ReadIpAddressCollection(DynDnsIpAddressObject.ServiceDNS, DynDnsIpAddressType.Public);
+            serverPublicIpAddressCollection.ReadIpAddressCollection(DynDnsIpAddressObject.ServiceDNS);
+
+            if (this.Name.Contains("yusousoochi") || this.Name.Contains("kuehn"))
+            {
+                DynDnsIpAddressCollection firwallPublicIpAddressCollection = this.NewIpAddressCollection();
+
+                foreach (DynDnsIpAddress ipAddress in serverPublicIpAddressCollection)
+                {
+                    if (ipAddress.IpAddressVersion == DynDnsIpAddressVersion.IPv6)
+                    {
+                        ipAddress.IpAddress = ipAddress.IpAddress.Replace("127c:61ff:fe2f:542c", "215:5dff:fe16:104");
+                    }
+
+                    firwallPublicIpAddressCollection.Add(ipAddress);
+                }
+
+                serverPublicIpAddressCollection = firwallPublicIpAddressCollection;
+            }
+
             servicePublicIpAddressCollection.Add(serverPublicIpAddressCollection);
             servicePublicIpAddressCollection.WriteIpAddressCollection();
 
-            // get private IP
-            base.GetPrivateIpAddress();
+            // update IP in Domain
+            this.UpdateLocalDomainAddress(servicePublicIpAddressCollection);
         }
 
         public override void UpdatePublicDnsIpAddress()
@@ -42,14 +61,14 @@
             base.GetPublicIpAddress(DynDnsIpAddressObject.ValidatedIP);
         }
 
-        public override void UpdatePublicDnsIpAddress(string updateUri, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion)
+        public override void UpdatePublicDnsIpAddress(String updateUri, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion)
         {
-            int ipAddressID = 0;
-            string dynDnsIpAddressNetworkID = string.Empty;
-            string sqlCommand = string.Empty;
+            Int32 ipAddressID = 0;
+            String dynDnsIpAddressNetworkID = String.Empty;
+            String sqlCommand = String.Empty;
             DataTable dataTable = null;
             DataRow dataRow = null;
-            string url;
+            String url;
             DynDnsIpAddress ipAddress;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServiceLocal_UpdatePublicDnsIpAddress, "checking for updateable Public IPs (" + ipAddressVersion.ToString() + ") for " + this.Name));
@@ -66,7 +85,7 @@
             dataRow = null;
 
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 ipAddressID = Convert.ToInt32(dataRow[0].ToString());
@@ -75,7 +94,7 @@
                 ipAddress.ReferenceId = this.DynDnsServiceID;
 
                 // update IP if row exists
-                url = string.Empty;
+                url = String.Empty;
 
                 url = updateUri;
                 url = url.Replace("<user>", networkCredential.UserName.Decrypt());

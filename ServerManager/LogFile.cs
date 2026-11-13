@@ -4,11 +4,11 @@
 
     public class LogFile : Log
     {
-        private string logFilePath;
+        private String logFilePath;
 
         public LogFile(Configuration configuration) : base(configuration)
         {
-            this.logFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "blog.dachs", "ServerManager", "ServerManager.log");
+            this.logFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "blog", "dachs", "ServerManager", "ServerManager.log");
         }
 
         public override void WriteLog(LogEntry logEntry)
@@ -17,7 +17,7 @@
             {
                 using (StreamWriter writer = new StreamWriter(this.logFilePath, true, Encoding.UTF8))
                 {
-                    string line = string.Empty;
+                    String line = String.Empty;
 
                     line += DateTime.Today + ";";
                     line += logEntry.LogSeverity.ToString() + ";";
@@ -26,6 +26,8 @@
 
                     writer.WriteLine(line);
                 }
+
+                GC.Collect();
             }
         }
     }

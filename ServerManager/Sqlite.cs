@@ -10,7 +10,7 @@
 
         public Sqlite(Configuration configuration) : base(configuration)
         {
-            string connectionString = "Data Source=" + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "blog.dachs", "ServerManager", "ServerManager.db");
+            String connectionString = "Data Source=" + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "blog", "dachs", "ServerManager", "ServerManager.db");
             dbConnection = new SQLiteConnection(connectionString);
             
             try
@@ -22,30 +22,30 @@
             }
         }
 
-        public override string GetCommand(Command command)
+        public override String GetCommand(Command command)
         {
-            string sqlCommand = string.Empty;
+            String sqlCommand = String.Empty;
 
             sqlCommand += "select a.Command_Name ";
             sqlCommand += "from Command a ";
-            sqlCommand += "where a.Command_ID = " + ((int)command).ToString() + " ";
+            sqlCommand += "where a.Command_ID = " + ((Int32)command).ToString() + " ";
 
             DataTable dataTable = this.GetDataTable(sqlCommand);
             DataRow dataRow;
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 sqlCommand = Convert.ToString(dataRow[0]);
             }
 
             if (sqlCommand == null)
-                sqlCommand = string.Empty;
+                sqlCommand = String.Empty;
 
             return sqlCommand;
         }
 
-        public override void ExecuteCommand(string sqlCommand)
+        public override void ExecuteCommand(String sqlCommand)
         {
             bool retry = true;
             SQLiteCommand sqliteCommand = new SQLiteCommand(sqlCommand, (SQLiteConnection)this.dbConnection);
@@ -70,7 +70,7 @@
             }
         }
 
-        public override DataTable GetDataTable(string sqlCommand)
+        public override DataTable GetDataTable(String sqlCommand)
         {
             bool retry = true;
             DataTable dataTable = new DataTable();
@@ -99,14 +99,14 @@
             return dataTable;
         }
 
-        public override DataRow? GetDataRow(string sqlCommand, int row, string filter = "")
+        public override DataRow? GetDataRow(String sqlCommand, Int32 row, String filter = "")
         {
-            sqlCommand = sqlCommand + " LIMIT 1 OFFSET " + row.ToString();
+            sqlCommand = sqlCommand + Environment.NewLine + " LIMIT 1 OFFSET " + row.ToString();
             
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
 
-            for (int i = 0; i < dataTable.Rows.Count; i++)
+            for (Int32 i = 0; i < dataTable.Rows.Count; i++)
             {
                 dataRow = dataTable.Rows[i];
             }

@@ -24,11 +24,11 @@
 
     public class BackupSet : GlobalExtention
     {
-        private int setId;
+        private Int32 setId;
         private BackupSource source;
         private BackupDestinationDevice device;
-        private string path;
-        private string name;
+        private String path;
+        private String name;
         private DateTime backupDate;
         private ulong size;
         private BackupSetState state;
@@ -48,7 +48,7 @@
             this.State = BackupSetState.initialized;
         }
 
-        public int SetId
+        public Int32 SetId
         {
             get { return this.setId; }
             set { this.setId = value; }
@@ -82,7 +82,7 @@
             }
         }
 
-        public string Path
+        public String Path
         {
             get { return this.path; }
             set
@@ -96,7 +96,7 @@
             }
         }
 
-        public string Name
+        public String Name
         {
             get { return this.name; }
             set
@@ -110,18 +110,18 @@
             }
         }
 
-        public string FullAbsolutePath
+        public String FullAbsolutePath
         {
             get
             {
-                string fullAbsolutePath = this.Source.Backup.DestinationDevicePath + "\\" + this.Source.Backup.DestinationBasePath; 
+                String fullAbsolutePath = this.Source.Backup.DestinationDevicePath + "\\" + this.Source.Backup.DestinationBasePath; 
                     
-                if (this.Path != string.Empty)
+                if (this.Path != String.Empty)
                 {
                     fullAbsolutePath = fullAbsolutePath + "\\" + this.Path;
                 }
   
-                if (this.Name != string.Empty)
+                if (this.Name != String.Empty)
                 {
                     fullAbsolutePath = fullAbsolutePath + "\\" + this.Name.Substring(0, 4) + "\\" + this.Name.Substring(4, 2) + "\\" + this.Name.Substring(6, 2) + "\\" + this.Name.Substring(8, 2) + "\\" + this.Name.Substring(10, 2);
                 }
@@ -198,7 +198,7 @@
             {
                 DataRow dataRow;
 
-                string sqlCommand;
+                String sqlCommand;
                 ulong sizeBackupSet;
                 ulong sizeDestinationDevice;
 
@@ -253,7 +253,7 @@
                 FileStream filestream = File.Open(fileListFileInfo.FullName, FileMode.Create);
                 StreamWriter fileListStreamWriter = new StreamWriter(filestream, Encoding.UTF8);
                 
-                string sqlCommand;
+                String sqlCommand;
 
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_CreateBackup_WriteFileList, "read FileList from Set " + this.FullAbsolutePath));
                 sqlCommand = this.Database.GetCommand(Command.BackupSet_CreateBackup_WriteFileList);
@@ -264,16 +264,16 @@
                 // read FileList from DB
                 using (fileListStreamWriter)
                 {
-                    int i = 0;
+                    Int32 i = 0;
                     while (true)
                     {
                         DataRow dataRow = this.Database.GetDataRow(sqlCommand, i);
 
                         if (dataRow != null)
                         {
-                            string fullPath = dataRow[0].ToString();
+                            String fullPath = dataRow[0].ToString();
 
-                            if (fullPath != null && fullPath != string.Empty)
+                            if (fullPath != null && fullPath != String.Empty)
                             { 
                                 fileListStreamWriter.WriteLine(fullPath);
                             }
@@ -313,8 +313,8 @@
                 this.State = BackupSetState.reading_FileList;
                 this.WriteToDisc();
 
-                string sqlCommandOriginal;
-                string sqlCommandPath;
+                String sqlCommandOriginal;
+                String sqlCommandPath;
 
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_CreateBackup_ReadFileList, "change State for BackupSetSourceFile " + this.FullAbsolutePath));
                 sqlCommandOriginal = this.Database.GetCommand(Command.BackupSet_CreateBackup_ReadFileList);
@@ -322,16 +322,16 @@
                 // validate files included in archive
                 ProcessOutput processOutput = this.SevenZip.FilesInArchive(this);
 
-                string fileNameWithoutDevice;
-                string packedSize;
+                String fileNameWithoutDevice;
+                String packedSize;
                 ulong size;
 
                 size = 0;
-                int i = 0;
+                Int32 i = 0;
                 while (true)
                 {
-                    fileNameWithoutDevice = string.Empty;
-                    string outputLine = this.CommandLine.GetProcessOutput(processOutput, i, "(a.ProcessOutput_Text like 'Path = %' or a.ProcessOutput_Text like 'Packed Size = %') and a.ProcessOutput_Text != 'Packed Size = '");
+                    fileNameWithoutDevice = String.Empty;
+                    String outputLine = this.CommandLine.GetProcessOutput(processOutput, i, "(a.ProcessOutput_Text like 'Path = %' or a.ProcessOutput_Text like 'Packed Size = %') and a.ProcessOutput_Text != 'Packed Size = '");
 
                     if (outputLine != null)
                     {
@@ -350,7 +350,7 @@
                         if (outputLine.Contains("Packed Size = "))
                         {
                             packedSize = outputLine.Substring(13).Trim();
-                            if (packedSize != string.Empty)
+                            if (packedSize != String.Empty)
                             {
                                 size += Convert.ToUInt64(packedSize);
                             }
@@ -376,13 +376,13 @@
                 this.State = BackupSetState.validating_Backup;
                 this.WriteToDisc();
 
-                string sqlCommand;
+                String sqlCommand;
 
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_CreateBackup_ValidateBackup, "validate BackupSet " + this.FullAbsolutePath));
                 sqlCommand = this.Database.GetCommand(Command.BackupSet_CreateBackup_ValidateBackup);
 
                 // test archive, possibly three times, as RClone might not provide them fast enough the first time
-                int i = 0;
+                Int32 i = 0;
                 bool testArchive = false;
                 while (!testArchive && i < 3)
                 {
@@ -404,7 +404,7 @@
 
             if (this.State == BackupSetState.Backup_validated)
             {
-                string sqlCommand;
+                String sqlCommand;
 
                 // set LastBackupDate
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_CreateBackup_ValidateBackup, "set LastBackupTimestamp for " + this.FullAbsolutePath));
@@ -460,7 +460,7 @@
         
         public void PrepareOnDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_PrepareOnDisc, "create SetId for " + this.FullAbsolutePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSet_PrepareOnDisc);
@@ -474,7 +474,7 @@
 
         public void ReadFromDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_ReadFromDisc, "read Id for Set " + this.FullAbsolutePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSet_ReadFromDisc);
@@ -487,7 +487,7 @@
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
 
@@ -497,7 +497,7 @@
 
         public void WriteToDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSet_WriteToDisc, "write properties for set " + this.FullAbsolutePath + " to disc"));
             sqlCommand = this.Database.GetCommand(Command.BackupSet_WriteToDisc);

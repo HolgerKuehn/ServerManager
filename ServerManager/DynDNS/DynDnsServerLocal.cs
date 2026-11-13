@@ -1,12 +1,13 @@
 ﻿using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Net;
+using System.Diagnostics;
 
 namespace blog.dachs.ServerManager.DynDNS
 {
     public class DynDnsServerLocal : DynDnsServer
     {
-        public DynDnsServerLocal(Configuration configuration, int dynDnsSerciceID) : base(configuration, dynDnsSerciceID)
+        public DynDnsServerLocal(Configuration configuration, Int32 dynDnsSerciceID) : base(configuration, dynDnsSerciceID)
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsServerLocal_DynDnsServerLocal, "set private DNS-Server IP Addresses"));
 
@@ -20,7 +21,8 @@ namespace blog.dachs.ServerManager.DynDNS
                         networkInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
                         networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
                     ) &&
-                    !networkInterface.Description.Contains("Bluetooth")
+                    !networkInterface.Description.Contains("Bluetooth") &&
+                    !networkInterface.Name.Contains("Default Switch")
                 )
                 {
                     IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
@@ -57,20 +59,62 @@ namespace blog.dachs.ServerManager.DynDNS
                     }
 
                     serverDnsAddressCollection.WriteIpAddressCollection();
-
-                    // Unicast
-                    // NetworkAdapter
                 }
             }
         }
 
         public override void GetIpAddress()
         {
-            // get public IP 
-            base.GetPublicIpAddress();
+            NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+            DynDnsIpAddressCollection serverAddressCollection = this.NewIpAddressCollection();
+            DynDnsIpAddress serverIpAddress;
 
-            // get private IP 
-            base.GetPrivateIpAddress();
+            // IPv4
+            serverAddressCollection.Add(this.GetPublicIpAddress());
+
+            // IPv6 and local addresses
+            foreach (NetworkInterface networkInterface in networkInterfaces)
+            {
+                if (
+                    networkInterface.OperationalStatus == OperationalStatus.Up &&
+                    (
+                        networkInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                        networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
+                    ) &&
+                    !networkInterface.Description.Contains("Bluetooth") &&
+                    !networkInterface.Name.Contains("Default Switch")
+                )
+                {
+                    IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
+                    
+                    UnicastIPAddressInformationCollection networkAdapterAddresses = ipProperties.UnicastAddresses;
+
+                    foreach (UnicastIPAddressInformation networkAdapterAddressInformation in networkAdapterAddresses)
+                    {
+                        serverIpAddress = serverAddressCollection.NewIpAddress();
+                        serverIpAddress.IpAddressObject = DynDnsIpAddressObject.ServiceDNS;
+                        serverIpAddress.IpAddress = networkAdapterAddressInformation.Address.ToString();
+
+                        if (
+                            serverIpAddress.IpAddressType != DynDnsIpAddressType.NotValid /* valid IP */ &&
+                           (
+                               networkAdapterAddressInformation.SuffixOrigin == SuffixOrigin.LinkLayerAddress ||
+                               networkAdapterAddressInformation.SuffixOrigin == SuffixOrigin.Manual ||
+                               networkAdapterAddressInformation.SuffixOrigin == SuffixOrigin.OriginDhcp
+                           ) &&
+                            networkAdapterAddressInformation.DuplicateAddressDetectionState == DuplicateAddressDetectionState.Preferred
+                        )
+                        {
+                            serverAddressCollection.Add(serverIpAddress);
+                        }
+                    }
+                }
+            }
+
+            serverAddressCollection.WriteIpAddressCollection();
+
+            // update IP in Domain
+            this.UpdateLocalDomainAddress(serverAddressCollection);
 
             // invoke depending objects
             base.GetIpAddress();

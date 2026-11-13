@@ -18,7 +18,7 @@ namespace blog.dachs.ServerManager
         /// EntryPoint for Windows Service
         /// </summary>
         /// <param name="args">Commandline arguments</param>
-        static void Main(string[] args)
+        static void Main(String[] args)
         {
             IHost host = Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(options =>

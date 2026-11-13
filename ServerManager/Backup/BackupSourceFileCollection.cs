@@ -20,11 +20,11 @@
 
         public void ReadFileList()
         {
-            string cmdCommand;
+            String cmdCommand;
             FileInfo fileInfo;
             BackupSourceFile sourceFile;
-            string path;
-            string name;
+            String path;
+            String name;
 
             // read files in directory
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceFileCollection_ReadFileList, "reading file from " + this.BackupSource.FullAbsolutePath));
@@ -33,15 +33,15 @@
             cmdCommand = cmdCommand.Replace("<SourceDirectory>", this.BackupSource.FullAbsolutePath);
             ProcessOutput cmdOutput = this.PowerShell.ExecuteCommand(cmdCommand);
 
-            int i = 0;
+            Int32 i = 0;
             while (true)
             {
-                string sourceFilePath = this.CommandLine.GetProcessOutput(cmdOutput, i);
+                String sourceFilePath = this.CommandLine.GetProcessOutput(cmdOutput, i);
             
-                if (sourceFilePath != null && sourceFilePath.Trim() != string.Empty)
+                if (sourceFilePath != null && sourceFilePath.Trim() != String.Empty)
                 {
-                    path = string.Empty;
-                    name = string.Empty;
+                    path = String.Empty;
+                    name = String.Empty;
 
                     fileInfo = new FileInfo(sourceFilePath);
 
@@ -49,7 +49,7 @@
                     {
                         if (fileInfo.DirectoryName != null && fileInfo.DirectoryName != this.BackupSource.FullAbsolutePath)
                         {
-                            path = fileInfo.DirectoryName.Replace(BackupSource.FullAbsolutePath + "\\", string.Empty);
+                            path = fileInfo.DirectoryName.Replace(BackupSource.FullAbsolutePath + "\\", String.Empty);
                         }
 
                         name = fileInfo.Name;
@@ -83,10 +83,10 @@
 
         public void CreateBackup()
         {
-            int i;
-            int sourceFileId;
-            string sourceFilePath;
-            string sourceFileName;
+            Int32 i;
+            Int32 sourceFileId;
+            String sourceFilePath;
+            String sourceFileName;
             ulong sourceFileSize;
 
             BackupSourceFile backupSourceFile;
@@ -98,7 +98,7 @@
                 // read changed files since last backup
                 this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceFileCollection_CreateBackup, "reading BackupSourceFiles with changes"));
 
-                string cmdCommand = this.Database.GetCommand(Command.BackupSourceFileCollection_CreateBackup);
+                String cmdCommand = this.Database.GetCommand(Command.BackupSourceFileCollection_CreateBackup);
                 cmdCommand = cmdCommand.Replace("<BackupSourceID>", this.BackupSource.SourceId.ToString());
 
                 i = 0;

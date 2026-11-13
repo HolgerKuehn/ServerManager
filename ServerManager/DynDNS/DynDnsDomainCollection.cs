@@ -19,20 +19,20 @@
         }
 
         #region implementing IList
-        public object? this[int index] { get => ((IList)DynDnsDomains)[index]; set => ((IList)DynDnsDomains)[index] = value; }
+        public object? this[Int32 index] { get => ((IList)DynDnsDomains)[index]; set => ((IList)DynDnsDomains)[index] = value; }
 
 
         public bool IsFixedSize => ((IList)DynDnsDomains).IsFixedSize;
 
         public bool IsReadOnly => ((IList)DynDnsDomains).IsReadOnly;
 
-        public int Count => ((ICollection)DynDnsDomains).Count;
+        public Int32 Count => ((ICollection)DynDnsDomains).Count;
 
         public bool IsSynchronized => ((ICollection)DynDnsDomains).IsSynchronized;
 
         public object SyncRoot => ((ICollection)DynDnsDomains).SyncRoot;
 
-        public int Add(object? value)
+        public Int32 Add(object? value)
         {
             return ((IList)DynDnsDomains).Add(value);
         }
@@ -47,7 +47,7 @@
             return ((IList)DynDnsDomains).Contains(value);
         }
 
-        public void CopyTo(Array array, int index)
+        public void CopyTo(Array array, Int32 index)
         {
             ((ICollection)DynDnsDomains).CopyTo(array, index);
         }
@@ -57,12 +57,12 @@
             return ((IEnumerable)DynDnsDomains).GetEnumerator();
         }
 
-        public int IndexOf(object? value)
+        public Int32 IndexOf(object? value)
         {
             return ((IList)DynDnsDomains).IndexOf(value);
         }
 
-        public void Insert(int index, object? value)
+        public void Insert(Int32 index, object? value)
         {
             ((IList)DynDnsDomains).Insert(index, value);
         }
@@ -72,7 +72,7 @@
             ((IList)DynDnsDomains).Remove(value);
         }
 
-        public void RemoveAt(int index)
+        public void RemoveAt(Int32 index)
         {
             ((IList)DynDnsDomains).RemoveAt(index);
         }

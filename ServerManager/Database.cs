@@ -8,13 +8,13 @@
         {
         }
 
-        public abstract void ExecuteCommand(string sqlCommand);
+        public abstract void ExecuteCommand(String sqlCommand);
 
-        public abstract string GetCommand(Command command);
+        public abstract String GetCommand(Command command);
 
-        public abstract DataTable GetDataTable(string sqlCommand);
+        public abstract DataTable GetDataTable(String sqlCommand);
 
-        public abstract DataRow? GetDataRow(string sqlCommand, int row, string filter = "");
+        public abstract DataRow? GetDataRow(String sqlCommand, Int32 row, String filter = "");
 
         public static Database GetHandlerDatabase(Configuration configuration)
         {

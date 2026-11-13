@@ -31,7 +31,7 @@ namespace blog.dachs.ServerManager
         {
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, "reading DataTable dgvGuiWindowLogLog"));
             
-            string sqlCommand = this.HandlerDatabase.GetCommand(Command.GuiWindowLog_TmrGuiWindowLog_Tick);
+            String sqlCommand = this.HandlerDatabase.GetCommand(Command.GuiWindowLog_TmrGuiWindowLog_Tick);
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.GuiWindowLog_TmrGuiWindowLog_Tick, sqlCommand));
 

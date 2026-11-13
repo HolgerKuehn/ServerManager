@@ -18,17 +18,17 @@
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.KeePassDatabaseCollection_KeePassDatabaseCollection, "reading primary KeePassDatabase"));
 
-            string sqlCommand = this.Database.GetCommand(Command.KeePassDatabaseCollection_KeePassDatabaseCollection);
+            String sqlCommand = this.Database.GetCommand(Command.KeePassDatabaseCollection_KeePassDatabaseCollection);
             sqlCommand = sqlCommand.Replace("<ConfigurationID>", this.Configuration.ConfigurationID.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.KeePassDatabaseCollection_KeePassDatabaseCollection, sqlCommand));
 
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
-            int keePassDatabaseID;
+            Int32 keePassDatabaseID;
 
             // reading values
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 keePassDatabaseID = Convert.ToInt32(dataRow[0].ToString());
@@ -41,7 +41,7 @@
             // read Database inside primary DB
             primaryKeePassDatabase = this.GetKeePassDatabase("ServerManager.kdbx");
 
-            foreach (string title in primaryKeePassDatabase.GetListOfEntries(""))
+            foreach (String title in primaryKeePassDatabase.GetListOfEntries(""))
             {
                 keePassEntry = primaryKeePassDatabase.GetEntry(title);
                 
@@ -63,19 +63,19 @@
 
         #region implementing IList
 
-        public object? this[int index] { get => ((IList)Collection)[index]; set => ((IList)Collection)[index] = value; }
+        public object? this[Int32 index] { get => ((IList)Collection)[index]; set => ((IList)Collection)[index] = value; }
 
         public bool IsFixedSize => ((IList)Collection).IsFixedSize;
 
         public bool IsReadOnly => ((IList)Collection).IsReadOnly;
 
-        public int Count => ((ICollection)Collection).Count;
+        public Int32 Count => ((ICollection)Collection).Count;
 
         public bool IsSynchronized => ((ICollection)Collection).IsSynchronized;
 
         public object SyncRoot => ((ICollection)Collection).SyncRoot;
 
-        public int Add(object? value)
+        public Int32 Add(object? value)
         {
             return ((IList)Collection).Add(value);
         }
@@ -90,7 +90,7 @@
             return ((IList)Collection).Contains(value);
         }
 
-        public void CopyTo(Array array, int index)
+        public void CopyTo(Array array, Int32 index)
         {
             ((ICollection)Collection).CopyTo(array, index);
         }
@@ -100,12 +100,12 @@
             return ((IEnumerable)Collection).GetEnumerator();
         }
 
-        public int IndexOf(object? value)
+        public Int32 IndexOf(object? value)
         {
             return ((IList)Collection).IndexOf(value);
         }
 
-        public void Insert(int index, object? value)
+        public void Insert(Int32 index, object? value)
         {
             ((IList)Collection).Insert(index, value);
         }
@@ -115,7 +115,7 @@
             ((IList)Collection).Remove(value);
         }
 
-        public void RemoveAt(int index)
+        public void RemoveAt(Int32 index)
         {
             ((IList)Collection).RemoveAt(index);
         }
@@ -140,12 +140,12 @@
             }
         }
 
-        public KeePassDatabase ElementAt(int index)
+        public KeePassDatabase ElementAt(Int32 index)
         {
             return this.Collection[index];
         }
 
-        public KeePassDatabase GetKeePassDatabase(string name)
+        public KeePassDatabase GetKeePassDatabase(String name)
         {
             KeePassDatabase result = new KeePassDatabase(this.Configuration);
 

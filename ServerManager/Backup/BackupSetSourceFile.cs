@@ -11,7 +11,7 @@
 
     public class BackupSetSourceFile : GlobalExtention
     {
-        private int setSourceFileId;
+        private Int32 setSourceFileId;
         private BackupSet set;
         private BackupSourceFile sourceFile;
         private BackupSetSourceFileState state;
@@ -24,7 +24,7 @@
             this.state = BackupSetSourceFileState.toBeBackedUp;
         }
 
-        public int SetSourceFileId
+        public Int32 SetSourceFileId
         {
             get { return this.setSourceFileId; }
             set { this.setSourceFileId = value; }
@@ -74,7 +74,7 @@
 
         public void PrepareOnDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSetSourceFile_PrepareOnDisc, "create SetSourceFileId for " + this.SourceFile.FullAbsolutePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSetSourceFile_PrepareOnDisc);
@@ -87,7 +87,7 @@
 
         public void ReadFromDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSetSourceFile_ReadFromDisc, "read Id for SetSourceFile " + this.SourceFile.FullAbsolutePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSetSourceFile_ReadFromDisc);
@@ -99,7 +99,7 @@
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
 
@@ -109,7 +109,7 @@
 
         public void WriteToDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSetSourceFile_WriteToDisc, "write properties for SetSourceFile " + this.SourceFile.FullAbsolutePath + " to disc"));
             sqlCommand = this.Database.GetCommand(Command.BackupSetSourceFile_WriteToDisc);

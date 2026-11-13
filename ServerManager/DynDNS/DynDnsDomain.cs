@@ -6,31 +6,31 @@
 
     public class DynDnsDomain : DynDnsService
     {
-        private int id;
-        private int serviceId;
-        private string name;
+        private Int32 id;
+        private Int32 serviceId;
+        private String name;
         private KeePassDatabase keePassDatabase;
-        private string user;
-        private string password;
+        private String user;
+        private String password;
         private DynDnsServiceCollection serviceCollection;
-        private Dictionary<DynDnsIpAddressVersion, string> updateUri;
+        private Dictionary<DynDnsIpAddressVersion, String> updateUri;
 
-        public DynDnsDomain(Configuration configuration, int dynDnsServiceID) : base(configuration, dynDnsServiceID)
+        public DynDnsDomain(Configuration configuration, Int32 dynDnsServiceID) : base(configuration, dynDnsServiceID)
         {
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.DynDnsDomain_DynDnsDomain, "creating DynDnsDomain with DynDnsDomain_ID = " + ID.ToString()));
 
-            string sqlCommand = Database.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsDomainProperties);
+            String sqlCommand = Database.GetCommand(Command.DynDnsDomain_DynDnsDomain_DynDnsDomainProperties);
             sqlCommand = sqlCommand.Replace("<DynDnsServiceID>", dynDnsServiceID.ToString());
 
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.DynDnsDomain_DynDnsDomain, sqlCommand));
 
             DataTable dataTable = Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
-            string dynDnsDomainName;
-            string keePassDatabase;
+            String dynDnsDomainName;
+            String keePassDatabase;
 
             // reading values
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 this.ID = Convert.ToInt32(dataRow[0].ToString());
@@ -43,7 +43,7 @@
                     Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "created DynDnsDomain with DynDnsDomain_Name = " + Name));
                 }
 
-                if (keePassDatabase != null && keePassDatabase != string.Empty)
+                if (keePassDatabase != null && keePassDatabase != String.Empty)
                 {
                     this.KeePassDatabase = this.KeePass.GetKeePassDatabase(keePassDatabase);
 
@@ -55,7 +55,7 @@
 
 
             // reading updater URI
-            UpdateUri = new Dictionary<DynDnsIpAddressVersion, string>();
+            UpdateUri = new Dictionary<DynDnsIpAddressVersion, String>();
 
             Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Informational, LogOrigin.DynDnsDomain_DynDnsDomain, "reading update URIs for DynDnsDomain with DynDnsDomain_Name = " + Name));
 
@@ -67,9 +67,9 @@
             dataTable = Database.GetDataTable(sqlCommand);
             dataRow = null;
             DynDnsIpAddressVersion ipAddressVersion;
-            string updateUri = string.Empty;
+            String updateUri = String.Empty;
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 ipAddressVersion = (DynDnsIpAddressVersion)Convert.ToByte(dataRow[0].ToString());
@@ -91,12 +91,12 @@
 
             dataTable = Database.GetDataTable(sqlCommand);
             dataRow = null;
-            int serviceID = 0;
+            Int32 serviceID = 0;
             DynDnsServiceType dynDnsServiceType;
             DynDnsService dynDnsService = null;
 
             // iterate each Service
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 serviceID = Convert.ToInt32(dataRow[0].ToString());
@@ -122,19 +122,19 @@
             }
         }
 
-        public int ID
+        public Int32 ID
         {
             get { return id; }
             set { id = value; }
         }
 
-        public int ServiceID
+        public Int32 ServiceID
         {
             get { return serviceId; }
             set { serviceId = value; }
         }
 
-        public new string Name
+        public new String Name
         {
             get { return name; }
             set { name = value; }
@@ -146,13 +146,13 @@
             set { this.keePassDatabase = value; }
         }
 
-        public string User
+        public String User
         {
             get { return user; }
             set { user = value; }
         }
 
-        public string Password
+        public String Password
         {
             get { return password; }
             set { password = value; }
@@ -164,7 +164,7 @@
             set { serviceCollection = value; }
         }
 
-        public Dictionary<DynDnsIpAddressVersion, string> UpdateUri
+        public Dictionary<DynDnsIpAddressVersion, String> UpdateUri
         {
             get { return updateUri; }
             set { updateUri = value; }
@@ -185,6 +185,7 @@
                 DynDnsIpAddressCollection domainPublicDnsServerCollection = this.NewIpAddressCollection();
                 DynDnsIpAddressCollection servicePublicDnsServerCollection = service.NewIpAddressCollection();
                 DynDnsIpAddressCollection privateDnsServerCollection = this.NewIpAddressCollection();
+                DynDnsIpAddress ipAddress;
 
                 List<DynDnsIpAddressType> dynDnsIpAddressTypes = [
                     DynDnsIpAddressType.Private,
@@ -202,13 +203,32 @@
 
                 if (servicePublicDnsServerCollection.Count == 0)
                 {
-                    service.IpAddressCollection.Add(domainPublicDnsServerCollection);
+                    ipAddress = servicePublicDnsServerCollection.NewIpAddress();
+                    ipAddress.IpAddressObject = DynDnsIpAddressObject.DNSServer;
+                    ipAddress.IpAddress = "45.90.28.58";
+                    servicePublicDnsServerCollection.Add(ipAddress);
+
+                    ipAddress = servicePublicDnsServerCollection.NewIpAddress();
+                    ipAddress.IpAddressObject = DynDnsIpAddressObject.DNSServer;
+                    ipAddress.IpAddress = "45.90.30.58";
+                    servicePublicDnsServerCollection.Add(ipAddress);
+
+                    ipAddress = servicePublicDnsServerCollection.NewIpAddress();
+                    ipAddress.IpAddressObject = DynDnsIpAddressObject.DNSServer;
+                    ipAddress.IpAddress = "2a07:a8c0::6d:cda2";
+                    servicePublicDnsServerCollection.Add(ipAddress);
+
+                    ipAddress = servicePublicDnsServerCollection.NewIpAddress();
+                    ipAddress.IpAddressObject = DynDnsIpAddressObject.DNSServer;
+                    ipAddress.IpAddress = "2a07:a8c1::6d:cda2";
+                    servicePublicDnsServerCollection.Add(ipAddress);
+
+                    privateDnsServerCollection.Add(servicePublicDnsServerCollection);
                 }
 
                 service.IpAddressCollection.Add(privateDnsServerCollection);
-
-                service.SetDnsServer();
                 service.IpAddressCollection.WriteIpAddressCollection();
+                service.SetDnsServer();
             }
         }
 

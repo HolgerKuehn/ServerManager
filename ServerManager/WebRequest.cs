@@ -23,14 +23,14 @@
             set { this.httpClientCollection = value; }
         }
 
-        public string Request(string url, DynDnsIpAddressVersion ipAddressVersion = DynDnsIpAddressVersion.IPv6)
+        public String Request(String url, DynDnsIpAddressVersion ipAddressVersion = DynDnsIpAddressVersion.IPv6)
         {
             return this.Request(url, new NetworkCredential("", ""), ipAddressVersion);
         }
 
-        public string Request(string url, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion = DynDnsIpAddressVersion.IPv6)
+        public String Request(String url, NetworkCredential networkCredential, DynDnsIpAddressVersion ipAddressVersion = DynDnsIpAddressVersion.IPv6)
         {
-            string response = string.Empty;
+            String response = String.Empty;
             HttpClient httpClient = this.HttpClientCollection[ipAddressVersion];
 
             if (networkCredential.UserName != "")

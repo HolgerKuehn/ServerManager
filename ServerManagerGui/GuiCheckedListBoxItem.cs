@@ -2,16 +2,16 @@
 {
     internal class GuiCheckedListBoxItem
     {
-        private string text;
+        private String text;
         private object value;
 
-        public GuiCheckedListBoxItem(string text, object value)
+        public GuiCheckedListBoxItem(String text, object value)
         {
             this.text = text;
             this.value = value;
         }
 
-        public string Text
+        public String Text
         {
             get { return this.text; }
             set { this.text = value; }
@@ -23,7 +23,7 @@
             set { this.value = value; }
         }
 
-        public override string ToString()
+        public override String ToString()
         {
             return this.Text;
         }

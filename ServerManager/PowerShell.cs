@@ -8,7 +8,7 @@ namespace blog.dachs.ServerManager
         {
         }
 
-        public ProcessOutput ExecuteCommand(string command)
+        public ProcessOutput ExecuteCommand(String command)
         {
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
             processStartInfo.FileName = "powershell.exe";

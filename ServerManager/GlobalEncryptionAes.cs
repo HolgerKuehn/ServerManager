@@ -5,22 +5,22 @@
     using System.Text;
 
     /// <summary>
-    /// Extension class for encryption based on an algorithm described in https://stackoverflow.com/questions/10168240/encrypting-decrypting-a-string-in-c-sharp
+    /// Extension class for encryption based on an algorithm described in https://stackoverflow.com/questions/10168240/encrypting-decrypting-a-String-in-c-sharp
     /// Changed the fixed derivationIterations to a random short-number and algorithm to AesCng.
     /// Changed HashAlgorithm to SHA512, as SHA1 became deprecated
     /// </summary>
     public static class GlobalEncryptionAes
     {
-        public static string Encrypt(this string plainText)
+        public static String Encrypt(this String plainText)
         {
             return Encrypt(plainText, GeneratePassPhrase());
         }
 
-        public static string Encrypt(this string plainText, string passPhrase)
+        public static String Encrypt(this String plainText, String passPhrase)
         {
             // DerivationIterations, Salt and IV are randomly generated each time, but is prepended to encrypted cipher text, so they can be used for decryption
             byte[] derivationIterationsBytes = GenerateBitsOfRandomEntropy(2);
-            int derivationIterations = (int)BitConverter.ToUInt16(derivationIterationsBytes);
+            Int32 derivationIterations = (Int32)BitConverter.ToUInt16(derivationIterationsBytes);
             if (derivationIterations == 0) derivationIterations++;
 
             byte[] saltStringBytes = GenerateBitsOfRandomEntropy(32);
@@ -53,7 +53,7 @@
                                 memoryStream.Close();
                                 cryptoStream.Close();
 
-                                return Convert.ToBase64String(cipherTextBytes);
+                                return "b64-" + Convert.ToBase64String(cipherTextBytes);
                             }
                         }
                     }
@@ -62,24 +62,40 @@
         }
 
         /// <summary>
-        /// decrypts a string
+        /// decrypts a String
         /// </summary>
-        /// <param name="cipherText">encrypted string</param>
+        /// <param name="cipherText">encrypted String</param>
         /// <returns></returns>
-        public static string Decrypt(this string cipherText)
+        public static String Decrypt(this String cipherText)
         {
             return Decrypt(cipherText, GeneratePassPhrase());
         }
 
         /// <summary>
-        /// decrypts a string
+        /// decrypts a String
         /// </summary>
-        /// <param name="cipherText">encrypted string</param>
+        /// <param name="cipherText">encrypted String</param>
         /// <param name="passPhrase">encryption key</param>
         /// <returns></returns>
-        public static string Decrypt(this string cipherText, string passPhrase)
+        public static String Decrypt(this String cipherText, String passPhrase)
         {
-            string plainText = string.Empty;
+            String plainText = String.Empty;
+
+            if(cipherText == null)
+            {
+                return plainText;
+            }
+
+            if(cipherText.Contains ("b64-"))
+            {
+                cipherText = cipherText.Substring (4, cipherText.Length - 4);
+            }
+            else
+            {
+                return cipherText;
+            }
+
+            
 
             // Get the complete stream of bytes that represent:
             // [2 byte of Derivation Iteration], [32 bytes of Salt] + [16 bytes of IV] + [n bytes of CipherText]
@@ -92,7 +108,7 @@
 
             // Get the DerivationIterationBytes by extracting the first 2 bytes from the supplied cipherText bytes.
             byte[] derivationIterationsBytes = cipherTextBytesWithDerivationIterationSaltIv.Take(2).ToArray();
-            int derivationIterations = (int)BitConverter.ToUInt16(derivationIterationsBytes);
+            Int32 derivationIterations = (Int32)BitConverter.ToUInt16(derivationIterationsBytes);
 
             // Get the saltStringBytes by extracting the next 32 bytes from the supplied cipherText bytes.
             byte[] saltStringBytes = cipherTextBytesWithDerivationIterationSaltIv.Skip(2).Take(32).ToArray();
@@ -100,7 +116,7 @@
             // Get the ivStringBytes by extracting the next 24 bytes from the supplied cipherText bytes.
             byte[] ivStringBytes = cipherTextBytesWithDerivationIterationSaltIv.Skip(34).Take(16).ToArray();
 
-            // Get the actual cipher text bytes by removing the first 58 bytes (2 + 32 + 16) from the cipherText string.
+            // Get the actual cipher text bytes by removing the first 58 bytes (2 + 32 + 16) from the cipherText String.
             byte[] cipherTextBytes = cipherTextBytesWithDerivationIterationSaltIv.Skip(50).Take(cipherTextBytesWithDerivationIterationSaltIv.Length - 50).ToArray();
 
             using (Rfc2898DeriveBytes password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, derivationIterations, HashAlgorithmName.SHA512))
@@ -136,16 +152,16 @@
         }
 
         /// <summary>
-        /// generates string dependent on machine name and user name and SID of user
+        /// generates String dependent on machine name and user name and SID of user
         /// </summary>
         /// <returns>passphrase</returns>
-        private static string GeneratePassPhrase()
+        private static String GeneratePassPhrase()
         {
-            string machineName;
-            string currentUserName;
+            String machineName;
+            String currentUserName;
             SecurityIdentifier? currentUserSecurityIdentifier;
-            string currentUserSecurityIdentifierString;
-            string passPhrasString;
+            String currentUserSecurityIdentifierString;
+            String passPhrasString;
             byte[] passPhraseBytes;
 
             machineName = Environment.MachineName;

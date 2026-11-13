@@ -4,10 +4,10 @@ namespace blog.dachs.ServerManager.Backup
 {
     public class BackupSourceFile : GlobalExtention
     {
-        private int backupSourceFileId;
+        private Int32 backupSourceFileId;
         private BackupSource backupSource;
-        private string path;
-        private string name;
+        private String path;
+        private String name;
         private DateTime creationDate;
         private DateTime lastAccessDate;
         private DateTime lastWriteDate;
@@ -15,7 +15,7 @@ namespace blog.dachs.ServerManager.Backup
         private DateTime lastBackupDate;
         private ulong size;
 
-        public BackupSourceFile(Configuration configuration, BackupSource backupSource, string path, string name) : base(configuration)
+        public BackupSourceFile(Configuration configuration, BackupSource backupSource, String path, String name) : base(configuration)
         {
             this.backupSourceFileId = 0;
 
@@ -35,7 +35,7 @@ namespace blog.dachs.ServerManager.Backup
         {
         }
 
-        public int BackupSourceFileId
+        public Int32 BackupSourceFileId
         {
             get { return this.backupSourceFileId; }
             set { this.backupSourceFileId = value; }
@@ -55,7 +55,7 @@ namespace blog.dachs.ServerManager.Backup
             }
         }
 
-        public string Path
+        public String Path
         {
             get { return this.path; }
             set
@@ -69,7 +69,7 @@ namespace blog.dachs.ServerManager.Backup
             }
         }
 
-        public string Name
+        public String Name
         {
             get { return this.name; }
             set
@@ -83,15 +83,15 @@ namespace blog.dachs.ServerManager.Backup
             }
         }
 
-        public string FullAbsolutePath
+        public String FullAbsolutePath
         {
             get
             {
-                string path;
+                String path;
 
                 path = this.BackupSource.FullAbsolutePath;
 
-                if (this.Path != string.Empty)
+                if (this.Path != String.Empty)
                 {
                     path += "\\" + this.Path;
                 }
@@ -103,15 +103,15 @@ namespace blog.dachs.ServerManager.Backup
             set { }
         }
 
-        public string FullRelativePath
+        public String FullRelativePath
         {
             get
             {
-                string path;
+                String path;
 
                 path = this.BackupSource.FullRelativePath;
 
-                if (this.Path != string.Empty)
+                if (this.Path != String.Empty)
                 {
                     path += "\\" + this.Path;
                 }
@@ -200,7 +200,7 @@ namespace blog.dachs.ServerManager.Backup
 
         public void PrepareOnDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceFile_PrepareOnDisc, "create BackupSourceFileId for " + this.FullRelativePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSourceFile_PrepareOnDisc);
@@ -214,7 +214,7 @@ namespace blog.dachs.ServerManager.Backup
 
         public void ReadFromDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceFile_ReadFromDisc, "read BackupSourceFileId for " + this.FullRelativePath));
             sqlCommand = this.Database.GetCommand(Command.BackupSourceFile_ReadFromDisc);
@@ -227,7 +227,7 @@ namespace blog.dachs.ServerManager.Backup
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
 
@@ -237,7 +237,7 @@ namespace blog.dachs.ServerManager.Backup
 
         public void WriteToDisc()
         {
-            string sqlCommand;
+            String sqlCommand;
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupSourceFile_WriteToDisc, "write properties for " + this.FullRelativePath + " to disc"));
             sqlCommand = this.Database.GetCommand(Command.BackupSourceFile_WriteToDisc);

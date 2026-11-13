@@ -5,30 +5,30 @@ namespace blog.dachs.ServerManager.Backup
 {
     public class BackupDestinationDevice : GlobalExtention
     {
-        private int id;
-        private string path;
+        private Int32 id;
+        private String path;
         private ulong availableSize;
         private ulong usedSize;
         private ulong freeSize;
 
-        public BackupDestinationDevice(Configuration configuration, int destinationDeviceId) : base(configuration)
+        public BackupDestinationDevice(Configuration configuration, Int32 destinationDeviceId) : base(configuration)
         {
             this.Id = destinationDeviceId;
 
             // read properties from disk
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupDestinationDevice_BackupDestinationDevice, "reading BackupDestinationDevice properties"));
 
-            string sqlCommand = this.Database.GetCommand(Command.BackupDestinationDevice_BackupDestinationDevice);
+            String sqlCommand = this.Database.GetCommand(Command.BackupDestinationDevice_BackupDestinationDevice);
             sqlCommand = sqlCommand.Replace("<BackupDestinationDeviceID>", this.Id.ToString());
 
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.SQL, LogOrigin.BackupDestinationDevice_BackupDestinationDevice, sqlCommand));
 
             DataTable dataTable = this.Database.GetDataTable(sqlCommand);
             DataRow dataRow = null;
-            string path;
+            String path;
 
             // get Backup properties 
-            for (int row = 0; row < dataTable.Rows.Count; row++)
+            for (Int32 row = 0; row < dataTable.Rows.Count; row++)
             {
                 dataRow = dataTable.Rows[row];
                 path = dataRow[0].ToString();
@@ -41,13 +41,13 @@ namespace blog.dachs.ServerManager.Backup
             }
         }
 
-        public int Id
+        public Int32 Id
         {
             get { return this.id; }
             set { this.id = value; }
         }
 
-        public string Path
+        public String Path
         {
             get { return this.path; }
             set { this.path = value; }
@@ -86,7 +86,7 @@ namespace blog.dachs.ServerManager.Backup
             // read properties from disk
             this.Configuration.GetLog().WriteLog(new LogEntry(LogSeverity.Debug, LogOrigin.BackupDestinationDevice_WriteToDisc, "writing BackupDestinationDevice properties to disc"));
 
-            string sqlCommand = this.Database.GetCommand(Command.BackupDestinationDevice_WriteToDisc);
+            String sqlCommand = this.Database.GetCommand(Command.BackupDestinationDevice_WriteToDisc);
             sqlCommand = sqlCommand.Replace("<BackupDestinationDeviceID>", this.Id.ToString());
             sqlCommand = sqlCommand.Replace("<BackupDestinationDeviceAvailableSize>", this.AvailableSize.ToString());
             sqlCommand = sqlCommand.Replace("<BackupDestinationDevice_UsedSize>", this.UsedSize.ToString());
